@@ -1,0 +1,58 @@
+{
+  "name": "nuxt-gql",
+  "version": "0.0.0",
+  "keywords": [
+    "vue",
+    "nuxt",
+    "nuxt3",
+    "nuxt-module",
+    "gql",
+    "graphql",
+    "graphql-request",
+    "codegen",
+    "graphql-code-generator"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "repository": "diizzayy/nuxt-gql",
+  "author": {
+    "name": "Diizzayy <https://diizzayy.com>",
+    "url": "https://github.com/diizzayy"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/module.mjs",
+      "require": "./dist/module.cjs"
+    }
+  },
+  "main": "./dist/module.cjs",
+  "types": "./dist/types.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepack": "yarn build",
+    "build": "nuxt-module-build",
+    "dev": "nuxi dev playground",
+    "dev:build": "nuxi build playground",
+    "lint": "eslint --ext .js,.ts,.vue",
+    "prepare": "nuxt-module-build --stub && nuxi prepare playground",
+    "release": "yarn lint && standard-version && yarn publish --access public && git push --follow-tags"
+  },
+  "dependencies": {
+    "@graphql-codegen/cli": "^2.6.2",
+    "@graphql-codegen/typescript": "^2.4.5",
+    "@graphql-codegen/typescript-graphql-request": "^4.3.7",
+    "@graphql-codegen/typescript-operations": "^2.3.2",
+    "@nuxt/kit": "npm:@nuxt/kit-edge@latest",
+    "graphql": "^16.3.0",
+    "graphql-request": "^4.0.0"
+  },
+  "devDependencies": {
+    "@nuxt/module-builder": "latest",
+    "@nuxtjs/eslint-config-typescript": "latest",
+    "eslint": "8.10.0",
+    "nuxt3": "3.0.0-27437402.494f85a",
+    "standard-version": "^9.3.2"
+  }
+}
