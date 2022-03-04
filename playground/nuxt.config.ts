@@ -11,13 +11,4 @@ export default defineNuxtConfig({
   publicRuntimeConfig: {
     GQL_HOST: 'https://api.spacex.land/graphql',
   },
-
-  vite: {
-    server: {
-      hmr: {
-        path: 'hmr/',
-        clientPort: 443,
-      },
-    },
-  },
 })
