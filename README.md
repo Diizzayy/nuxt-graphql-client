@@ -101,7 +101,7 @@ query launches($sort: String = "launch_year", $order: String = "desc") {
 With [`autoImport`](#configuration) enabled, the query above can be accessed in the Vue portion of your app by prefixing the Operation name (`launches` in this example with the [Function Prefix](#configuration)).
 The `launches` query can be executed as `GqlLaunches()`
 
-1. ⚡️ You're ready to go!
+4. ⚡️ You're ready to go!
 
 Run `yarn dev` for the `nuxt-gql` module to generate the necessary types and functions.
 
