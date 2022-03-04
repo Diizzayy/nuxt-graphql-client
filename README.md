@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/diizzayy/gql/actions?query=branch%3Amain+event%3Apush">
-    <img alt="CI" src="https://github.com/diizzayy/gql/actions/workflows/ci.yml/badge.svg?branch=main"/>
+  <a href="https://github.com/diizzayy/nuxt-gql/actions?query=branch%3Amain+event%3Apush">
+    <img alt="CI" src="https://github.com/diizzayy/nuxt-gql/actions/workflows/ci.yml/badge.svg?branch=main"/>
   </a>
   
   <a href="https://npmjs.com/package/nuxt-gql">
