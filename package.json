@@ -52,7 +52,7 @@
     "@nuxt/module-builder": "latest",
     "@nuxtjs/eslint-config-typescript": "latest",
     "eslint": "8.10.0",
-    "nuxt3": "3.0.0-27437402.494f85a",
+    "nuxt3": "3.0.0-27439932.78761c2",
     "standard-version": "^9.3.2"
   }
 }
