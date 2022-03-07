@@ -1,12 +1,6 @@
 <h1 align="center">nuxt-gql</h1>
 
-<p align="center">⚡️ Minimal GraphQL Client + Code Generation for Nuxt 3</p>
-
-<p align="center">
-  <a href="https://www.npmjs.com/package/nuxt-gql">
-    <img src="https://img.shields.io/npm/v/nuxt-gql?color=398AB9&amp;label=" alt="NPM version"/>
-  </a>
-</p>
+<p align="center">⚡️ Minimal GraphQL Client + Code Generation for Nuxt</p>
 
 <p align="center">
   <a href="https://github.com/diizzayy/nuxt-gql/actions?query=branch%3Amain+event%3Apush">
@@ -26,7 +20,7 @@
   </a>
 </p>
 
-> ⚡️ Minimal GraphQL Client + Code Generation for Nuxt 3
+> ⚡️ Minimal GraphQL Client + Code Generation for Nuxt
 
 ## Features
 
