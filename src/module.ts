@@ -1,4 +1,4 @@
-import { existsSync } from 'fs'
+import { existsSync, statSync } from 'fs'
 import {
   useLogger,
   addTemplate,
@@ -119,7 +119,7 @@ export default defineNuxtModule<ModuleOptions>({
     async function generateGqlTypes() {
       const gqlFiles: string[] = []
       for await (const path of documentPaths) {
-        const files = await resolveFiles(path, gqlMatch)
+        const files = (await resolveFiles(path, gqlMatch)).filter(allowDocument)
 
         gqlFiles.push(...files)
       }
@@ -179,8 +179,6 @@ export default defineNuxtModule<ModuleOptions>({
         getContents: () => ctx.generateDeclarations(),
       })
 
-      // Known bug: isn't triggered on `generateApp`. Hence, your dev server
-      // must be restarted when GraphQL documents are renamed or added.
       nuxt.hook('autoImports:extend', (autoimports) => {
         autoimports.push(...ctx.fnImports)
       })
@@ -191,10 +189,14 @@ export default defineNuxtModule<ModuleOptions>({
       // })
     }
 
+    const allowDocument = (f: string) => !!statSync(gqlResolver.resolve(f)).size
+
     if (options.watch) {
-      nuxt.hook('builder:watch', async (_event, path) => {
+      nuxt.hook('builder:watch', async (event, path) => {
         if (!path.match(/\.(gql|graphql)$/)) return
-        
+
+        if (event !== 'unlink' && !allowDocument(path)) return
+
         const start = Date.now()
         await generateGqlTypes()
         await nuxt.callHook('builder:generateApp')
