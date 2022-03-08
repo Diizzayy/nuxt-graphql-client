@@ -1,18 +1,18 @@
-<h1 align="center">nuxt-gql</h1>
+<h1 align="center">nuxt-graphql-client</h1>
 
 <p align="center">⚡️ Minimal GraphQL Client + Code Generation for Nuxt</p>
 
 <p align="center">
-  <a href="https://github.com/diizzayy/nuxt-gql/actions?query=branch%3Amain+event%3Apush">
-    <img alt="CI" src="https://github.com/diizzayy/nuxt-gql/actions/workflows/ci.yml/badge.svg?branch=main"/>
+  <a href="https://github.com/diizzayy/nuxt-graphql-client/actions?query=branch%3Amain+event%3Apush">
+    <img alt="CI" src="https://github.com/diizzayy/nuxt-graphql-client/actions/workflows/ci.yml/badge.svg?branch=main"/>
   </a>
   
-  <a href="https://npmjs.com/package/nuxt-gql">
-      <img alt="Version" src="https://img.shields.io/npm/v/nuxt-gql?color=blue&style=flat-square"/>
+  <a href="https://npmjs.com/package/nuxt-graphql-client">
+      <img alt="Version" src="https://img.shields.io/npm/v/nuxt-graphql-client?color=blue&style=flat-square"/>
   </a>
   
-  <a href="https://npmjs.com/package/nuxt-gql">
-      <img alt="Downloads" src="https://img.shields.io/npm/dt/nuxt-gql?color=blue&style=flat-square"/>
+  <a href="https://npmjs.com/package/nuxt-graphql-client">
+      <img alt="Downloads" src="https://img.shields.io/npm/dt/nuxt-graphql-client?color=blue&style=flat-square"/>
   </a>
   
   <a href="https://opensource.org/licenses/MIT">
@@ -34,23 +34,23 @@
 
 ```sh
 # using yarn
-yarn add nuxt-gql
+yarn add nuxt-graphql-client
 
 # using npm
-npm install nuxt-gql --save
+npm install nuxt-graphql-client --save
 ```
 
 ## Usage
 
 ### Nuxt
 
-1. Add `nuxt-gql` to the `buildModules` section of `nuxt.config.ts` [Configuration Options](#configuration)
+1. Add `nuxt-graphql-client` to the `buildModules` section of `nuxt.config.ts` [Configuration Options](#configuration)
 
 ```ts
 import { defineNuxtConfig } from 'nuxt3'
 
 export default defineNuxtConfig({
-  buildModules: ['nuxt-gql'],
+  buildModules: ['nuxt-graphql-client'],
 
   gql: {
     // configuration
@@ -97,7 +97,7 @@ The `launches` query can be executed as `GqlLaunches()`
 
 4. ⚡️ You're ready to go!
 
-Run `yarn dev` for the `nuxt-gql` module to generate the necessary types and functions.
+Run `yarn dev` for the `nuxt-graphql-client` module to generate the necessary types and functions.
 
 - HMR (Hot Module Reload) for your GraphQL documents.
 - Access the types from the GraphQL document(s) that you've written.

@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-gql",
+  "name": "nuxt-graphql-client",
   "version": "0.0.4",
   "keywords": [
     "vue",
@@ -14,7 +14,7 @@
   ],
   "license": "MIT",
   "type": "module",
-  "repository": "diizzayy/nuxt-gql",
+  "repository": "diizzayy/nuxt-graphql-client",
   "author": {
     "name": "Diizzayy <https://diizzayy.com>",
     "url": "https://github.com/diizzayy"
