@@ -4,6 +4,7 @@ import {
   addTemplate,
   resolveFiles,
   addAutoImport,
+  addAutoImportDir,
   createResolver,
   defineNuxtModule,
 } from '@nuxt/kit'
@@ -162,11 +163,7 @@ export default defineNuxtModule<ModuleOptions>({
       from: `#build/gql-sdk`,
     })
 
-    addAutoImport({
-      as: 'useGql',
-      name: 'useGql',
-      from: resolver.resolve('runtime/composables/useGql'),
-    })
+    addAutoImportDir(resolver.resolve('runtime/composables'))
 
     if (options.autoImport) {
       addTemplate({
