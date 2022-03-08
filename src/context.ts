@@ -9,7 +9,7 @@ export interface GqlContext {
 }
 
 export function prepareContext(ctx: GqlContext, prefix: string) {
-  ctx.fns = ctx.template?.match(/\w+\s*(?=\(variables\?)/g)?.sort() || []
+  ctx.fns = ctx.template?.match(/\w+\s*(?=\(variables)/g)?.sort() || []
 
   const fnName = (fn: string) =>
     prefix + fn.charAt(0).toUpperCase() + fn.slice(1)
