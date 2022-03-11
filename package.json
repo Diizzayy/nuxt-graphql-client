@@ -41,18 +41,18 @@
   },
   "dependencies": {
     "@graphql-codegen/cli": "^2.6.2",
-    "@graphql-codegen/typescript": "^2.4.5",
-    "@graphql-codegen/typescript-graphql-request": "^4.3.7",
-    "@graphql-codegen/typescript-operations": "^2.3.2",
+    "@graphql-codegen/typescript": "^2.4.7",
+    "@graphql-codegen/typescript-graphql-request": "^4.4.2",
+    "@graphql-codegen/typescript-operations": "^2.3.4",
     "@nuxt/kit": "npm:@nuxt/kit-edge@latest",
     "graphql": "^16.3.0",
-    "graphql-request": "^4.0.0"
+    "graphql-request": "^4.1.0"
   },
   "devDependencies": {
     "@nuxt/module-builder": "latest",
     "@nuxtjs/eslint-config-typescript": "latest",
-    "eslint": "8.10.0",
-    "nuxt3": "3.0.0-27445576.02e683d",
+    "eslint": "8.11.0",
+    "nuxt3": "3.0.0-27450445.3e68433",
     "standard-version": "^9.3.2"
   }
 }
