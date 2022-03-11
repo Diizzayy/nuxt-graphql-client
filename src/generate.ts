@@ -1,7 +1,7 @@
 import { generate } from '@graphql-codegen/cli'
 
 interface GenerateOptions {
-  host: string
+  host: string[]
   file: string
   silent?: boolean
   plugins?: string[]

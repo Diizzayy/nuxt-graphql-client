@@ -11,8 +11,15 @@ import {
 import generate from './generate'
 import { name, version } from '../package.json'
 import { prepareContext, GqlContext } from './context'
+import { prepareOperations, prepareTemplate } from './utils'
 
-const logger = useLogger('diizzayy:gql')
+const logger = useLogger('nuxt-graphql-client')
+
+export interface GqlClientOptions {
+  name: string
+  host: string
+  default?: boolean
+}
 
 export interface ModuleOptions {
   /**
@@ -73,6 +80,13 @@ export interface ModuleOptions {
    * @default true
    * */
   onlyOperationTypes?: boolean
+
+  /**
+   * Allows generating multiple clients with different GraphQL hosts.
+   *
+   * @note this option overrides the `GQL_HOST` in `publicRuntimeConfig`.
+   * */
+  clients?: GqlClientOptions[]
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -85,6 +99,7 @@ export default defineNuxtModule<ModuleOptions>({
     },
   },
   defaults: {
+    clients: [],
     watch: true,
     silent: true,
     autoImport: true,
@@ -92,13 +107,36 @@ export default defineNuxtModule<ModuleOptions>({
     onlyOperationTypes: true,
   },
   async setup(options, nuxt) {
-    const host = nuxt.options.publicRuntimeConfig.GQL_HOST
+    const ctx: GqlContext = {}
 
-    if (!host) {
-      return logger.error(
-        'Gql Module: GQL_HOST is not set in publicRuntimeConfig'
-      )
+    if (!options?.clients?.length) {
+      const host = nuxt.options.publicRuntimeConfig.GQL_HOST
+
+      if (!host) throw new Error('GQL_HOST is not set in publicRuntimeConfig')
+
+      options.clients = [{ name: 'default', host }]
+    } else {
+      for (const client of options.clients) {
+        if (!client?.name || !client?.host)
+          throw new Error(`GraphQL client is missing name or host`)
+
+        if (!ctx.clientOps) ctx.clientOps = {}
+        ctx.clientOps[client.name] = []
+      }
+
+      if (
+        options.clients.find((c) => c.default) &&
+        options.clients.filter((c) => c.default).length > 1
+      ) {
+        throw new Error(`Only one GraphQL client can be set to default.`)
+      }
     }
+
+    ctx.clients = options.clients.map((c) => c.name)
+
+    nuxt.options.publicRuntimeConfig[name] = { clients: options.clients }
+
+    const multipleClients = options.clients?.length > 1
 
     const resolver = createResolver(import.meta.url)
     const gqlResolver = createResolver(nuxt.options.srcDir)
@@ -114,13 +152,13 @@ export default defineNuxtModule<ModuleOptions>({
       }
     }
 
-    const ctx: GqlContext = {}
-
     const gqlMatch = '**/*.{gql,graphql}'
     async function generateGqlTypes() {
       const gqlFiles: string[] = []
       for await (const path of documentPaths) {
         const files = (await resolveFiles(path, gqlMatch)).filter(allowDocument)
+
+        if (multipleClients) await prepareOperations(ctx, files)
 
         gqlFiles.push(...files)
       }
@@ -140,13 +178,15 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       ctx.template = await generate({
-        host,
+        host: options.clients.map((c) => c.host),
         file: 'gql-sdk.ts',
         silent: options.silent,
         plugins,
         documents,
         onlyOperationTypes: options.onlyOperationTypes,
       })
+
+      if (multipleClients) prepareTemplate(ctx)
 
       prepareContext(ctx, options.functionPrefix)
     }
@@ -163,7 +203,7 @@ export default defineNuxtModule<ModuleOptions>({
       from: `#build/gql-sdk`,
     })
 
-    addAutoImportDir(resolver.resolve('runtime/composables'))
+    addAutoImportDir(resolver.resolve('runtime'))
 
     if (options.autoImport) {
       addTemplate({
@@ -177,7 +217,15 @@ export default defineNuxtModule<ModuleOptions>({
       })
 
       nuxt.hook('autoImports:extend', (autoimports) => {
-        autoimports.push(...ctx.fnImports)
+        if (!ctx.fnImports?.length) return
+
+        const names = autoimports.map((a) => a.name)
+        
+        const fnImports = ctx.fnImports.filter((i) => !names.includes(i.name))
+
+        if (!fnImports?.length) return
+
+        autoimports.push(...fnImports)
       })
 
       // TODO: See if needed

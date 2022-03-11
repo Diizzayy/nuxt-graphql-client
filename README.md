@@ -167,12 +167,19 @@ export default defineNuxtConfig({
     /**
      * Only generate the types for the operations in your GraphQL documents.
      * When set to true, only the types needed for your operations will be generated.
-     * When set to false, all types from the GraphQL schema will be generated.
+     * When set to false, all types from the GraphQL API will be generated.
      *
      * @type boolean
      * @default true
      * */
     onlyOperationTypes: boolean
+
+    /**
+     * Allows generating multiple clients with different GraphQL hosts.
+     *
+     * @note this option overrides the `GQL_HOST` in `publicRuntimeConfig`.
+     * */
+    clients: GqlClientOptions[]
   },
 
   publicRuntimeConfig: {
