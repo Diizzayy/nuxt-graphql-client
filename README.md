@@ -188,6 +188,13 @@ export default defineNuxtConfig({
 })
 ```
 
+## Credits
+
+[`nuxt-graphql-client`](#nuxt-graphql-client) is developed by [@diizzayy](https://github.com/diizzayy).
+
+Special thanks to [@danielroe](https://github.com/danielroe) for helping me navigate and making this possible!
+
+
 ## License
 
 [MIT](./LICENSE) License © 2022 [Diizzayy](https://github.com/diizzayy)
