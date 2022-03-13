@@ -1,7 +1,7 @@
 import { generate } from '@graphql-codegen/cli'
 
 interface GenerateOptions {
-  host: string[]
+  hosts: string[]
   file: string
   silent?: boolean
   plugins?: string[]
@@ -12,7 +12,7 @@ interface GenerateOptions {
 export default async function (options: GenerateOptions): Promise<string> {
   const [{ content }]: [{ content: string }] = await generate(
     {
-      schema: options.host,
+      schema: options.hosts,
       silent: options.silent,
       documents: options.documents,
       generates: {

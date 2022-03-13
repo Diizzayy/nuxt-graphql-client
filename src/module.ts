@@ -1,3 +1,4 @@
+import defu from 'defu'
 import { existsSync, statSync } from 'fs'
 import {
   useLogger,
@@ -15,10 +16,14 @@ import { prepareOperations, prepareTemplate } from './utils'
 
 const logger = useLogger('nuxt-graphql-client')
 
-export interface GqlClientOptions {
+export interface GqlClient {
   name: string
   host: string
   default?: boolean
+}
+
+export interface GqlConfig {
+  clients: Record<string, string | GqlClient>
 }
 
 export interface ModuleOptions {
@@ -86,7 +91,7 @@ export interface ModuleOptions {
    *
    * @note this option overrides the `GQL_HOST` in `publicRuntimeConfig`.
    * */
-  clients?: GqlClientOptions[]
+  clients?: GqlConfig['clients']
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -99,7 +104,7 @@ export default defineNuxtModule<ModuleOptions>({
     },
   },
   defaults: {
-    clients: [],
+    clients: {},
     watch: true,
     silent: true,
     autoImport: true,
@@ -107,36 +112,66 @@ export default defineNuxtModule<ModuleOptions>({
     onlyOperationTypes: true,
   },
   async setup(options, nuxt) {
-    const ctx: GqlContext = {}
+    let hosts: string[] = []
 
-    if (!options?.clients?.length) {
-      const host = nuxt.options.publicRuntimeConfig.GQL_HOST
+    const ctx: GqlContext = {
+      clients: [],
+      clientOps: {},
+    }
+
+    const config: Partial<GqlConfig> = defu(
+      {},
+      nuxt.options.publicRuntimeConfig['graphql-client'],
+      nuxt.options.publicRuntimeConfig['gql'],
+      { clients: options.clients }
+    )
+
+    ctx.clients = Object.keys(config.clients)
+
+    if (!ctx?.clients?.length) {
+      const host =
+        process.env.GQL_HOST || nuxt.options.publicRuntimeConfig.GQL_HOST
 
       if (!host) throw new Error('GQL_HOST is not set in publicRuntimeConfig')
 
-      options.clients = [{ name: 'default', host }]
-    } else {
-      for (const client of options.clients) {
-        if (!client?.name || !client?.host)
-          throw new Error(`GraphQL client is missing name or host`)
-
-        if (!ctx.clientOps) ctx.clientOps = {}
-        ctx.clientOps[client.name] = []
-      }
-
-      if (
-        options.clients.find((c) => c.default) &&
-        options.clients.filter((c) => c.default).length > 1
-      ) {
-        throw new Error(`Only one GraphQL client can be set to default.`)
-      }
+      config.clients = { default: host }
     }
 
-    ctx.clients = options.clients.map((c) => c.name)
+    const multipleClients = ctx?.clients?.length > 1
 
-    nuxt.options.publicRuntimeConfig[name] = { clients: options.clients }
+    if (multipleClients) {
+      const defaults = Object.entries(config.clients).reduce((i, [k, v]) => {
+        if (k === 'default' || (typeof v !== 'string' && v.default)) i++
 
-    const multipleClients = options.clients?.length > 1
+        return i
+      }, 0)
+
+      if (defaults > 1)
+        throw new Error('Only one client can have the default flag set.')
+    }
+
+    for (const [k, v] of Object.entries(config.clients)) {
+      const runtimeHost =
+        k === 'default'
+          ? process.env.GQL_HOST
+          : process.env?.[`GQL_${k.toUpperCase()}_HOST`]
+
+      let host: string
+      if (runtimeHost) host = runtimeHost
+      else if (typeof v === 'string') host = v
+      else if ('host' in v) host = v?.host
+
+      if (!host) throw new Error(`GraphQL client (${k}) is missing it's host.`)
+
+      hosts.push(host)
+
+      ctx.clientOps[k] = []
+      if (typeof v == 'string') config.clients[k] = host
+      else if ('host' in v) config.clients[k] = defu(v, { host })
+    }
+
+    // @ts-ignore
+    nuxt.options.publicRuntimeConfig['graphql-client'] = config
 
     const resolver = createResolver(import.meta.url)
     const gqlResolver = createResolver(nuxt.options.srcDir)
@@ -178,7 +213,7 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       ctx.template = await generate({
-        host: options.clients.map((c) => c.host),
+        hosts,
         file: 'gql-sdk.ts',
         silent: options.silent,
         plugins,
@@ -220,7 +255,7 @@ export default defineNuxtModule<ModuleOptions>({
         if (!ctx.fnImports?.length) return
 
         const names = autoimports.map((a) => a.name)
-        
+
         const fnImports = ctx.fnImports.filter((i) => !names.includes(i.name))
 
         if (!fnImports?.length) return
@@ -247,7 +282,7 @@ export default defineNuxtModule<ModuleOptions>({
         await nuxt.callHook('builder:generateApp')
 
         const time = Date.now() - start
-        logger.success(`[Gql Module]: Generation completed in ${time}ms`)
+        logger.success(`[GraphQL Client]: Generation completed in ${time}ms`)
       })
     }
 
@@ -263,13 +298,11 @@ declare module '@nuxt/schema' {
      * @type string
      */
     GQL_HOST: string
-  }
-  interface PrivateRuntimeConfig {
-    /**
-     * URL pointing to a GraphQL endpoint
-     *
-     * @type string
-     */
-    GQL_HOST: string
+
+    // @ts-ignore
+    gql?: GqlConfig
+
+    // @ts-ignore
+    'graphql-client'?: GqlConfig
   }
 }

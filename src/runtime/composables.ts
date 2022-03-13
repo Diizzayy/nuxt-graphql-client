@@ -3,7 +3,7 @@ import { useNuxtApp, useRuntimeConfig } from '#app'
 import { gqlSdk } from '#imports'
 import type { Ref } from 'vue'
 import type { GqlClients } from '#build/gql'
-import type { GqlClientOptions } from '../module'
+import type { GqlConfig } from '../module'
 
 interface GqlState {
   clients?: Record<string, GraphQLClient>
@@ -88,21 +88,18 @@ const useGqlState = (state?: GqlState, reset?: boolean): Ref<GqlState> => {
 const initClients = () => {
   const state = useGqlState()
 
-  const { clients } = useRuntimeConfig()?.['nuxt-graphql-client'] as {
-    clients: GqlClientOptions[]
-  }
+  const { clients } = useRuntimeConfig()?.['graphql-client'] as GqlConfig
 
   state.value.clients = state.value?.clients || {}
   state.value.options = state.value?.options || {}
 
-  for (const { name, host } of clients) {
-    // if client already exists, skip
+  for (const [name, v] of Object.entries(clients)) {
     if (state.value?.clients[name]) continue
 
-    // if options don't exist for client, initialize
     if (!state.value?.options[name]) state.value.options[name] = {}
 
-    // create clients, and map them to state
+    const host = typeof v === 'string' ? v : v.host
+
     const c = new GraphQLClient(host, state.value.options[name])
     state.value.clients[name] = c
   }
@@ -113,17 +110,17 @@ const getClient = (client?: GqlClients): GqlClients => {
 
   if (client && state.value?.clients?.[client]) return client
 
-  const { clients } = useRuntimeConfig()?.['nuxt-graphql-client'] as {
-    clients: GqlClientOptions[]
-  }
+  const { clients } = useRuntimeConfig()?.['graphql-client'] as GqlConfig
 
   if (!state.value.clients || !state.value.options) initClients()
 
-  if (!client && clients?.length) {
-    const defaultClient = clients.find((c) => c.default)
+  if (!client && Object.keys(clients)?.length) {
+    const defaultClient = Object.entries(clients).find(
+      ([k, v]) => k === 'default' || (typeof v !== 'string' && v.default)
+    )
 
-    if (defaultClient) client = defaultClient.name as GqlClients
-    else client = clients[0].name as GqlClients
+    if (defaultClient) client = defaultClient[0] as GqlClients
+    else client = Object.keys(clients)[0] as GqlClients
   }
 
   return client
@@ -200,7 +197,7 @@ type GqlTokenOptions = {
 
 /**
  * `useGqlToken` adds an Authorization header to every request.
- * 
+ *
  * @param {string} token
  * @param {object} opts
  * */
@@ -235,7 +232,7 @@ interface GqlCors {
 
 /**
  * `useGqlCors` adds CORS headers to every request.
- * 
+ *
  * @param {object} opts
  * */
 export const useGqlCors = ({ mode, credentials, client }: GqlCors) => {
