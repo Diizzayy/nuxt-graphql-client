@@ -1,7 +1,9 @@
 import { generate } from '@graphql-codegen/cli'
+import type { Types } from '@graphql-codegen/plugin-helpers'
+import type { GqlConfigReady } from './module'
 
 interface GenerateOptions {
-  host: string
+  clients?: GqlConfigReady['clients']
   file: string
   silent?: boolean
   plugins?: string[]
@@ -10,9 +12,15 @@ interface GenerateOptions {
 }
 
 export default async function (options: GenerateOptions): Promise<string> {
+  let schema: Types.Config['schema'] = Object.values(options.clients).map((v) =>
+    !v?.token
+      ? v.host
+      : { [v.host]: { headers: { Authorization: 'Bearer ' + v.token } } }
+  )
+
   const [{ content }]: [{ content: string }] = await generate(
     {
-      schema: options.host,
+      schema,
       silent: options.silent,
       documents: options.documents,
       generates: {
