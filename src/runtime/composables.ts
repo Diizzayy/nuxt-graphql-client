@@ -3,7 +3,7 @@ import { useNuxtApp, useRuntimeConfig } from '#app'
 import { gqlSdk } from '#imports'
 import type { Ref } from 'vue'
 import type { GqlClients } from '#build/gql'
-import type { GqlConfig } from '../module'
+import type { GqlConfigReady } from '../module'
 
 interface GqlState {
   clients?: Record<string, GraphQLClient>
@@ -41,7 +41,10 @@ const DEFAULT_STATE: GqlState = { proxyCookies: true }
  *
  * */
 // The decision was made to avert using `GraphQLClient's` `setHeader(s)` helper in favor of reactivity and more granular control.
-const useGqlState = (state?: GqlState, reset?: boolean): Ref<GqlState> => {
+const useGqlState = (
+  state?: GqlState,
+  reset?: boolean
+): Ref<GqlState> => {
   const nuxtApp = useNuxtApp()
 
   if (!nuxtApp._gqlState) {
@@ -88,7 +91,7 @@ const useGqlState = (state?: GqlState, reset?: boolean): Ref<GqlState> => {
 const initClients = () => {
   const state = useGqlState()
 
-  const { clients } = useRuntimeConfig()?.['graphql-client'] as GqlConfig
+  const { clients } = useRuntimeConfig()?.['graphql-client'] as GqlConfigReady
 
   state.value.clients = state.value?.clients || {}
   state.value.options = state.value?.options || {}
@@ -98,10 +101,10 @@ const initClients = () => {
 
     if (!state.value?.options[name]) state.value.options[name] = {}
 
-    const host = typeof v === 'string' ? v : v.host
-
-    const c = new GraphQLClient(host, state.value.options[name])
+    const c = new GraphQLClient(v.host, state.value.options[name])
     state.value.clients[name] = c
+
+    if (v?.token) useGqlToken(v.token, { client: name as GqlClients })
   }
 }
 
@@ -110,13 +113,13 @@ const getClient = (client?: GqlClients): GqlClients => {
 
   if (client && state.value?.clients?.[client]) return client
 
-  const { clients } = useRuntimeConfig()?.['graphql-client'] as GqlConfig
+  const { clients } = useRuntimeConfig()?.['graphql-client'] as GqlConfigReady
 
   if (!state.value.clients || !state.value.options) initClients()
 
   if (!client && Object.keys(clients)?.length) {
     const defaultClient = Object.entries(clients).find(
-      ([k, v]) => k === 'default' || (typeof v !== 'string' && v.default)
+      ([k, v]) => k === 'default' || v?.default
     )
 
     if (defaultClient) client = defaultClient[0] as GqlClients

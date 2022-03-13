@@ -17,13 +17,17 @@ import { prepareOperations, prepareTemplate } from './utils'
 const logger = useLogger('nuxt-graphql-client')
 
 export interface GqlClient {
-  name: string
   host: string
   default?: boolean
+  token?: string
 }
 
 export interface GqlConfig {
   clients: Record<string, string | GqlClient>
+}
+
+export interface GqlConfigReady {
+  clients: Record<string, GqlClient>
 }
 
 export interface ModuleOptions {
@@ -112,8 +116,6 @@ export default defineNuxtModule<ModuleOptions>({
     onlyOperationTypes: true,
   },
   async setup(options, nuxt) {
-    let hosts: string[] = []
-
     const ctx: GqlContext = {
       clients: [],
       clientOps: {},
@@ -163,11 +165,18 @@ export default defineNuxtModule<ModuleOptions>({
 
       if (!host) throw new Error(`GraphQL client (${k}) is missing it's host.`)
 
-      hosts.push(host)
+      const runtimeToken =
+        k === 'default'
+          ? process.env.GQL_TOKEN
+          : process.env?.[`GQL_${k.toUpperCase()}_TOKEN`]
+
+      let token = runtimeToken || (typeof v !== 'string' && v?.token)
+
+      let conf = { host, ...(token && { token }) }
 
       ctx.clientOps[k] = []
-      if (typeof v == 'string') config.clients[k] = host
-      else if ('host' in v) config.clients[k] = defu(v, { host })
+      if (typeof v == 'string') config.clients[k] = conf
+      else if ('host' in v) config.clients[k] = defu(v, conf)
     }
 
     // @ts-ignore
@@ -213,7 +222,7 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       ctx.template = await generate({
-        hosts,
+        clients: config.clients as GqlConfigReady['clients'],
         file: 'gql-sdk.ts',
         silent: options.silent,
         plugins,
