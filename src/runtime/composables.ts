@@ -1,6 +1,12 @@
 import { GraphQLClient } from 'graphql-request'
-import { useNuxtApp, useRuntimeConfig } from '#app'
-import { gqlSdk } from '#imports'
+import {
+  ref,
+  gqlSdk,
+  useNuxtApp,
+  useRuntimeConfig,
+  useRequestHeaders,
+} from '#imports'
+
 import type { Ref } from 'vue'
 import type { GqlClients } from '#build/gql'
 import type { GqlConfigReady } from '../module'
@@ -41,10 +47,7 @@ const DEFAULT_STATE: GqlState = { proxyCookies: true }
  *
  * */
 // The decision was made to avert using `GraphQLClient's` `setHeader(s)` helper in favor of reactivity and more granular control.
-const useGqlState = (
-  state?: GqlState,
-  reset?: boolean
-): Ref<GqlState> => {
+const useGqlState = (state?: GqlState, reset?: boolean): Ref<GqlState> => {
   const nuxtApp = useNuxtApp()
 
   if (!nuxtApp._gqlState) {
