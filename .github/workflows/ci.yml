@@ -16,6 +16,31 @@ jobs:
     strategy:
       matrix:
         node: [16]
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          cache: 'yarn'
+          cache-dependency-path: yarn.lock
+          node-version: ${{ matrix.node }}
+
+      - name: Install dependencies
+        run: yarn --immutable
+
+      - name: Build
+        run: yarn build
+
+  lint:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        node: [16]
         os: [ubuntu-latest]
 
     steps:
@@ -30,7 +55,48 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies
-        run: yarn
+        run: yarn --immutable
 
-      - name: Build
-        run: yarn build
+      - name: Lint
+        run: yarn lint
+  
+  build-publish:
+    if: |
+      github.event_name == push &&
+      !contains(github.event.head_commit.message, 'chore') &&
+      !contains(github.event.head_commit.message, 'docs')
+
+    needs:
+      - lint
+      - build
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [16]
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'yarn'
+          cache-dependency-path: yarn.lock
+          node-version: ${{ matrix.node }}
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Install dependencies 👨🏻‍💻
+        run: yarn --immutable
+
+      - name: Publish Package
+        run: yarn release
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
