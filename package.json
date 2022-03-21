@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@graphql-codegen/cli": "^2.6.2",
-    "@graphql-codegen/typescript": "^2.4.7",
+    "@graphql-codegen/typescript": "^2.4.8",
     "@graphql-codegen/typescript-graphql-request": "^4.4.2",
     "@graphql-codegen/typescript-operations": "^2.3.4",
     "@nuxt/kit": "npm:@nuxt/kit-edge@latest",
