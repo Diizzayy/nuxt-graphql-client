@@ -1,10 +1,10 @@
-import type { AutoImport } from '@nuxt/schema'
+import type { Import } from 'unimport'
 
 export interface GqlContext {
   template?: string
   fns?: string[]
   clients?: string[]
-  fnImports?: AutoImport[]
+  fnImports?: Import[]
   generateImports?: () => string
   generateDeclarations?: () => string
   clientOps?: Record<string, string[]> | null

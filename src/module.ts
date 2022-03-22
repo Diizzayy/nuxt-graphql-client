@@ -9,6 +9,7 @@ import {
   createResolver,
   defineNuxtModule,
 } from '@nuxt/kit'
+import { deepmerge } from 'deepmerge-ts'
 import generate from './generate'
 import { name, version } from '../package.json'
 import { prepareContext, GqlContext } from './context'
@@ -22,12 +23,8 @@ export interface GqlClient {
   token?: string
 }
 
-export interface GqlConfig {
-  clients: Record<string, string | GqlClient>
-}
-
-export interface GqlConfigReady {
-  clients: Record<string, GqlClient>
+export type GqlConfig<T = GqlClient> = {
+  clients: Record<string, T extends GqlClient ? GqlClient : string | GqlClient>
 }
 
 export interface ModuleOptions {
@@ -121,7 +118,7 @@ export default defineNuxtModule<ModuleOptions>({
       clientOps: {},
     }
 
-    const config: Partial<GqlConfig> = defu(
+    const config: GqlConfig<string | GqlClient> = defu(
       {},
       nuxt.options.publicRuntimeConfig['graphql-client'],
       nuxt.options.publicRuntimeConfig['gql'],
@@ -152,6 +149,9 @@ export default defineNuxtModule<ModuleOptions>({
         throw new Error('Only one client can have the default flag set.')
     }
 
+    // @ts-ignore
+    nuxt.options.privateRuntimeConfig['graphql-client'] = { clients: {} }
+
     for (const [k, v] of Object.entries(config.clients)) {
       const runtimeHost =
         k === 'default'
@@ -177,10 +177,23 @@ export default defineNuxtModule<ModuleOptions>({
       ctx.clientOps[k] = []
       if (typeof v == 'string') config.clients[k] = conf
       else if ('host' in v) config.clients[k] = defu(v, conf)
-    }
 
-    // @ts-ignore
-    nuxt.options.publicRuntimeConfig['graphql-client'] = config
+      nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] = deepmerge(
+        {},
+        config.clients[k]
+      )
+
+      if (token) {
+        delete (
+          nuxt.options.publicRuntimeConfig['graphql-client'].clients[
+            k
+          ] as GqlClient
+        ).token
+        nuxt.options.privateRuntimeConfig['graphql-client'].clients[k] = {
+          token,
+        }
+      }
+    }
 
     const resolver = createResolver(import.meta.url)
     const gqlResolver = createResolver(nuxt.options.srcDir)
@@ -222,7 +235,7 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       ctx.template = await generate({
-        clients: config.clients as GqlConfigReady['clients'],
+        clients: config.clients as GqlConfig['clients'],
         file: 'gql-sdk.ts',
         silent: options.silent,
         plugins,
@@ -309,9 +322,13 @@ declare module '@nuxt/schema' {
     GQL_HOST: string
 
     // @ts-ignore
-    gql?: GqlConfig
+    gql?: {
+      clients: Omit<GqlConfig<any>['clients'], 'token'>
+    }
 
     // @ts-ignore
-    'graphql-client'?: GqlConfig
+    'graphql-client'?: {
+      clients: Omit<GqlConfig<any>['clients'], 'token'>
+    }
   }
 }

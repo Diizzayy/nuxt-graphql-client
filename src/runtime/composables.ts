@@ -6,10 +6,11 @@ import {
   useRuntimeConfig,
   useRequestHeaders,
 } from '#imports'
+import { deepmerge } from "deepmerge-ts";
 
 import type { Ref } from 'vue'
 import type { GqlClients } from '#build/gql'
-import type { GqlConfigReady } from '../module'
+import type { GqlConfig } from '../module'
 
 interface GqlState {
   clients?: Record<string, GraphQLClient>
@@ -22,20 +23,6 @@ interface GqlState {
    * @default true
    * */
   proxyCookies?: boolean
-}
-
-const deepMerge = (a: GqlState, b: GqlState) => {
-  const result = { ...a }
-  for (const key in b) {
-    if (b.hasOwnProperty(key)) {
-      if (typeof b[key] === 'object' && b[key] !== null) {
-        result[key] = deepMerge(result[key] || {}, b[key])
-      } else {
-        result[key] = b[key]
-      }
-    }
-  }
-  return result
 }
 
 const DEFAULT_STATE: GqlState = { proxyCookies: true }
@@ -69,7 +56,7 @@ const useGqlState = (state?: GqlState, reset?: boolean): Ref<GqlState> => {
       nuxtApp._gqlState.value = Object.assign(DEFAULT_STATE, {
         clients: nuxtApp._gqlState.value.clients,
       })
-    } else nuxtApp._gqlState.value = deepMerge(nuxtApp._gqlState.value, state)
+    } else nuxtApp._gqlState.value = deepmerge(nuxtApp._gqlState.value, state)
 
     const clients = nuxtApp._gqlState.value.clients
 
@@ -94,7 +81,7 @@ const useGqlState = (state?: GqlState, reset?: boolean): Ref<GqlState> => {
 const initClients = () => {
   const state = useGqlState()
 
-  const { clients } = useRuntimeConfig()?.['graphql-client'] as GqlConfigReady
+  const { clients } = useRuntimeConfig()?.['graphql-client'] as GqlConfig
 
   state.value.clients = state.value?.clients || {}
   state.value.options = state.value?.options || {}
@@ -116,7 +103,7 @@ const getClient = (client?: GqlClients): GqlClients => {
 
   if (client && state.value?.clients?.[client]) return client
 
-  const { clients } = useRuntimeConfig()?.['graphql-client'] as GqlConfigReady
+  const { clients } = useRuntimeConfig()?.['graphql-client'] as GqlConfig
 
   if (!state.value.clients || !state.value.options) initClients()
 

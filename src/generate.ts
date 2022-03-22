@@ -1,9 +1,9 @@
 import { generate } from '@graphql-codegen/cli'
 import type { Types } from '@graphql-codegen/plugin-helpers'
-import type { GqlConfigReady } from './module'
+import type { GqlConfig } from './module'
 
 interface GenerateOptions {
-  clients?: GqlConfigReady['clients']
+  clients?: GqlConfig['clients']
   file: string
   silent?: boolean
   plugins?: string[]
