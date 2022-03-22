@@ -171,10 +171,13 @@ export default defineNuxtModule<ModuleOptions>({
         config.clients[k] = defu(v, conf)
       }
 
+      // @ts-ignore
       nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] = deepmerge({}, config.clients[k])
 
       if (token) {
         delete (nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] as GqlClient).token
+
+        // @ts-ignore
         nuxt.options.privateRuntimeConfig['graphql-client'].clients[k] = { token }
       }
     }
