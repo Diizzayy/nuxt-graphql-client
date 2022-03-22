@@ -5,10 +5,10 @@ export default defineNuxtConfig({
   modules: [MyModule],
 
   gql: {
-    documentPaths: [],
+    documentPaths: []
   },
 
   publicRuntimeConfig: {
-    GQL_HOST: 'https://api.spacex.land/graphql',
-  },
+    GQL_HOST: 'https://api.spacex.land/graphql'
+  }
 })
