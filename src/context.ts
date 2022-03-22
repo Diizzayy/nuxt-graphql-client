@@ -10,7 +10,7 @@ export interface GqlContext {
   clientOps?: Record<string, string[]> | null
 }
 
-export function prepareContext(ctx: GqlContext, prefix: string) {
+export function prepareContext (ctx: GqlContext, prefix: string) {
   ctx.fns = ctx.template?.match(/\w+\s*(?=\(variables)/g)?.sort() || []
 
   const fnName = (fn: string) =>
@@ -20,12 +20,9 @@ export function prepareContext(ctx: GqlContext, prefix: string) {
     const name = fnName(fn)
 
     if (!typed) {
-      const client = ctx?.clients.find((c) => ctx?.clientOps?.[c]?.includes(fn))
+      const client = ctx?.clients.find(c => ctx?.clientOps?.[c]?.includes(fn))
 
-      if (!client)
-        return `export const ${name} = (...params) => useGql()['${fn}'](...params)`
-      else
-        return `export const ${name} = (...params) => useGql('${client}')['${fn}'](...params)`
+      if (!client) { return `export const ${name} = (...params) => useGql()['${fn}'](...params)` } else { return `export const ${name} = (...params) => useGql('${client}')['${fn}'](...params)` }
     }
 
     return `  export const ${name}: (...params: Parameters<GqlFunc['${fn}']>) => ReturnType<GqlFunc['${fn}']>`
@@ -33,18 +30,18 @@ export function prepareContext(ctx: GqlContext, prefix: string) {
 
   ctx.generateImports = () => {
     return [
-      `import { useGql } from '#imports'`,
-      ...ctx.fns.map((f) => fnExp(f)),
+      'import { useGql } from \'#imports\'',
+      ...ctx.fns.map(f => fnExp(f))
     ].join('\n')
   }
 
   ctx.generateDeclarations = () => {
     return [
-      `declare module '#build/gql' {`,
+      'declare module \'#build/gql\' {',
       `  type GqlClients = '${ctx.clients.join("' | '")}'`,
-      `  type GqlFunc = ReturnType<typeof import('#imports')['useGql']>`,
-      ...ctx.fns.map((f) => fnExp(f, true)),
-      `}`,
+      '  type GqlFunc = ReturnType<typeof import(\'#imports\')[\'useGql\']>',
+      ...ctx.fns.map(f => fnExp(f, true)),
+      '}'
     ].join('\n')
   }
 
@@ -54,7 +51,7 @@ export function prepareContext(ctx: GqlContext, prefix: string) {
     return {
       name,
       as: name,
-      from: `#build/gql`,
+      from: '#build/gql'
     }
   })
 }

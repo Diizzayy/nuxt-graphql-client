@@ -12,7 +12,7 @@ interface GenerateOptions {
 }
 
 export default async function (options: GenerateOptions): Promise<string> {
-  let schema: Types.Config['schema'] = Object.values(options.clients).map((v) =>
+  const schema: Types.Config['schema'] = Object.values(options.clients).map(v =>
     !v?.token
       ? v.host
       : { [v.host]: { headers: { Authorization: 'Bearer ' + v.token } } }
@@ -30,10 +30,10 @@ export default async function (options: GenerateOptions): Promise<string> {
             skipTypename: true,
             useTypeImports: true,
             gqlImport: 'graphql-request#gql',
-            onlyOperationTypes: options.onlyOperationTypes,
-          },
-        },
-      },
+            onlyOperationTypes: options.onlyOperationTypes
+          }
+        }
+      }
     },
     false
   )

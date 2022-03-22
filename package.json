@@ -36,8 +36,8 @@
     "build": "nuxt-module-build",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
-    "lint": "eslint --ext .js,.ts,.vue",
-    "lint:fix": "eslint --fix --ext .js,.ts,.vue --fix",
+    "lint": "eslint --ext .js,.ts,.vue .",
+    "lint:fix": "eslint --fix --ext .js,.ts,.vue .",
     "prepare": "nuxt-module-build --stub && nuxi prepare playground",
     "release": "yarn lint && standard-version && yarn publish --access public && git push --follow-tags"
   },

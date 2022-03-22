@@ -1,16 +1,17 @@
+import { deepmerge } from 'deepmerge-ts'
 import { GraphQLClient } from 'graphql-request'
+
+import type { Ref } from 'vue'
+import type { GqlConfig } from '../module'
+import type { GqlClients } from '#build/gql'
+
 import {
   ref,
   gqlSdk,
   useNuxtApp,
   useRuntimeConfig,
-  useRequestHeaders,
+  useRequestHeaders
 } from '#imports'
-import { deepmerge } from "deepmerge-ts";
-
-import type { Ref } from 'vue'
-import type { GqlClients } from '#build/gql'
-import type { GqlConfig } from '../module'
 
 interface GqlState {
   clients?: Record<string, GraphQLClient>
@@ -46,31 +47,33 @@ const useGqlState = (state?: GqlState, reset?: boolean): Ref<GqlState> => {
       const optionKeys = Object.keys(state.options || {})
 
       for (const k of optionKeys) {
-        if (!nuxtApp._gqlState.value.clients?.[k]) delete state.options[k]
+        if (!nuxtApp._gqlState.value.clients?.[k]) { delete state.options[k] }
       }
     }
 
-    if (reset === undefined) reset = !Object.keys(state).length
+    if (reset === undefined) { reset = !Object.keys(state).length }
 
     if (reset) {
       nuxtApp._gqlState.value = Object.assign(DEFAULT_STATE, {
-        clients: nuxtApp._gqlState.value.clients,
+        clients: nuxtApp._gqlState.value.clients
       })
-    } else nuxtApp._gqlState.value = deepmerge(nuxtApp._gqlState.value, state)
+    } else { nuxtApp._gqlState.value = deepmerge(nuxtApp._gqlState.value, state) }
 
-    const clients = nuxtApp._gqlState.value.clients
+    const clients = (nuxtApp._gqlState.value as GqlState).clients
 
     if (clients) {
-      for (let [k, v] of Object.entries(clients)) {
+      for (const [k, v] of Object.entries(clients)) {
         if (reset) {
-          v['options'] = {}
+          // @ts-ignore
+          v.options = {}
 
           continue
         }
 
-        if (!state?.options?.[k]) continue
+        if (!state?.options?.[k]) { continue }
 
-        v['options'] = nuxtApp._gqlState.value.options[k]
+        // @ts-ignore
+        v.options = nuxtApp._gqlState.value.options[k]
       }
     }
   }
@@ -87,33 +90,32 @@ const initClients = () => {
   state.value.options = state.value?.options || {}
 
   for (const [name, v] of Object.entries(clients)) {
-    if (state.value?.clients[name]) continue
+    if (state.value?.clients[name]) { continue }
 
-    if (!state.value?.options[name]) state.value.options[name] = {}
+    if (!state.value?.options[name]) { state.value.options[name] = {} }
 
     const c = new GraphQLClient(v.host, state.value.options[name])
     state.value.clients[name] = c
 
-    if (v?.token) useGqlToken(v.token, { client: name as GqlClients })
+    if (v?.token) { useGqlToken(v.token, { client: name as GqlClients }) }
   }
 }
 
 const getClient = (client?: GqlClients): GqlClients => {
   const state = useGqlState()
 
-  if (client && state.value?.clients?.[client]) return client
+  if (client && state.value?.clients?.[client]) { return client }
 
   const { clients } = useRuntimeConfig()?.['graphql-client'] as GqlConfig
 
-  if (!state.value.clients || !state.value.options) initClients()
+  if (!state.value.clients || !state.value.options) { initClients() }
 
   if (!client && Object.keys(clients)?.length) {
     const defaultClient = Object.entries(clients).find(
       ([k, v]) => k === 'default' || v?.default
     )
 
-    if (defaultClient) client = defaultClient[0] as GqlClients
-    else client = Object.keys(clients)[0] as GqlClients
+    if (defaultClient) { client = defaultClient[0] as GqlClients } else { client = Object.keys(clients)[0] as GqlClients }
   }
 
   return client
@@ -195,7 +197,7 @@ type GqlTokenOptions = {
  * @param {object} opts
  * */
 export const useGqlToken = (token: string, opts?: GqlTokenOptions) => {
-  if (!token) return
+  if (!token) { return }
 
   let { client, config } = opts || {}
 
@@ -206,9 +208,9 @@ export const useGqlToken = (token: string, opts?: GqlTokenOptions) => {
   useGqlState({
     options: {
       [client]: {
-        headers: { [config.name]: `${config.type} ${token}` },
-      },
-    },
+        headers: { [config.name]: `${config.type} ${token}` }
+      }
+    }
   })
 }
 
@@ -233,7 +235,7 @@ export const useGqlCors = ({ mode, credentials, client }: GqlCors) => {
 
   const corsOptions = {
     ...(mode && { mode }),
-    ...(credentials && { credentials }),
+    ...(credentials && { credentials })
   }
 
   useGqlState({ options: { [client]: corsOptions } })
@@ -252,7 +254,7 @@ export const useGql = (client?: GqlClients): ReturnType<typeof gqlSdk> => {
   if (process.server && state.value?.proxyCookies) {
     const { cookie } = useRequestHeaders(['cookie'])
 
-    if (cookie) gqlClient.setHeader('cookie', cookie)
+    if (cookie) { gqlClient.setHeader('cookie', cookie) }
   }
 
   const $gql: ReturnType<typeof gqlSdk> = gqlSdk(gqlClient)
