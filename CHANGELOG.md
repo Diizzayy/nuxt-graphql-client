@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.0.9 (2022-03-23)
+
+
+### Bug Fixes
+
+* respect custom auth header ([b376641](https://github.com/diizzayy/nuxt-graphql-client/commit/b376641f2df41d95e25e6ba4cd05c9a3565c1705))
+
 ### 0.0.8 (2022-03-22)
 
 
