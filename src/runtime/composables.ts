@@ -1,8 +1,7 @@
-import { deepmerge } from 'deepmerge-ts'
 import { GraphQLClient } from 'graphql-request'
-
 import type { Ref } from 'vue'
-import type { GqlConfig } from '../module'
+import { deepmerge } from '../utils'
+import type { GqlClient, GqlConfig } from '../module'
 import type { GqlClients } from '#build/gql'
 
 import {
@@ -97,7 +96,7 @@ const initClients = () => {
     const c = new GraphQLClient(v.host, state.value.options[name])
     state.value.clients[name] = c
 
-    if (v?.token) { useGqlToken(v.token, { client: name as GqlClients }) }
+    if (v?.token) { useGqlToken(v.token.value, { client: name as GqlClients, config: { name: v?.token?.name } }) }
   }
 }
 
@@ -203,12 +202,16 @@ export const useGqlToken = (token: string, opts?: GqlTokenOptions) => {
 
   client = getClient(client)
 
-  config = { ...DEFAULT_AUTH, ...config }
+  config = {
+    ...DEFAULT_AUTH,
+    ...{ name: (useRuntimeConfig()?.['graphql-client']?.clients?.[client] as GqlClient<object>)?.token?.name },
+    ...config
+  }
 
   useGqlState({
     options: {
       [client]: {
-        headers: { [config.name]: `${config.type} ${token}` }
+        headers: { [config.name || 'Authorization']: `${config.type} ${token}` }
       }
     }
   })

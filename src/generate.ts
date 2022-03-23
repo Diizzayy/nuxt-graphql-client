@@ -15,7 +15,7 @@ export default async function (options: GenerateOptions): Promise<string> {
   const schema: Types.Config['schema'] = Object.values(options.clients).map(v =>
     !v?.token
       ? v.host
-      : { [v.host]: { headers: { Authorization: 'Bearer ' + v.token } } }
+      : { [v.host]: { headers: { [v?.token?.name || 'Authorization']: `Bearer ${v.token.value}` } } }
   )
 
   const [{ content }]: [{ content: string }] = await generate(

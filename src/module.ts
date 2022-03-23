@@ -9,22 +9,23 @@ import {
   createResolver,
   defineNuxtModule
 } from '@nuxt/kit'
-import { deepmerge } from 'deepmerge-ts'
 import { name, version } from '../package.json'
 import generate from './generate'
-import { prepareContext, GqlContext } from './context'
-import { prepareOperations, prepareTemplate } from './utils'
+import { deepmerge } from './utils'
+import { prepareContext, GqlContext, prepareOperations, prepareTemplate } from './context'
 
 const logger = useLogger('nuxt-graphql-client')
 
-export interface GqlClient {
+type TokenOpts = { name?: string, value?: string }
+
+export interface GqlClient<T = string> {
   host: string
   default?: boolean
-  token?: string
+  token?: T extends object ? TokenOpts : string | TokenOpts
 }
 
 export type GqlConfig<T = GqlClient> = {
-  clients: Record<string, T extends GqlClient ? GqlClient : string | GqlClient>
+  clients: Record<string, T extends GqlClient ? Partial<GqlClient<T>> : string | GqlClient<T>>
 }
 
 export interface ModuleOptions {
@@ -164,23 +165,30 @@ export default defineNuxtModule<ModuleOptions>({
 
       const runtimeToken = k === 'default' ? process.env.GQL_TOKEN : process.env?.[`GQL_${k.toUpperCase()}_TOKEN`]
 
-      const token = runtimeToken || (typeof v !== 'string' && v?.token)
+      const token = runtimeToken || (
+        typeof v !== 'string' && ((typeof v?.token === 'object' && v.token?.value) || (typeof v?.token === 'string' && v.token))
+      )
 
-      const conf = { host, ...(token && { token }) }
+      const runtimeTokenName = k === 'default' ? process.env.GQL_TOKEN_NAME : process.env?.[`GQL_${k.toUpperCase()}_TOKEN_NAME`]
+      const tokenName = runtimeTokenName || (typeof v !== 'string' && typeof v?.token === 'object' && v.token.name)
 
-      ctx.clientOps[k] = []
-      if (typeof v === 'string') {
-        config.clients[k] = conf
-      } else if ('host' in v) {
-        config.clients[k] = defu(v, conf)
+      const conf: GqlClient = {
+        ...(typeof v !== 'string' && { ...v }),
+        host,
+        token: { name: tokenName, ...(token && { value: token }) }
       }
 
-      nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] = deepmerge({}, config.clients[k])
+      ctx.clientOps[k] = []
+      config.clients[k] = deepmerge({}, conf)
+      nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] = deepmerge({}, conf)
 
       if (token) {
-        delete (nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] as GqlClient).token
+        if (!tokenName) {
+          delete (nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] as GqlClient)?.token
+          // @ts-ignore
+        } else { delete (nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] as GqlClient)?.token?.value }
 
-        nuxt.options.privateRuntimeConfig['graphql-client'].clients[k] = { token }
+        nuxt.options.privateRuntimeConfig['graphql-client'].clients[k] = { token: { value: token } }
       }
     }
 
@@ -207,10 +215,6 @@ export default defineNuxtModule<ModuleOptions>({
       for await (const path of documentPaths) {
         const files = (await resolveFiles(path, gqlMatch)).filter(allowDocument)
 
-        if (multipleClients) {
-          await prepareOperations(ctx, files)
-        }
-
         gqlFiles.push(...files)
       }
 
@@ -221,13 +225,9 @@ export default defineNuxtModule<ModuleOptions>({
       if (gqlFiles?.length) {
         plugins.push('typescript-operations')
 
-        for (const file of gqlFiles) {
-          documents.push(file)
-        }
+        for (const file of gqlFiles) { documents.push(file) }
 
-        if (documents?.length) {
-          plugins.push('typescript-graphql-request')
-        }
+        if (documents?.length) { plugins.push('typescript-graphql-request') }
       }
 
       ctx.template = await generate({
@@ -241,6 +241,7 @@ export default defineNuxtModule<ModuleOptions>({
 
       if (multipleClients) {
         prepareTemplate(ctx)
+        await prepareOperations(ctx, gqlFiles)
       }
 
       prepareContext(ctx, options.functionPrefix)
@@ -320,13 +321,9 @@ declare module '@nuxt/schema' {
     GQL_HOST: string
 
     // @ts-ignore
-    gql?: {
-      clients: Omit<GqlConfig<any>['clients'], 'token'>
-    }
+    gql?: GqlConfig<any>
 
     // @ts-ignore
-    'graphql-client'?: {
-      clients: Omit<GqlConfig<any>['clients'], 'token'>
-    }
+    'graphql-client'?: GqlConfig<any>
   }
 }
