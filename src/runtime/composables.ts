@@ -1,7 +1,7 @@
 import { GraphQLClient } from 'graphql-request'
 import type { Ref } from 'vue'
-import { deepmerge } from '../utils'
 import type { GqlClient, GqlConfig } from '../module'
+import { deepmerge } from './utils'
 import type { GqlClients } from '#build/gql'
 
 import {

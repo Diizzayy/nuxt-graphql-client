@@ -11,7 +11,7 @@ import {
 } from '@nuxt/kit'
 import { name, version } from '../package.json'
 import generate from './generate'
-import { deepmerge } from './utils'
+import { deepmerge } from './runtime/utils'
 import { prepareContext, GqlContext, prepareOperations, prepareTemplate } from './context'
 
 const logger = useLogger('nuxt-graphql-client')
