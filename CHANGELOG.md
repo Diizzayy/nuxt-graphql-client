@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.10](https://github.com/diizzayy/nuxt-graphql-client/compare/v0.0.9...v0.0.10) (2022-03-24)
+
+
+### Bug Fixes
+
+* prepare operations before template ([dbfbab4](https://github.com/diizzayy/nuxt-graphql-client/commit/dbfbab490dd939cb5d1cd839b9e214adbee2674f))
+
 ### 0.0.9 (2022-03-23)
 
 
