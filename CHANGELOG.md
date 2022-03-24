@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.11](https://github.com/diizzayy/nuxt-graphql-client/compare/v0.0.10...v0.0.11) (2022-03-24)
+
+
+### Bug Fixes
+
+* allow naming conventions for single clients ([324ab72](https://github.com/diizzayy/nuxt-graphql-client/commit/324ab7246cacaadeca25d055548a15c97d8b8c22))
+
 ### [0.0.10](https://github.com/diizzayy/nuxt-graphql-client/compare/v0.0.9...v0.0.10) (2022-03-24)
 
 
