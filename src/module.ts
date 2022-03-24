@@ -239,7 +239,7 @@ export default defineNuxtModule<ModuleOptions>({
         onlyOperationTypes: options.onlyOperationTypes
       })
 
-      if (multipleClients) {
+      if (multipleClients || !config.clients?.default) {
         await prepareOperations(ctx, gqlFiles)
         prepareTemplate(ctx)
       }
