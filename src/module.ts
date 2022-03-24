@@ -240,8 +240,8 @@ export default defineNuxtModule<ModuleOptions>({
       })
 
       if (multipleClients) {
-        prepareTemplate(ctx)
         await prepareOperations(ctx, gqlFiles)
+        prepareTemplate(ctx)
       }
 
       prepareContext(ctx, options.functionPrefix)
