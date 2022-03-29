@@ -24,6 +24,9 @@ dist
 .env
 .netlify
 
+# Firebase
+.firebase*
+
 # Env
 .env*
 

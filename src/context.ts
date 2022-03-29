@@ -1,5 +1,6 @@
 import { promises as fsp } from 'fs'
 import { parse } from 'graphql'
+import { upperFirst } from 'scule'
 import type { Import } from 'unimport'
 
 export interface GqlContext {
@@ -15,8 +16,7 @@ export interface GqlContext {
 export function prepareContext (ctx: GqlContext, prefix: string) {
   ctx.fns = ctx.template?.match(/\w+\s*(?=\(variables)/g)?.sort() || []
 
-  const fnName = (fn: string) =>
-    prefix + fn.charAt(0).toUpperCase() + fn.slice(1)
+  const fnName = (fn: string) => prefix + upperFirst(fn)
 
   const fnExp = (fn: string, typed = false) => {
     const name = fnName(fn)
@@ -101,10 +101,7 @@ export function prepareTemplate (ctx: GqlContext) {
       const originalName = `${client}_${op}`
       const originalNameRe = new RegExp(originalName, 'g')
 
-      const toPSCase = (s: string) => s
-        .split('_')
-        .map(s => s.charAt(0).toUpperCase() + s.slice(1))
-        .join('_')
+      const toPSCase = (s: string) => s.split('_').map(upperFirst).join('_')
 
       const secondCase = toPSCase(originalName)
       const secondCaseRe = new RegExp(secondCase, 'g')
