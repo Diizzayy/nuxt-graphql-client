@@ -60,7 +60,7 @@ jobs:
       - name: Lint
         run: yarn lint
   
-  build-publish:
+  release-build:
     if: |
       github.event_name == 'push' &&
       !contains(github.event.head_commit.message, 'chore') &&
@@ -100,3 +100,53 @@ jobs:
         run: yarn release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    
+  publish-docs:
+    if: |
+      github.event_name == 'push' &&
+      contains(github.event.head_commit.message, 'docs')
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [16]
+    
+    defaults:
+      run:
+        working-directory: docs
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'yarn'
+          cache-dependency-path: yarn.lock
+          node-version: ${{ matrix.node }}
+
+      - name: Install dependencies 👨🏻‍💻
+        run: yarn --immutable
+
+      - name: Cache Nuxt Build
+        uses: actions/cache@v2
+        id: nuxt-cache
+        with:
+          path: ./node_modules/.cache
+          key: ${{ runner.os }}-nuxt-${{ hashFiles('**/lockfiles') }}
+          restore-keys: |
+            ${{ runner.os }}-nuxt-
+
+      - name: Generate Docs
+        run: yarn generate
+
+      - name: Deploy To Firebase
+        run: |
+          curl -sL firebase.tools | bash > /dev/null
+          firebase use --add "$PROJECT_ID" > /dev/null
+          firebase deploy --only hosting --message "$COMMIT_MESSAGE"
+        env:
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}

@@ -25,7 +25,7 @@ dist
 .netlify
 
 # Env
-.env
+.env*
 
 # Testing
 reports
