@@ -130,7 +130,7 @@ jobs:
         run: yarn --immutable
 
       - name: Cache Nuxt Build
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: nuxt-cache
         with:
           path: ./node_modules/.cache
