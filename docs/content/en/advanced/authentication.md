@@ -9,7 +9,7 @@ position: 5
 
 Make authenticated requests to the GraphQL APIs.
 
-`nuxt-graphql-client` provides a [`useGqlToken`](/getting-started/helper-functions#usegqltoken) helper function to attach an authorization header to subsequent requests.
+`nuxt-graphql-client` provides a [`useGqlToken`](/getting-started/composables#usegqltoken) composable to attach an authorization header to subsequent requests.
 
 Any requests made after the token is set will be sent with the authenticaion header configured by `useGqlToken`.
 
@@ -24,14 +24,14 @@ function afterLogin(idToken: string) {
 </script>
 ```
 
-More information at [useGqlToken helper function](/getting-started/helper-functions#usegqltoken)
+More information at [useGqlToken composable](/getting-started/composables#usegqltoken)
 
 ### Custom Token
 
 The default Authorization header is `Authorization`. If your GraphQL API requires a different name, you can specify it either:
 - In the Nuxt Configuration
 - In an Environment Variable
-- When using the [`useGqlToken`](/getting-started/helper-functions#usegqltoken) helper function.
+- When using the [`useGqlToken`](/getting-started/composables#usegqltoken) composable.
 
 Given the [client](multiple-clients) name `shopify`
 

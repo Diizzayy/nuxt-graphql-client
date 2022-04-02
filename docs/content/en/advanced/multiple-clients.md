@@ -23,7 +23,7 @@ Only one client can be set as [default](/advanced/multiple-clients#default-clien
 
 ## Multiple Client Mode
 
-When you have configured more than one client, The behavior of the module slightly changes and the pertinent client must be specified when using [Helper Functions](/getting-started/helper-functions) and when composing GraphQL Operations for the clients that aren't flagged as [default](#default-client).
+When you have configured more than one client, The behavior of the module slightly changes and the pertinent client must be specified when using `nuxt-graphql-client`[Composables](/getting-started/composables) and when composing GraphQL Operations for the clients that aren't flagged as [default](#default-client).
 
 ### Configure multiple clients
 

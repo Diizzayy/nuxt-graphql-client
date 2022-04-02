@@ -2,11 +2,35 @@
 title: Configuration
 description: 'Configuration options for `nuxt-graphql-client`.'
 category: Getting Started
-position: 3
+position: 4
 ---
 
 `nuxt-graphql-client` can be configured via [runtime configuration](https://v3.nuxtjs.org/docs/usage/runtime-config) by using either the `gql` or `graphql-client` key.
 
+## Options
+
+```ts
+{
+  watch: true,
+  silent: true,
+  autoImport: true,
+  functionPrefix: 'Gql',
+  onlyOperationTypes: true,
+  documentPaths: [],
+  clients: {
+    default: '<GRAPHQL_HOST>',
+    '<CLIENT_NAME>': {
+      default: false,
+      host: '<GRAPHQL_HOST>',
+      token: '<TOKEN_VALUE>'
+      // token: {
+      //   name: '<TOKEN_NAME>',
+      //   value: '<TOKEN_VALUE>'
+      // },
+    }
+  }
+}
+```
 
 ## Reference
 
@@ -16,6 +40,13 @@ position: 3
 - Default: **true**
 
 Enable hot reloading for GraphQL documents
+
+### `slient`
+
+- Type: **boolean**
+- Default: **true**
+
+Prevent GraphQL Code Generator from printing to console
 
 ### `autoImport`
 

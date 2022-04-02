@@ -1,8 +1,8 @@
 ---
-title: Helper Functions
-description: 'Use authentication helpers provided by nuxt-graphql-client'
+title: Composables
+description: 'Use composables provided by nuxt-graphql-client'
 category: Getting Started
-position: 4
+position: 3
 ---
 
 ## `useGqlCors`
