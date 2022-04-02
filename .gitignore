@@ -52,3 +52,6 @@ coverage
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# GraphQL Code Generator
+.graphqlrc

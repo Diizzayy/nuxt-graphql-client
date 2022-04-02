@@ -30,7 +30,10 @@ export default async function (options: GenerateOptions): Promise<string> {
             skipTypename: true,
             useTypeImports: true,
             gqlImport: 'graphql-request#gql',
-            onlyOperationTypes: options.onlyOperationTypes
+            onlyOperationTypes: options.onlyOperationTypes,
+            namingConvention: {
+              enumValues: 'change-case-all#upperCaseFirst'
+            }
           }
         }
       }
