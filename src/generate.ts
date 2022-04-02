@@ -13,7 +13,7 @@ interface GenerateOptions {
 
 export default async function (options: GenerateOptions): Promise<string> {
   const schema: Types.Config['schema'] = Object.values(options.clients).map(v =>
-    !v?.token
+    !v?.token?.value
       ? v.host
       : { [v.host]: { headers: { [v?.token?.name || 'Authorization']: `Bearer ${v.token.value}` } } }
   )

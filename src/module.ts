@@ -24,11 +24,7 @@ export interface GqlClient<T = string> {
   token?: T extends object ? TokenOpts : string | TokenOpts
 }
 
-export type GqlConfig<T = GqlClient> = {
-  clients: Record<string, T extends GqlClient ? Partial<GqlClient<T>> : string | GqlClient<T>>
-}
-
-export interface ModuleOptions {
+export interface GqlConfig<T = GqlClient> {
   /**
    * Prevent codegen from printing to console in dev mode
    *
@@ -93,14 +89,14 @@ export interface ModuleOptions {
    *
    * @note this option overrides the `GQL_HOST` in `publicRuntimeConfig`.
    * */
-  clients?: GqlConfig['clients']
+  clients?: Record<string, T extends GqlClient ? Partial<GqlClient<T>> : string | GqlClient<T>>
 }
 
-export default defineNuxtModule<ModuleOptions>({
+export default defineNuxtModule<GqlConfig>({
   meta: {
     name,
     version,
-    configKey: 'gql',
+    configKey: 'graphql-client',
     compatibility: {
       nuxt: '^3.0.0'
     }
@@ -113,15 +109,14 @@ export default defineNuxtModule<ModuleOptions>({
     functionPrefix: 'Gql',
     onlyOperationTypes: true
   },
-  async setup (options, nuxt) {
+  async setup (opts, nuxt) {
     const ctx: GqlContext = { clients: [], clientOps: {} }
 
     const config: GqlConfig<string | GqlClient> = defu(
       {},
       nuxt.options.publicRuntimeConfig['graphql-client'],
       nuxt.options.publicRuntimeConfig.gql,
-      { clients: options.clients }
-    )
+      opts)
 
     ctx.clients = Object.keys(config.clients)
 
@@ -149,9 +144,7 @@ export default defineNuxtModule<ModuleOptions>({
     // @ts-ignore
     nuxt.options.privateRuntimeConfig['graphql-client'] = { clients: {} }
 
-    if (!nuxt.options.publicRuntimeConfig['graphql-client']) {
-      nuxt.options.publicRuntimeConfig['graphql-client'] = { clients: {} }
-    }
+    nuxt.options.publicRuntimeConfig['graphql-client'] = defu({}, { clients: {} }, nuxt.options.publicRuntimeConfig['graphql-client'])
 
     for (const [k, v] of Object.entries(config.clients)) {
       const runtimeHost = k === 'default' ? process.env.GQL_HOST : process.env?.[`GQL_${k.toUpperCase()}_HOST`]
@@ -175,7 +168,7 @@ export default defineNuxtModule<ModuleOptions>({
       const conf: GqlClient = {
         ...(typeof v !== 'string' && { ...v }),
         host,
-        token: { name: tokenName, ...(token && { value: token }) }
+        token: { ...(token && { value: token }), ...(tokenName && { name: tokenName }) }
       }
 
       ctx.clientOps[k] = []
@@ -184,21 +177,22 @@ export default defineNuxtModule<ModuleOptions>({
 
       if (token) {
         if (!tokenName) {
-          delete (nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] as GqlClient)?.token
-          // @ts-ignore
-        } else { delete (nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] as GqlClient)?.token?.value }
+          (nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] as GqlClient).token = undefined
+        } else if (((nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] as GqlClient).token as TokenOpts).value) {
+          ((nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] as GqlClient).token as TokenOpts) = undefined
+        }
 
         nuxt.options.privateRuntimeConfig['graphql-client'].clients[k] = { token: { value: token } }
       }
     }
 
     const resolver = createResolver(import.meta.url)
-    const gqlResolver = createResolver(nuxt.options.srcDir)
+    const srcResolver = createResolver(nuxt.options.srcDir)
 
-    const documentPaths = [gqlResolver.resolve()]
+    const documentPaths = [srcResolver.resolve()]
 
-    if (options.documentPaths) {
-      for (const path of options.documentPaths) {
+    if (config.documentPaths) {
+      for (const path of config.documentPaths) {
         const dir = createResolver(path).resolve()
 
         if (existsSync(dir)) {
@@ -233,10 +227,10 @@ export default defineNuxtModule<ModuleOptions>({
       ctx.template = await generate({
         clients: config.clients as GqlConfig['clients'],
         file: 'gql-sdk.ts',
-        silent: options.silent,
+        silent: config.silent,
         plugins,
         documents,
-        onlyOperationTypes: options.onlyOperationTypes
+        onlyOperationTypes: config.onlyOperationTypes
       })
 
       if (multipleClients || !config.clients?.default) {
@@ -244,7 +238,7 @@ export default defineNuxtModule<ModuleOptions>({
         prepareTemplate(ctx)
       }
 
-      prepareContext(ctx, options.functionPrefix)
+      prepareContext(ctx, config.functionPrefix)
     }
 
     addTemplate({
@@ -261,7 +255,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     addAutoImportDir(resolver.resolve('runtime'))
 
-    if (options.autoImport) {
+    if (config.autoImport) {
       addTemplate({
         filename: 'gql.mjs',
         getContents: () => ctx.generateImports()
@@ -290,9 +284,9 @@ export default defineNuxtModule<ModuleOptions>({
       // })
     }
 
-    const allowDocument = (f: string) => !!statSync(gqlResolver.resolve(f)).size
+    const allowDocument = (f: string) => !!statSync(srcResolver.resolve(f)).size
 
-    if (options.watch) {
+    if (config.watch) {
       nuxt.hook('builder:watch', async (event, path) => {
         if (!path.match(/\.(gql|graphql)$/)) { return }
 
