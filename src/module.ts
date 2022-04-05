@@ -230,7 +230,8 @@ export default defineNuxtModule<GqlConfig>({
         silent: config.silent,
         plugins,
         documents,
-        onlyOperationTypes: config.onlyOperationTypes
+        onlyOperationTypes: config.onlyOperationTypes,
+        resolver: srcResolver
       })
 
       if (multipleClients || !config.clients?.default) {
