@@ -165,7 +165,7 @@ export default defineNuxtModule<GqlConfig>({
       const runtimeTokenName = k === 'default' ? process.env.GQL_TOKEN_NAME : process.env?.[`GQL_${k.toUpperCase()}_TOKEN_NAME`]
       const tokenName = runtimeTokenName || (typeof v !== 'string' && typeof v?.token === 'object' && v.token.name)
 
-      const conf: GqlClient = {
+      const conf: GqlClient<TokenOpts> = {
         ...(typeof v !== 'string' && { ...v }),
         host,
         token: { ...(token && { value: token }), ...(tokenName && { name: tokenName }) }
@@ -175,15 +175,15 @@ export default defineNuxtModule<GqlConfig>({
       config.clients[k] = deepmerge({}, conf)
       nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] = deepmerge({}, conf)
 
-      if (token) {
-        if (!tokenName) {
-          (nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] as GqlClient).token = undefined
-        } else if (((nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] as GqlClient).token as TokenOpts).value) {
-          ((nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] as GqlClient).token as TokenOpts) = undefined
-        }
-
-        nuxt.options.privateRuntimeConfig['graphql-client'].clients[k] = { token: { value: token } }
+      if (!conf.token?.name) {
+        // @ts-ignore
+        nuxt.options.publicRuntimeConfig['graphql-client'].clients[k].token = undefined
+      } else {
+        // @ts-ignore
+        nuxt.options.publicRuntimeConfig['graphql-client'].clients[k].token.value = undefined
       }
+
+      if (conf.token?.value) { nuxt.options.privateRuntimeConfig['graphql-client'].clients[k] = { token: { value: token } } }
     }
 
     const resolver = createResolver(import.meta.url)
