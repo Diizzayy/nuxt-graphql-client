@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.0.17 (2022-04-08)
+
+
+### Bug Fixes
+
+* adhere to runtimeConfig changes ([ac5d53f](https://github.com/diizzayy/nuxt-graphql-client/commit/ac5d53f4fa03389787db059edb0daa70bd022120))
+
 ### 0.0.16 (2022-04-05)
 
 ### 0.0.15 (2022-04-02)
