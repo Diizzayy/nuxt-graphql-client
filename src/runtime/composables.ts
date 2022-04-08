@@ -1,3 +1,4 @@
+import { defu } from 'defu'
 import { GraphQLClient } from 'graphql-request'
 import type { Ref } from 'vue'
 import type { GqlClient, GqlConfig } from '../module'
@@ -83,7 +84,8 @@ const useGqlState = (state?: GqlState, reset?: boolean): Ref<GqlState> => {
 const initClients = () => {
   const state = useGqlState()
 
-  const { clients } = useRuntimeConfig()?.['graphql-client'] as GqlConfig
+  const config = useRuntimeConfig()
+  const { clients } = deepmerge({}, defu(config?.['graphql-client'], config?.public?.['graphql-client'])) as GqlConfig
 
   state.value.clients = state.value?.clients || {}
   state.value.options = state.value?.options || {}
@@ -105,7 +107,7 @@ const getClient = (client?: GqlClients): GqlClients => {
 
   if (client && state.value?.clients?.[client]) { return client }
 
-  const { clients } = useRuntimeConfig()?.['graphql-client'] as GqlConfig
+  const { clients } = useRuntimeConfig()?.public?.['graphql-client'] as GqlConfig
 
   if (!state.value.clients || !state.value.options) { initClients() }
 
@@ -204,7 +206,7 @@ export const useGqlToken = (token: string, opts?: GqlTokenOptions) => {
 
   config = {
     ...DEFAULT_AUTH,
-    ...{ name: (useRuntimeConfig()?.['graphql-client']?.clients?.[client] as GqlClient<object>)?.token?.name },
+    ...{ name: (useRuntimeConfig()?.public?.['graphql-client']?.clients?.[client] as GqlClient<object>)?.token?.name },
     ...config
   }
 
