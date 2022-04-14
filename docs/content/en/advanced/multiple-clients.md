@@ -27,7 +27,7 @@ When you have configured more than one client, The behavior of the module slight
 
 ### Configure multiple clients
 
-Multiple clients can be configured by adding the `clients` key to the `graphql-client` property in publicRuntimeConfig.
+Multiple clients can be configured by adding the `clients` key to the `graphql-client` property in public runtimeConfig.
 
 The client names are inferred from the keys provided in the `clients` object.
 
@@ -39,19 +39,21 @@ import { defineNuxtConfig } from 'nuxt3'
 export default defineNuxtConfig({
   modules: ['nuxt-graphql-client'],
 
-  publicRuntimeConfig: {
-    'graphql-client': {
-      clients: {
-        default: 'https://api.spacex.land/graphql', // process.env.GQL_HOST
-        github: {
-          host: 'https://api.github.com/graphql', // process.env.GQL_GITHUB_HOST
-          token: 'your_access_token', // process.env.GQL_GITHUB_TOKEN & process.env.GQL_GITHUB_TOKEN_NAME
-        },
-        countries: {
-          host: 'https://countries.trevorblades.com/graphql', // process.env.GQL_COUNTRIES_HOST
-          token: {
-            name: 'X-Custom-Auth', // process.env.GQL_COUNTRIES_TOKEN_NAME
-            value: 'your_access_token' // process.env.GQL_COUNTRIES_TOKEN
+  runtimeConfig: {
+    public: {
+      'graphql-client': {
+        clients: {
+          default: 'https://api.spacex.land/graphql', // process.env.GQL_HOST
+          github: {
+            host: 'https://api.github.com/graphql', // process.env.GQL_GITHUB_HOST
+            token: 'your_access_token', // process.env.GQL_GITHUB_TOKEN & process.env.GQL_GITHUB_TOKEN_NAME
+          },
+          countries: {
+            host: 'https://countries.trevorblades.com/graphql', // process.env.GQL_COUNTRIES_HOST
+            token: {
+              name: 'X-Custom-Auth', // process.env.GQL_COUNTRIES_TOKEN_NAME
+              value: 'your_access_token' // process.env.GQL_COUNTRIES_TOKEN
+            }
           }
         }
       }

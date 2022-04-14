@@ -48,14 +48,18 @@ Given the [client](multiple-clients) name `shopify`
     export default defineNuxtConfig({
         modules: ['nuxt-graphql-client'],
 
-        publicRuntimeConfig: {
-            'graphql-client': {
-                default: 'https://api.spacex.land/graphql', // overwritten by process.env.GQL_HOST 
-                shopify: {
-                    host: '', // overwritten by process.env.GQL_SHOPIFY_HOST 
-                    token: {
-                        name: 'X-Shopify-Access-Token', // overwritten by process.env.GQL_SHOPIFY_TOKEN_NAME
-                        value: 'your_access_token' // overwritten by process.env.GQL_SHOPIFY_TOKEN
+        runtimeConfig: {
+            public: {
+                'graphql-client': {
+                    clients: {
+                        default: 'https://api.spacex.land/graphql', // overwritten by process.env.GQL_HOST 
+                        shopify: {
+                            host: '', // overwritten by process.env.GQL_SHOPIFY_HOST 
+                            token: {
+                                name: 'X-Shopify-Access-Token', // overwritten by process.env.GQL_SHOPIFY_TOKEN_NAME
+                                value: 'your_access_token' // overwritten by process.env.GQL_SHOPIFY_TOKEN
+                            }
+                        }
                     }
                 }
             }
@@ -75,12 +79,16 @@ import { defineNuxtConfig } from 'nuxt3'
 export default defineNuxtConfig({
     modules: ['nuxt-graphql-client'],
 
-    publicRuntimeConfig: {
-        'graphql-client': {
-            default: 'https://api.spacex.land/graphql',
-            github: {
-                host: 'https://api.github.com/graphql',
-                token: '<your-github-token>' // overwritten by process.env.GQL_GITHUB_TOKEN
+    runtimeConfig: {
+        public: {
+            'graphql-client': {
+                clients: {
+                    default: 'https://api.spacex.land/graphql',
+                    github: {
+                        host: 'https://api.github.com/graphql',
+                        token: '<your-github-token>' // overwritten by process.env.GQL_GITHUB_TOKEN
+                    }
+                }
             }
         }
     }

@@ -87,7 +87,7 @@ export interface GqlConfig<T = GqlClient> {
   /**
    * Allows generating multiple clients with different GraphQL hosts.
    *
-   * @note this option overrides the `GQL_HOST` in `publicRuntimeConfig`.
+   * @note this option overrides the `GQL_HOST` in `runtimeConfig`.
    * */
   clients?: Record<string, T extends GqlClient ? Partial<GqlClient<T>> : string | GqlClient<T>>
 }
@@ -114,17 +114,17 @@ export default defineNuxtModule<GqlConfig>({
 
     const config: GqlConfig<string | GqlClient> = defu(
       {},
-      nuxt.options.publicRuntimeConfig['graphql-client'],
-      nuxt.options.publicRuntimeConfig.gql,
+      nuxt.options.runtimeConfig.public['graphql-client'],
+      nuxt.options.runtimeConfig.public.gql,
       opts)
 
     ctx.clients = Object.keys(config.clients)
 
     if (!ctx?.clients?.length) {
       const host =
-        process.env.GQL_HOST || nuxt.options.publicRuntimeConfig.GQL_HOST
+        process.env.GQL_HOST || nuxt.options.runtimeConfig.public.GQL_HOST
 
-      if (!host) { throw new Error('GQL_HOST is not set in publicRuntimeConfig') }
+      if (!host) { throw new Error('GQL_HOST is not set in public runtimeConfig') }
 
       config.clients = { default: host }
     }
@@ -142,9 +142,9 @@ export default defineNuxtModule<GqlConfig>({
     }
 
     // @ts-ignore
-    nuxt.options.privateRuntimeConfig['graphql-client'] = { clients: {} }
+    nuxt.options.runtimeConfig['graphql-client'] = { clients: {} }
 
-    nuxt.options.publicRuntimeConfig['graphql-client'] = defu({}, { clients: {} }, nuxt.options.publicRuntimeConfig['graphql-client'])
+    nuxt.options.runtimeConfig.public['graphql-client'] = defu({}, { clients: {} }, nuxt.options.runtimeConfig.public['graphql-client'])
 
     for (const [k, v] of Object.entries(config.clients)) {
       const runtimeHost = k === 'default' ? process.env.GQL_HOST : process.env?.[`GQL_${k.toUpperCase()}_HOST`]
@@ -173,17 +173,17 @@ export default defineNuxtModule<GqlConfig>({
 
       ctx.clientOps[k] = []
       config.clients[k] = deepmerge({}, conf)
-      nuxt.options.publicRuntimeConfig['graphql-client'].clients[k] = deepmerge({}, conf)
+      nuxt.options.runtimeConfig.public['graphql-client'].clients[k] = deepmerge({}, conf)
 
       if (!conf.token?.name) {
         // @ts-ignore
-        nuxt.options.publicRuntimeConfig['graphql-client'].clients[k].token = undefined
+        nuxt.options.runtimeConfig.public['graphql-client'].clients[k].token = undefined
       } else {
         // @ts-ignore
-        nuxt.options.publicRuntimeConfig['graphql-client'].clients[k].token.value = undefined
+        nuxt.options.runtimeConfig.public['graphql-client'].clients[k].token.value = undefined
       }
 
-      if (conf.token?.value) { nuxt.options.privateRuntimeConfig['graphql-client'].clients[k] = { token: { value: token } } }
+      if (conf.token?.value) { nuxt.options.runtimeConfig['graphql-client'].clients[k] = { token: { value: token } } }
     }
 
     const resolver = createResolver(import.meta.url)
