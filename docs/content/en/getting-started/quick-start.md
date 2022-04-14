@@ -53,8 +53,10 @@ position: 2
       export default defineNuxtConfig({
         modules: ['nuxt-graphql-client'],
 
-        publicRuntimeConfig: {
-          GQL_HOST: 'https://api.spacex.land/graphql' // overwritten by process.env.GQL_HOST
+        runtimeConfig: {
+          public: {
+            GQL_HOST: 'https://api.spacex.land/graphql' // overwritten by process.env.GQL_HOST
+          }
         }
       })
       ```

@@ -4,11 +4,11 @@ import MyModule from '..'
 export default defineNuxtConfig({
   modules: [MyModule],
 
-  'graphql-client': {
-    documentPaths: []
-  },
+  'graphql-client': { },
 
-  publicRuntimeConfig: {
-    GQL_HOST: 'https://api.spacex.land/graphql'
+  runtimeConfig: {
+    public: {
+      GQL_HOST: 'https://api.spacex.land/graphql'
+    }
   }
 })

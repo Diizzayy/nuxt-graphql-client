@@ -120,17 +120,19 @@ import { defineNuxtConfig } from 'nuxt3'
 export default defineNuxtConfig({
   modules: ['nuxt-graphql-client'],
 
-  publicRuntimeConfig: {
-    'graphql-client': {
-      clients: {
-        default: 'https://api.spacex.land/graphql', // process.env.GQL_HOST & process.env.GQL_TOKEN & process.env.GQL_TOKEN_NAME
-        github: {
-          host: 'https://api.github.com/graphql', // process.env.GQL_GITHUB_HOST
-          token: 'your_access_token', // process.env.GQL_GITHUB_TOKEN & process.env.GQL_GITHUB_TOKEN_NAME
-          // token: {
-          //   name: 'X-Custom-Auth', // process.env.GQL_GITHUB_TOKEN_NAME
-          //   value: 'your_access_token' // process.env.GQL_GITHUB_TOKEN
-          // }
+  runtimeConfig: {
+    public: {
+      'graphql-client': {
+        clients: {
+          default: 'https://api.spacex.land/graphql', // process.env.GQL_HOST & process.env.GQL_TOKEN & process.env.GQL_TOKEN_NAME
+          github: {
+            host: 'https://api.github.com/graphql', // process.env.GQL_GITHUB_HOST
+            token: 'your_access_token', // process.env.GQL_GITHUB_TOKEN & process.env.GQL_GITHUB_TOKEN_NAME
+            // token: {
+            //   name: 'X-Custom-Auth', // process.env.GQL_GITHUB_TOKEN_NAME
+            //   value: 'your_access_token' // process.env.GQL_GITHUB_TOKEN
+            // }
+          }
         }
       }
     }
