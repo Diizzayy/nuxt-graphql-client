@@ -43,7 +43,7 @@ Given the [client](multiple-clients) name `shopify`
 
 - Or, in the Nuxt Configuration:
     ```ts[nuxt.config.ts]
-    import { defineNuxtConfig } from 'nuxt3'
+    import { defineNuxtConfig } from 'nuxt'
 
     export default defineNuxtConfig({
         modules: ['nuxt-graphql-client'],
@@ -74,7 +74,7 @@ Authentication tokens added to either the Nuxt configuration or environment vari
 <code-block label="Nuxt Config" active>
 
 ```ts[nuxt.config.ts]
-import { defineNuxtConfig } from 'nuxt3'
+import { defineNuxtConfig } from 'nuxt'
 
 export default defineNuxtConfig({
     modules: ['nuxt-graphql-client'],

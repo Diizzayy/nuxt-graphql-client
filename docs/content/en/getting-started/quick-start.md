@@ -29,7 +29,7 @@ position: 2
 2. **Enable the module in your nuxt configuration**
 
     ```ts[nuxt.config.ts]
-    import { defineNuxtConfig } from 'nuxt3'
+    import { defineNuxtConfig } from 'nuxt'
 
     export default defineNuxtConfig({
       modules: ['nuxt-graphql-client'],
@@ -48,7 +48,7 @@ position: 2
       <code-block label="Nuxt Config" active>
 
       ```ts[nuxt.config.ts]
-      import { defineNuxtConfig } from 'nuxt3'
+      import { defineNuxtConfig } from 'nuxt'
 
       export default defineNuxtConfig({
         modules: ['nuxt-graphql-client'],

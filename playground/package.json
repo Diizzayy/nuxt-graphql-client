@@ -1,3 +1,4 @@
 {
+    "private": true,
     "name": "nuxt-graphql-client-playground"
 }

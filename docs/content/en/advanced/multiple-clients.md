@@ -34,7 +34,7 @@ The client names are inferred from the keys provided in the `clients` object.
 [Available client options](/getting-started/configuration#clients)
 
 ```ts
-import { defineNuxtConfig } from 'nuxt3'
+import { defineNuxtConfig } from 'nuxt'
 
 export default defineNuxtConfig({
   modules: ['nuxt-graphql-client'],
