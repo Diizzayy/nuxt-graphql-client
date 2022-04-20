@@ -172,7 +172,7 @@ export default defineNuxtModule<GqlConfig>({
       const schema = (typeof v !== 'string' && v?.schema) && srcResolver.resolve(v.schema)
 
       if (schema && !existsSync(schema)) {
-        logger.warn(`The Schema provided for the (${k}) GraphQL Client does not exist. \`host\` will be used as fallback.`)
+        logger.warn(`[nuxt-graphql-client] The Schema provided for the (${k}) GraphQL Client does not exist. \`host\` will be used as fallback.`)
       }
 
       const conf: GqlClient<TokenOpts> = {
@@ -206,7 +206,7 @@ export default defineNuxtModule<GqlConfig>({
         if (existsSync(dir)) {
           documentPaths.push(dir)
         } else {
-          logger.warn(`[Gql Module] Invalid document path: ${dir}`)
+          logger.warn(`[nuxt-graphql-client] Invalid document path: ${dir}`)
         }
       }
     }
