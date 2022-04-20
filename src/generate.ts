@@ -17,9 +17,11 @@ interface GenerateOptions {
 
 async function prepareConfig (options: GenerateOptions): Promise<Types.Config> {
   const schema: Types.Config['schema'] = Object.values(options.clients).map(v =>
-    !v?.token?.value
-      ? v.host
-      : { [v.host]: { headers: { [v?.token?.name || 'Authorization']: `Bearer ${v.token.value}` } } }
+    v?.schema
+      ? v.schema
+      : !v?.token?.value
+          ? v.host
+          : { [v.host]: { headers: { [v?.token?.name || 'Authorization']: `Bearer ${v.token.value}` } } }
   )
 
   const config: Types.Config = {

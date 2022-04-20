@@ -20,6 +20,7 @@ type TokenOpts = { name?: string, value?: string }
 
 export interface GqlClient<T = string> {
   host: string
+  schema?: string
   default?: boolean
   token?: T extends object ? TokenOpts : string | TokenOpts
 }
@@ -110,6 +111,9 @@ export default defineNuxtModule<GqlConfig>({
     onlyOperationTypes: true
   },
   async setup (opts, nuxt) {
+    const resolver = createResolver(import.meta.url)
+    const srcResolver = createResolver(nuxt.options.srcDir)
+
     const ctx: GqlContext = { clients: [], clientOps: {} }
 
     const config: GqlConfig<string | GqlClient> = defu(
@@ -165,9 +169,16 @@ export default defineNuxtModule<GqlConfig>({
       const runtimeTokenName = k === 'default' ? process.env.GQL_TOKEN_NAME : process.env?.[`GQL_${k.toUpperCase()}_TOKEN_NAME`]
       const tokenName = runtimeTokenName || (typeof v !== 'string' && typeof v?.token === 'object' && v.token.name)
 
+      const schema = (typeof v !== 'string' && v?.schema) && srcResolver.resolve(v.schema)
+
+      if (schema && !existsSync(schema)) {
+        logger.warn(`The Schema provided for the (${k}) GraphQL Client does not exist. \`host\` will be used as fallback.`)
+      }
+
       const conf: GqlClient<TokenOpts> = {
         ...(typeof v !== 'string' && { ...v }),
         host,
+        schema: schema && existsSync(schema) ? schema : undefined,
         token: { ...(token && { value: token }), ...(tokenName && { name: tokenName }) }
       }
 
@@ -185,9 +196,6 @@ export default defineNuxtModule<GqlConfig>({
 
       if (conf.token?.value) { nuxt.options.runtimeConfig['graphql-client'].clients[k] = { token: { value: token } } }
     }
-
-    const resolver = createResolver(import.meta.url)
-    const srcResolver = createResolver(nuxt.options.srcDir)
 
     const documentPaths = [srcResolver.resolve()]
 
