@@ -75,7 +75,11 @@ export async function prepareOperations (ctx: GqlContext, path: string[]) {
     const { definitions } = parse(await fsp.readFile(file, 'utf8'))
 
     // @ts-ignore
-    const operations: string[] = definitions.map(({ name }) => name.value)
+    const operations: string[] = definitions.map(({ name }) => {
+      if (!name?.value) { throw new Error(`Operation name missing in: ${file}`) }
+
+      return name.value
+    })
 
     for (const op of operations) {
       const clientName = op?.match(/^([^_]*)/)?.[0]
