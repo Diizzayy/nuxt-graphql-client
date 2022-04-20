@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.0.20 (2022-04-20)
+
+
+### Features
+
+* allow schema to be provided for code generation ([4771ea8](https://github.com/diizzayy/nuxt-graphql-client/commit/4771ea8d8a07c7b25b8ca9afe6a31f60ef5bc639))
+
 ### 0.0.19 (2022-04-20)
 
 
