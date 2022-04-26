@@ -16,7 +16,7 @@ import { prepareContext, GqlContext, prepareOperations, prepareTemplate } from '
 
 const logger = useLogger('nuxt-graphql-client')
 
-type TokenOpts = { name?: string, value?: string }
+type TokenOpts = { name?: string, value?: string, type?: string | null | undefined }
 
 export interface GqlClient<T = string> {
   host: string
@@ -168,6 +168,7 @@ export default defineNuxtModule<GqlConfig>({
 
       const runtimeTokenName = k === 'default' ? process.env.GQL_TOKEN_NAME : process.env?.[`GQL_${k.toUpperCase()}_TOKEN_NAME`]
       const tokenName = runtimeTokenName || (typeof v !== 'string' && typeof v?.token === 'object' && v.token.name)
+      const tokenType = (typeof v !== 'string' && typeof v?.token === 'object' && v?.token?.type !== undefined) ? v?.token?.type : 'Bearer'
 
       const schema = (typeof v !== 'string' && v?.schema) && srcResolver.resolve(v.schema)
 
@@ -179,22 +180,21 @@ export default defineNuxtModule<GqlConfig>({
         ...(typeof v !== 'string' && { ...v }),
         host,
         schema: schema && existsSync(schema) ? schema : undefined,
-        token: { ...(token && { value: token }), ...(tokenName && { name: tokenName }) }
+        token: {
+          ...(token && { value: token }),
+          ...(tokenName && { name: tokenName }),
+          type: typeof tokenType !== 'string' ? '' : tokenType
+        }
       }
 
       ctx.clientOps[k] = []
       config.clients[k] = deepmerge({}, conf)
       nuxt.options.runtimeConfig.public['graphql-client'].clients[k] = deepmerge({}, conf)
 
-      if (!conf.token?.name) {
-        // @ts-ignore
-        nuxt.options.runtimeConfig.public['graphql-client'].clients[k].token = undefined
-      } else {
-        // @ts-ignore
+      if (conf.token?.value) {
+        nuxt.options.runtimeConfig['graphql-client'].clients[k] = { token: conf.token }
         nuxt.options.runtimeConfig.public['graphql-client'].clients[k].token.value = undefined
       }
-
-      if (conf.token?.value) { nuxt.options.runtimeConfig['graphql-client'].clients[k] = { token: { value: token } } }
     }
 
     const documentPaths = [srcResolver.resolve()]

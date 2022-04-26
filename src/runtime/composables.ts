@@ -98,7 +98,7 @@ const initClients = () => {
     const c = new GraphQLClient(v.host, state.value.options[name])
     state.value.clients[name] = c
 
-    if (v?.token?.value) { useGqlToken(v.token.value, { client: name as GqlClients, config: { name: v?.token?.name } }) }
+    if (v?.token?.value) { useGqlToken(v.token.value, { client: name as GqlClients }) }
   }
 }
 
@@ -171,7 +171,7 @@ interface GqlTokenConfig {
   type?: string
 }
 
-const DEFAULT_AUTH: GqlTokenConfig = { type: 'Bearer', name: 'authorization' }
+const DEFAULT_AUTH: GqlTokenConfig = { type: 'Bearer', name: 'Authorization' }
 
 type GqlTokenOptions = {
   /**
@@ -204,16 +204,19 @@ export const useGqlToken = (token: string, opts?: GqlTokenOptions) => {
 
   client = getClient(client)
 
+  const clientConfig: GqlClient<object> = useRuntimeConfig()?.public?.['graphql-client']?.clients?.[client]
+
   config = {
     ...DEFAULT_AUTH,
-    ...{ name: (useRuntimeConfig()?.public?.['graphql-client']?.clients?.[client] as GqlClient<object>)?.token?.name },
+    ...(clientConfig?.token?.name && { name: clientConfig.token.name }),
+    ...(clientConfig?.token?.type !== undefined && { type: clientConfig.token.type }),
     ...config
   }
 
   useGqlState({
     options: {
       [client]: {
-        headers: { [config.name || 'Authorization']: `${config.type} ${token}` }
+        headers: { [config.name || DEFAULT_AUTH.name]: `${config.type} ${token}`.trim() }
       }
     }
   })
