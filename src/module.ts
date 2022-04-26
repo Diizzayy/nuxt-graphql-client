@@ -16,7 +16,7 @@ import { prepareContext, GqlContext, prepareOperations, prepareTemplate } from '
 
 const logger = useLogger('nuxt-graphql-client')
 
-type TokenOpts = { name?: string, value?: string, type?: string | null | undefined }
+type TokenOpts = { name?: string, value?: string, type?: string}
 
 export interface GqlClient<T = string> {
   host: string
