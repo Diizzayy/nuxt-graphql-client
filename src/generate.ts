@@ -16,13 +16,16 @@ interface GenerateOptions {
 }
 
 async function prepareConfig (options: GenerateOptions): Promise<Types.Config> {
-  const schema: Types.Config['schema'] = Object.values(options.clients).map(v =>
-    v?.schema
-      ? v.schema
-      : !v?.token?.value
-          ? v.host
-          : { [v.host]: { headers: { [v?.token?.name || 'Authorization']: `Bearer ${v.token.value}` } } }
-  )
+  const schema: Types.Config['schema'] = Object.values(options.clients).map((v) => {
+    if (v.schema) { return v.schema }
+
+    if (!v?.token?.value) { return v.host }
+
+    const tokenName = v?.token?.name || 'Authorization'
+    const token = `${v?.token?.type} ${v?.token?.value}`.trim()
+
+    return { [v.host]: { headers: { [tokenName]: token } } }
+  })
 
   const config: Types.Config = {
     schema,

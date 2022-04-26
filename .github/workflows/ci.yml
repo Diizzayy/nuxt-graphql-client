@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         node: [16]
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
 
     steps:
       - name: Checkout
@@ -130,7 +130,7 @@ jobs:
         run: yarn --immutable
 
       - name: Cache Nuxt Build
-        uses: actions/cache@v3.0.2
+        uses: actions/cache@v2
         id: nuxt-cache
         with:
           path: ./node_modules/.cache

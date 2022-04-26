@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.0.21 (2022-04-26)
+
+
+### Bug Fixes
+
+* allow authentication without `auth-scheme` ([bcb2ef0](https://github.com/diizzayy/nuxt-graphql-client/commit/bcb2ef06a09d7324f564e49d1966b2cf86bdc11b))
+
 ### 0.0.20 (2022-04-20)
 
 
