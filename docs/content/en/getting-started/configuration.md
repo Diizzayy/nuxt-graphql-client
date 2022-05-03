@@ -41,7 +41,7 @@ position: 4
 
 Enable hot reloading for GraphQL documents
 
-### `slient`
+### `silent`
 
 - Type: **boolean**
 - Default: **true**
