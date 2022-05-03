@@ -32,14 +32,14 @@ position: 2
     import { defineNuxtConfig } from 'nuxt'
 
     export default defineNuxtConfig({
-      modules: ['nuxt-graphql-client'],
+      buildModules: ['nuxt-graphql-client'],
     })
     ```
 
 3. **Provide the URL to your GraphQL API**
 
     This can be done in either the nuxt configuration or via a `.env` file. 
-    
+
     However though, Adding the `GQL_HOST` variable to your `.env` would overwrite the `GQL_HOST` value defined in the nuxt configuration.
 
     The example below uses the public [SpaceX GraphQL API](https://api.spacex.land/graphql).
@@ -51,7 +51,7 @@ position: 2
       import { defineNuxtConfig } from 'nuxt'
 
       export default defineNuxtConfig({
-        modules: ['nuxt-graphql-client'],
+        buildModules: ['nuxt-graphql-client'],
 
         runtimeConfig: {
           public: {

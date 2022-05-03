@@ -41,7 +41,7 @@ position: 4
 
 Enable hot reloading for GraphQL documents
 
-### `slient`
+### `silent`
 
 - Type: **boolean**
 - Default: **true**
@@ -118,7 +118,7 @@ The [default client](/advanced/multiple-clients#default-client) overrides `GQL_H
 import { defineNuxtConfig } from 'nuxt'
 
 export default defineNuxtConfig({
-  modules: ['nuxt-graphql-client'],
+  buildModules: ['nuxt-graphql-client'],
 
   runtimeConfig: {
     public: {

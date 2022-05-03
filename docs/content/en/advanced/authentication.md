@@ -46,7 +46,7 @@ Given the [client](multiple-clients) name `shopify`
     import { defineNuxtConfig } from 'nuxt'
 
     export default defineNuxtConfig({
-        modules: ['nuxt-graphql-client'],
+        buildModules: ['nuxt-graphql-client'],
 
         runtimeConfig: {
             public: {
@@ -77,7 +77,7 @@ Authentication tokens added to either the Nuxt configuration or environment vari
 import { defineNuxtConfig } from 'nuxt'
 
 export default defineNuxtConfig({
-    modules: ['nuxt-graphql-client'],
+    buildModules: ['nuxt-graphql-client'],
 
     runtimeConfig: {
         public: {
