@@ -118,7 +118,7 @@ The [default client](/advanced/multiple-clients#default-client) overrides `GQL_H
 import { defineNuxtConfig } from 'nuxt'
 
 export default defineNuxtConfig({
-  buildModules: ['nuxt-graphql-client'],
+  modules: ['nuxt-graphql-client'],
 
   runtimeConfig: {
     public: {

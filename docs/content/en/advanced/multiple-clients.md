@@ -37,7 +37,7 @@ The client names are inferred from the keys provided in the `clients` object.
 import { defineNuxtConfig } from 'nuxt'
 
 export default defineNuxtConfig({
-  buildModules: ['nuxt-graphql-client'],
+  modules: ['nuxt-graphql-client'],
 
   runtimeConfig: {
     public: {
