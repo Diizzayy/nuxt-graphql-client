@@ -105,6 +105,35 @@ GQL_GITHUB_TOKEN="<your-github-token>"
 </code-block>
 </code-group>
 
+
+### Retain Token on Client-Side
+
+To circumvent the default behavior mentioned in the [Server Side Only](/advanced/authentication#server-side-only) section, you can use the `retainToken` flag to force a token set at config-level to be retained on the client side.
+
+<alert type="danger">
+
+This flag exposes the token to the client side, which can be a security risk. <br>
+Please use this flag only if you understand the security implications.
+
+</alert>
+
+```ts[nuxt-config.ts]
+runtimeConfig: {
+    public: {
+        'graphql-client': {
+            clients: {
+                default: 'https://api.spacex.land/graphql',
+                github: {
+                    host: 'https://api.github.com/graphql',
+                    token: '<your-github-token>', // overwritten by process.env.GQL_GITHUB_TOKEN
+                    retainToken: true
+                }
+            }
+        }
+    }
+}
+```
+
 ## Code Generation Introspection
 
 [GraphQL Schema Introspection](https://graphql.org/learn/introspection) enables you to query a GraphQL server for information about it's underlying schema. This includes data such as types, fields, queries, mutations, and even the field-level descriptions
