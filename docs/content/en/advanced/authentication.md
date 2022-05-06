@@ -113,7 +113,7 @@ To circumvent the default behavior mentioned in the [Server Side Only](/advanced
 <alert type="danger">
 
 This flag exposes the token to the client side, which can be a security risk. <br>
-Please use this flag only if you understand the security implications.
+Only use this flag if you understand the security implications.
 
 </alert>
 
