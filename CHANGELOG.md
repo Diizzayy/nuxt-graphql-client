@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.0.23 (2022-05-06)
+
+
+### Features
+
+* allow config-level tokens to be retained client-side ([68e92eb](https://github.com/diizzayy/nuxt-graphql-client/commit/68e92ebc945289e3bf5461997f34c2bc49c41de9))
+
 ### 0.0.22 (2022-04-26)
 
 ### 0.0.21 (2022-04-26)
