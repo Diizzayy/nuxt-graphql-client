@@ -108,7 +108,7 @@ GQL_GITHUB_TOKEN="<your-github-token>"
 
 ### Retain Token on Client-Side
 
-To circumvent the default behavior mentioned in the [Server Side Only](/advanced/authentication#server-side-only) section, you can use the `retainToken` flag to force a token set at config-level to be retained on the client side.
+To circumvent the default behavior mentioned in the [Server Side Only](/advanced/authentication#server-side-only) section, you can use the `retainToken` flag to force a token set at config-level ( by `runtimeConfig` or `environment variables` ) to be retained on the client side.
 
 <alert type="danger">
 
