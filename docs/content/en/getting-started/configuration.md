@@ -23,6 +23,7 @@ position: 4
       default: false,
       host: '<GRAPHQL_HOST>',
       token: '<TOKEN_VALUE>'
+      // retainToken: false,
       // token: {
       //   name: '<TOKEN_NAME>',
       //   value: '<TOKEN_VALUE>'
@@ -83,6 +84,12 @@ When set to false, all types from the GraphQL API will be generated.
 
 ### `clients`
 
+<alert type="warning">
+
+The [default client](/advanced/multiple-clients#default-client) overrides `GQL_HOST`.
+
+</alert>
+
 - Type: **string | object**
 
 Configure your app to interact with multiple GraphQL APIs. The name of each client is the key of the object provided.
@@ -106,12 +113,11 @@ The available options are:
     - **Optional**
     - Type: **`string | { name: string, value?: string }`**
 
+- `retainToken`
+    - **Optional**
+    - Type: **boolean**
 
-<alert type="warning">
-
-The [default client](/advanced/multiple-clients#default-client) overrides `GQL_HOST`.
-
-</alert>
+    [More information here](/advanced/authentication#retain-token-on-client-side)
 
 
 ```ts[nuxt.config.ts]

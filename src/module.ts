@@ -23,6 +23,15 @@ export interface GqlClient<T = string> {
   schema?: string
   default?: boolean
   token?: T extends object ? TokenOpts : string | TokenOpts
+
+  /**
+   * When enabled, this flag will force tokens set at config-level to be retained client-side.
+   * By default, tokens set by `runtimeConfig` or `environment variables` only live server-side (for Code Generation & SSR requests).
+   *
+   * @type boolean
+   * @default false
+   * */
+  retainToken?: boolean
 }
 
 export interface GqlConfig<T = GqlClient> {
@@ -193,7 +202,10 @@ export default defineNuxtModule<GqlConfig>({
 
       if (conf.token?.value) {
         nuxt.options.runtimeConfig['graphql-client'].clients[k] = { token: conf.token }
-        nuxt.options.runtimeConfig.public['graphql-client'].clients[k].token.value = undefined
+
+        if (!(typeof v !== 'string' && v?.retainToken)) {
+          nuxt.options.runtimeConfig.public['graphql-client'].clients[k].token.value = undefined
+        }
       }
     }
 
