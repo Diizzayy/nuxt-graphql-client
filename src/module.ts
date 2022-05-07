@@ -102,6 +102,8 @@ export interface GqlConfig<T = GqlClient> {
   clients?: Record<string, T extends GqlClient ? Partial<GqlClient<T>> : string | GqlClient<T>>
 }
 
+export type ModuleOptions = GqlConfig
+
 export default defineNuxtModule<GqlConfig>({
   meta: {
     name,
