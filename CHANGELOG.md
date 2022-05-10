@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.25](https://github.com/diizzayy/nuxt-graphql-client/compare/v0.0.24...v0.0.25) (2022-05-10)
+
+
+### Bug Fixes
+
+* **deps:** bump @graphql-codegen/typescript from 2.4.8 to 2.4.10 ([0c4a51e](https://github.com/diizzayy/nuxt-graphql-client/commit/0c4a51eb2c308c819e11b4655b06c4d00b06218a))
+* **deps:** bump @graphql-codegen/typescript from 2.4.8 to 2.4.10 ([0ee989f](https://github.com/diizzayy/nuxt-graphql-client/commit/0ee989f5e6b7f89e02cc51c5e9f8119bf219122d))
+* **deps:** bump @graphql-codegen/typescript-operations ([e1abafb](https://github.com/diizzayy/nuxt-graphql-client/commit/e1abafb0da1db1e753a35a809641440f091c00a3))
+* **deps:** bump @graphql-codegen/typescript-operations from 2.3.5 to 2.3.7 ([85c8006](https://github.com/diizzayy/nuxt-graphql-client/commit/85c80065bd9f177e323d6d699fc893b9a13be754))
+* **deps:** bump @nuxt/kit from 3.0.0-rc.1 to 3.0.0-rc.2 ([4963f85](https://github.com/diizzayy/nuxt-graphql-client/commit/4963f857c6a537c3463fe70e38ef62c9ca3f77fe))
+* **deps:** bump @nuxt/kit from 3.0.0-rc.1 to 3.0.0-rc.2 ([bbf1900](https://github.com/diizzayy/nuxt-graphql-client/commit/bbf1900376ec94ec3b852f2b192670aabb4f5068))
+
 ### 0.0.24 (2022-05-07)
 
 ### 0.0.23 (2022-05-06)
