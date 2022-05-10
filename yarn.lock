@@ -1041,7 +1041,7 @@
   resolved "https://registry.yarnpkg.com/@nuxt/devalue/-/devalue-2.0.0.tgz#c7bd7e9a516514e612d5d2e511ffc399e0eac322"
   integrity sha512-YBI/6o2EBz02tdEJRBK8xkt3zvOFOWlLBf7WKYGBsSYSRtjjgrqPe2skp6VLLmKx5WbHHDNcW+6oACaurxGzeA==
 
-"@nuxt/kit@3.0.0-rc.1", "@nuxt/kit@^3.0.0-rc.0", "@nuxt/kit@^3.0.0-rc.1":
+"@nuxt/kit@3.0.0-rc.1":
   version "3.0.0-rc.1"
   resolved "https://registry.yarnpkg.com/@nuxt/kit/-/kit-3.0.0-rc.1.tgz#c6197351970d85eecb17d646667178ecefb2b955"
   integrity sha512-S2x0zdLYLZ4/2lMnS6emSmFPJszPJf70Y4/8gpmkPb4TArEjPNaOTCIz7tKpj/Upo71fv7cfuwYw/X0F2UAntg==
@@ -1065,6 +1065,30 @@
     unimport "^0.1.6"
     untyped "^0.4.4"
 
+"@nuxt/kit@^3.0.0-rc.1", "@nuxt/kit@^3.0.0-rc.2":
+  version "3.0.0-rc.2"
+  resolved "https://registry.yarnpkg.com/@nuxt/kit/-/kit-3.0.0-rc.2.tgz#a8fd62694923391edf0963f74c8377a56e69a668"
+  integrity sha512-uRsV2UWj4sgkXhXq8bMcl+jostzfKsRUNQVIVHOi7TrhuHBnF1UjZJN9UfOAHVVzobQ9zUXLnGL7+PJhQ/xDdw==
+  dependencies:
+    "@nuxt/schema" "^3.0.0-rc.2"
+    c12 "^0.2.7"
+    consola "^2.15.3"
+    defu "^6.0.0"
+    globby "^13.1.1"
+    hash-sum "^2.0.0"
+    ignore "^5.2.0"
+    jiti "^1.13.0"
+    knitwork "^0.1.1"
+    lodash.template "^4.5.0"
+    mlly "^0.5.2"
+    pathe "^0.2.0"
+    pkg-types "^0.3.2"
+    scule "^0.2.1"
+    semver "^7.3.7"
+    unctx "^1.1.4"
+    unimport "^0.1.8"
+    untyped "^0.4.4"
+
 "@nuxt/module-builder@latest":
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/@nuxt/module-builder/-/module-builder-0.1.7.tgz#6de83fa24a839265d43abdb5ecf8ec85456ca765"
@@ -1076,10 +1100,10 @@
     pathe "^0.2.0"
     unbuild "^0.6.7"
 
-"@nuxt/schema@^3.0.0-rc.1":
-  version "3.0.0-rc.1"
-  resolved "https://registry.yarnpkg.com/@nuxt/schema/-/schema-3.0.0-rc.1.tgz#ea8d3de35386cb287af6b54ba0075abee5d2ae61"
-  integrity sha512-EhkSK8QnlAI/ZZoYHnks8yLa1KZRx+WO4gslkN9Wx85vU+3KAM7svSAljvSw3+7xxqQcZ1SeNuFXU3BT8r78KA==
+"@nuxt/schema@^3.0.0-rc.1", "@nuxt/schema@^3.0.0-rc.2":
+  version "3.0.0-rc.2"
+  resolved "https://registry.yarnpkg.com/@nuxt/schema/-/schema-3.0.0-rc.2.tgz#8b8f25571a8f69f0967c89fd281c6ab007ca0ae1"
+  integrity sha512-5lhM+TF8jw2rx4asBtaP91KjEDYMbjid142dEla8TO4DPqZcwtzQ1rm075aGRtywwxjRVZ/e2kcu/3DV53D6VQ==
   dependencies:
     c12 "^0.2.7"
     create-require "^1.1.1"
@@ -1090,7 +1114,7 @@
     scule "^0.2.1"
     std-env "^3.1.1"
     ufo "^0.8.3"
-    unimport "^0.1.6"
+    unimport "^0.1.8"
 
 "@nuxt/telemetry@^2.1.2":
   version "2.1.3"
@@ -8304,10 +8328,10 @@ unenv@^0.4.6:
     upath "^2.0.1"
     util "^0.12.4"
 
-unimport@^0.1.6:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/unimport/-/unimport-0.1.6.tgz#e672a1ae84660d47b759ac566902e7cd35a00252"
-  integrity sha512-KxKQF0De2v+vPkz6D/hGHNvzBti+Im95NctEa8Kdb45m0YSQSH7kJjmHwruxKLNQrOw6N18NwKkiaNFiH0DbnA==
+unimport@^0.1.6, unimport@^0.1.8:
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/unimport/-/unimport-0.1.8.tgz#c2bb15e28ec614bd310cf374de8235d2d093240c"
+  integrity sha512-Eynu+yyVVZ76te5DbE3744z1YjqoES+muNlNP03kVURHC/S2IR65mjzdmT6wpWvU78q488dK0fQ+tUK9UEndZA==
   dependencies:
     "@rollup/pluginutils" "^4.2.1"
     escape-string-regexp "^5.0.0"
