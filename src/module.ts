@@ -206,7 +206,7 @@ export default defineNuxtModule<GqlConfig>({
         nuxt.options.runtimeConfig['graphql-client'].clients[k] = { token: conf.token }
 
         if (!(typeof v !== 'string' && v?.retainToken)) {
-          nuxt.options.runtimeConfig.public['graphql-client'].clients[k].token.value = undefined
+          (nuxt.options.runtimeConfig.public['graphql-client'] as GqlConfig).clients[k].token.value = undefined
         }
       }
     }
