@@ -51,7 +51,6 @@
     "defu": "^6.0.0",
     "graphql": "^16.5.0",
     "graphql-request": "^4.2.0",
-    "node-fetch-native": "^0.1.1",
     "scule": "^0.2.1"
   },
   "devDependencies": {
@@ -60,8 +59,5 @@
     "eslint": "8.15.0",
     "nuxt": "^3.0.0-rc.3",
     "standard-version": "^9.3.2"
-  },
-  "resolutions": {
-    "node-fetch": "npm:node-fetch-native@latest"
   }
 }
