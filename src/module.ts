@@ -215,7 +215,7 @@ export default defineNuxtModule<GqlConfig>({
 
     if (config.documentPaths) {
       for (const path of config.documentPaths) {
-        const dir = createResolver(path).resolve()
+        const dir = srcResolver.resolve(path)
 
         if (existsSync(dir)) {
           documentPaths.push(dir)
