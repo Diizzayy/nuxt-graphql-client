@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.0.27 (2022-05-11)
+
+
+### Bug Fixes
+
+* `node-fetch` compatibility ([4c93ca3](https://github.com/diizzayy/nuxt-graphql-client/commit/4c93ca360baf7d634c92e5c0ca98d984e1ce9930))
+
 ### 0.0.26 (2022-05-11)
 
 
