@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.0.26 (2022-05-11)
+
+
+### Bug Fixes
+
+* properly resolve `documentPaths` ([858f246](https://github.com/diizzayy/nuxt-graphql-client/commit/858f246a9165335803b03ac1055e7de0cd0d9167))
+
 ### [0.0.25](https://github.com/diizzayy/nuxt-graphql-client/compare/v0.0.24...v0.0.25) (2022-05-10)
 
 
