@@ -214,7 +214,7 @@ export default defineNuxtModule<GqlConfig>({
       const conf: GqlClient<TokenOpts> = {
         ...(typeof v !== 'string' && { ...v }),
         host,
-        ...(runtimeClientHost && { clientHost }),
+        ...(clientHost && { clientHost }),
         ...(schema && existsSync(schema) && { schema }),
         token: {
           ...(token && { value: token }),
