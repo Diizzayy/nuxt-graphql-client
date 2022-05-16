@@ -352,7 +352,15 @@ declare module '@nuxt/schema' {
      *
      * @type string
      */
-    GQL_HOST: string
+    // @ts-ignore
+    GQL_HOST?: string
+
+    /**
+     * Specify a host to be used for client side requests.
+     *
+     * @type string
+     */
+    GQL_CLIENT_HOST?: string
 
     // @ts-ignore
     gql?: GqlConfig<any>
