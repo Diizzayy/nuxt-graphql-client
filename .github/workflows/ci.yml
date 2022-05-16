@@ -26,11 +26,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           cache: 'yarn'
-          cache-dependency-path: yarn.lock
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies
-        run: yarn --immutable
+        run: yarn --frozen-lockfile
 
       - name: Build
         run: yarn build
@@ -51,11 +50,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           cache: 'yarn'
-          cache-dependency-path: yarn.lock
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies
-        run: yarn --immutable
+        run: yarn --frozen-lockfile
 
       - name: Lint
         run: yarn lint
@@ -89,12 +87,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           cache: 'yarn'
-          cache-dependency-path: yarn.lock
           node-version: ${{ matrix.node }}
           registry-url: 'https://registry.npmjs.org/'
 
       - name: Install dependencies 👨🏻‍💻
-        run: yarn --immutable
+        run: yarn --frozen-lockfile
 
       - name: Publish Package
         run: yarn release
@@ -123,11 +120,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           cache: 'yarn'
-          cache-dependency-path: yarn.lock
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies 👨🏻‍💻
-        run: yarn --immutable
+        run: yarn --frozen-lockfile
 
       - name: Cache Nuxt Build
         uses: actions/cache@v2
