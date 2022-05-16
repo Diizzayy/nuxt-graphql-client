@@ -315,15 +315,7 @@ export default defineNuxtModule<GqlConfig>({
       })
 
       nuxt.hook('autoImports:extend', (autoimports) => {
-        if (!ctx.fnImports?.length) { return }
-
-        const names = autoimports.map(a => a.name)
-
-        const fnImports = ctx.fnImports.filter(i => !names.includes(i.name))
-
-        if (!fnImports?.length) { return }
-
-        autoimports.push(...fnImports)
+        autoimports.push(...ctx.fnImports)
       })
 
       // TODO: See if needed
