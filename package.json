@@ -37,8 +37,9 @@
     "build": "nuxt-module-build",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
-    "lint": "eslint --ext .ts .",
-    "lint:fix": "eslint --fix --ext .ts .",
+    "test": "vitest run --dir test",
+    "lint": "eslint --ext .js,.ts,.vue .",
+    "lint:fix": "eslint --fix --ext .js,.ts,.vue .",
     "prepare": "nuxt-module-build --stub && nuxi prepare playground",
     "release": "yarn lint && standard-version && yarn publish --access public && git push --follow-tags"
   },
@@ -55,9 +56,11 @@
   },
   "devDependencies": {
     "@nuxt/module-builder": "latest",
+    "@nuxt/test-utils": "latest",
     "@nuxtjs/eslint-config-typescript": "10.0.0",
     "eslint": "8.15.0",
     "nuxt": "^3.0.0-rc.3",
-    "standard-version": "^9.3.2"
+    "standard-version": "^9.3.2",
+    "vitest": "latest"
   }
 }
