@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.0.30 (2022-05-16)
+
+
+### Features
+
+* support optional `clientHost` ([7d3e117](https://github.com/diizzayy/nuxt-graphql-client/commit/7d3e11756e8d206a431b5b8b342857393b1d7c6a))
+
 ### 0.0.29 (2022-05-16)
 
 
