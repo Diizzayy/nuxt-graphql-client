@@ -266,7 +266,7 @@ export default defineNuxtModule<GqlConfig>({
       if (gqlFiles?.length) {
         plugins.push('typescript-operations')
 
-        for (const file of gqlFiles) { documents.push(file) }
+        documents.push(...gqlFiles)
 
         if (documents?.length) { plugins.push('typescript-graphql-request') }
       }
