@@ -60,6 +60,30 @@ jobs:
       - name: Lint
         run: yarn lint
   
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        node: [16]
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          cache: 'yarn'
+          node-version: ${{ matrix.node }}
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Run Tests
+        run: yarn test
+  
   release-build:
     if: |
       github.event_name == 'push' &&
