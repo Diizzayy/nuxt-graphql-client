@@ -95,7 +95,9 @@ const initClients = () => {
 
     if (!state.value?.options[name]) { state.value.options[name] = {} }
 
-    const c = new GraphQLClient(v.host, state.value.options[name])
+    const host = (process.client && v?.clientHost) || v.host
+
+    const c = new GraphQLClient(host, state.value.options[name])
     state.value.clients[name] = c
 
     if (v?.token?.value) { useGqlToken(v.token.value, { client: name as GqlClients }) }

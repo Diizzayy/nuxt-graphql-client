@@ -20,8 +20,28 @@ type TokenOpts = { name?: string, value?: string, type?: string}
 
 export interface GqlClient<T = string> {
   host: string
+
+  /**
+   * Specify a host to be used for client side requests.
+   *
+   * @type string
+   * */
+  clientHost?: string
+
+  /**
+   * Specify the path to a GraphQL Schema file to be used for code generation. When omitted, the `host` will be used.
+   *
+   * @type string
+   * */
   schema?: string
+
+  /**
+   * This option allows you to manually specify the `default` client. When using multiple clients, the `default` client is set either to the client named `default` or the first client in the list.
+   *
+   * @type boolean
+   * */
   default?: boolean
+
   token?: T extends object ? TokenOpts : string | TokenOpts
 
   /**
@@ -139,9 +159,12 @@ export default defineNuxtModule<GqlConfig>({
       const host =
         process.env.GQL_HOST || nuxt.options.runtimeConfig.public.GQL_HOST
 
+      const clientHost =
+        process.env.GQL_CLIENT_HOST || nuxt.options.runtimeConfig.public.GQL_CLIENT_HOST
+
       if (!host) { throw new Error('GQL_HOST is not set in public runtimeConfig') }
 
-      config.clients = { default: host }
+      config.clients = !clientHost ? { default: host } : { default: { host, clientHost } }
     }
 
     const multipleClients = ctx?.clients?.length > 1
@@ -163,9 +186,10 @@ export default defineNuxtModule<GqlConfig>({
 
     for (const [k, v] of Object.entries(config.clients)) {
       const runtimeHost = k === 'default' ? process.env.GQL_HOST : process.env?.[`GQL_${k.toUpperCase()}_HOST`]
+      const runtimeClientHost = k === 'default' ? process.env.GQL_CLIENT_HOST : process.env?.[`GQL_${k.toUpperCase()}_CLIENT_HOST`]
 
-      let host: string
-      if (runtimeHost) { host = runtimeHost } else if (typeof v === 'string') { host = v } else if ('host' in v) { host = v?.host }
+      const host = runtimeHost || (typeof v === 'string' ? v : v?.host)
+      const clientHost: string = runtimeClientHost || (typeof v !== 'string' && v.clientHost)
 
       if (!host) {
         throw new Error(`GraphQL client (${k}) is missing it's host.`)
@@ -190,7 +214,8 @@ export default defineNuxtModule<GqlConfig>({
       const conf: GqlClient<TokenOpts> = {
         ...(typeof v !== 'string' && { ...v }),
         host,
-        schema: schema && existsSync(schema) ? schema : undefined,
+        ...(runtimeClientHost && { clientHost }),
+        ...(schema && existsSync(schema) && { schema }),
         token: {
           ...(token && { value: token }),
           ...(tokenName && { name: tokenName }),
