@@ -1,6 +1,9 @@
-import { promises as fsp, existsSync } from 'fs'
-import { defu } from 'defu'
-import { generate, loadCodegenConfig } from '@graphql-codegen/cli'
+import { generate } from '@graphql-codegen/cli'
+
+import * as PluginTS from '@graphql-codegen/typescript'
+import * as PluginTSOperations from '@graphql-codegen/typescript-operations'
+import * as PluginTSGraphqlRequest from '@graphql-codegen/typescript-graphql-request'
+
 import type { Types } from '@graphql-codegen/plugin-helpers'
 import type { Resolver } from '@nuxt/kit'
 import type { GqlConfig } from './module'
@@ -15,7 +18,13 @@ interface GenerateOptions {
   resolver? : Resolver
 }
 
-async function prepareConfig (options: GenerateOptions): Promise<Types.Config> {
+function pluginLoader (name: string): Promise<any> {
+  if (name === '@graphql-codegen/typescript') { return Promise.resolve(PluginTS) }
+  if (name === '@graphql-codegen/typescript-operations') { return Promise.resolve(PluginTSOperations) }
+  if (name === '@graphql-codegen/typescript-graphql-request') { return Promise.resolve(PluginTSGraphqlRequest) }
+}
+
+function prepareConfig (options: GenerateOptions): Types.Config {
   const schema: Types.Config['schema'] = Object.values(options.clients).map((v) => {
     if (v.schema) { return v.schema }
 
@@ -27,8 +36,9 @@ async function prepareConfig (options: GenerateOptions): Promise<Types.Config> {
     return { [v.host]: { headers: { [tokenName]: token } } }
   })
 
-  const config: Types.Config = {
+  return {
     schema,
+    pluginLoader,
     silent: options.silent,
     documents: options.documents,
     generates: {
@@ -46,26 +56,10 @@ async function prepareConfig (options: GenerateOptions): Promise<Types.Config> {
       }
     }
   }
-
-  if (process.platform !== 'win32') { return config }
-
-  const codegenConfig = options.resolver.resolve('.graphqlrc')
-
-  if (!existsSync(codegenConfig)) {
-    await fsp.writeFile(codegenConfig, JSON.stringify(config, null, 2), { encoding: 'utf8' })
-  } else {
-    const codegenConfigContent = await fsp.readFile(codegenConfig, { encoding: 'utf8' }).then(JSON.parse)
-
-    const appropriate = JSON.stringify(defu({ ...codegenConfigContent, ...config }), null, 2)
-
-    await fsp.writeFile(codegenConfig, appropriate, { encoding: 'utf8' })
-  }
-
-  return (await loadCodegenConfig({ configFilePath: codegenConfig }))?.config
 }
 
 export default async function (options: GenerateOptions): Promise<string> {
-  const config = await prepareConfig(options)
+  const config = prepareConfig(options)
 
   return await generate(config, false).then(([{ content }]) => content)
 }
