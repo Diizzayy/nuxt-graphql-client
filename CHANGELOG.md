@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.0.29 (2022-05-16)
+
+
+### Bug Fixes
+
+* provide custom plugin loader ([06eb1c3](https://github.com/diizzayy/nuxt-graphql-client/commit/06eb1c3c39e85668f4037cbf535036364192a741))
+
 ### 0.0.28 (2022-05-11)
 
 ### 0.0.27 (2022-05-11)
