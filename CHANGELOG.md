@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 0.0.31 (2022-05-17)
+
+
+### Bug Fixes
+
+* don't expose `deepmerge` ([412990a](https://github.com/diizzayy/nuxt-graphql-client/commit/412990a490eb62ae183e5e489c1d02f5edb18129))
+
 ### 0.0.30 (2022-05-16)
 
 
