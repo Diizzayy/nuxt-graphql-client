@@ -295,13 +295,7 @@ export default defineNuxtModule<GqlConfig>({
       getContents: () => ctx.template
     })
 
-    addAutoImport({
-      as: 'gqlSdk',
-      name: 'getSdk',
-      from: '#build/gql-sdk'
-    })
-
-    addAutoImportDir(resolver.resolve('runtime'))
+    addAutoImportDir(resolver.resolve('runtime/composables'))
 
     if (config.autoImport) {
       addTemplate({

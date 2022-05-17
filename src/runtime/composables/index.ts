@@ -1,17 +1,12 @@
 import { defu } from 'defu'
 import { GraphQLClient } from 'graphql-request'
 import type { Ref } from 'vue'
-import type { GqlClient, GqlConfig } from '../module'
-import { deepmerge } from './utils'
+import type { GqlClient, GqlConfig } from '../../module'
+import { deepmerge } from '../utils'
 import type { GqlClients } from '#build/gql'
 
-import {
-  ref,
-  gqlSdk,
-  useNuxtApp,
-  useRuntimeConfig,
-  useRequestHeaders
-} from '#imports'
+import { getSdk as gqlSdk } from '#build/gql-sdk'
+import { ref, useNuxtApp, useRuntimeConfig, useRequestHeaders } from '#imports'
 
 interface GqlState {
   clients?: Record<string, GraphQLClient>
