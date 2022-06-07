@@ -1,17 +1,45 @@
 import { defu } from 'defu'
-import { GraphQLClient } from 'graphql-request'
+import { GraphQLClient, ClientError } from 'graphql-request'
 import type { Ref } from 'vue'
 import type { GqlClient, GqlConfig } from '../../module'
 import { deepmerge } from '../utils'
 import type { GqlClients } from '#build/gql'
 
 import { getSdk as gqlSdk } from '#build/gql-sdk'
+import type { SdkFunctionWrapper } from '#build/gql-sdk'
 import { ref, useNuxtApp, useRuntimeConfig, useRequestHeaders } from '#imports'
+
+class GqlError extends ClientError {
+  message: string
+  gqlClient?: GqlClients
+  operationName?: string
+  operationType?: string
+
+  constructor (
+    response: ClientError['response'],
+    request: ClientError['request'],
+    message?: string,
+    gqlClient?: GqlClients,
+    operationName?: string,
+    operationType?: string
+  ) {
+    super(response, request)
+
+    Object.setPrototypeOf(this, GqlError.prototype)
+
+    this.message = message
+    this.gqlClient = gqlClient
+    this.operationName = operationName
+    this.operationType = operationType
+  }
+}
 
 interface GqlState {
   clients?: Record<string, GraphQLClient>
 
   options?: Record<string, RequestInit>
+
+  onError?: <T>(error: GqlError, retry?: Parameters<SdkFunctionWrapper>[0]) => Promise<T> | any
 
   /**
    * Send cookies from the browser to the GraphQL server in SSR mode.
@@ -119,12 +147,12 @@ const getClient = (client?: GqlClients): GqlClients => {
   return client
 }
 
-const useGqlClient = (client?: GqlClients): GraphQLClient => {
+const useGqlClient = (client?: GqlClients): {client: GqlClients, instance: GraphQLClient} => {
   const state = useGqlState()
 
   client = getClient(client)
 
-  return state.value.clients[client]
+  return { client, instance: state.value.clients[client] }
 }
 
 /**
@@ -254,15 +282,39 @@ export const useGqlCors = ({ mode, credentials, client }: GqlCors) => {
 export const useGql = (client?: GqlClients): ReturnType<typeof gqlSdk> => {
   const state = useGqlState()
 
-  const gqlClient = useGqlClient(client)
+  const { client: gqlClient, instance } = useGqlClient(client)
 
   if (process.server && state.value?.proxyCookies) {
     const { cookie } = useRequestHeaders(['cookie'])
 
-    if (cookie) { gqlClient.setHeader('cookie', cookie) }
+    if (cookie) { instance.setHeader('cookie', cookie) }
   }
 
-  const $gql: ReturnType<typeof gqlSdk> = gqlSdk(gqlClient)
+  const $gql: ReturnType<typeof gqlSdk> = gqlSdk(instance, (action, operationName, operationType) => {
+    try {
+      return action()
+    } catch (err) {
+      const createGqlErr = (e: ClientError) => ({
+        ...e,
+        response: JSON.parse(JSON.stringify(e?.response)),
+        gqlClient,
+        operationName,
+        operationType
+      })
+
+      if (state.value.onError) {
+        return state.value.onError(createGqlErr(err), async (headers) => {
+          return await action(headers).catch(e => createGqlErr(e))
+        })
+      }
+
+      return createGqlErr(err)
+    }
+  })
 
   return { ...$gql }
+}
+
+export const useGqlError = (onError: GqlState['onError']) => {
+  useGqlState().value.onError = onError
 }
