@@ -6,7 +6,6 @@ import { deepmerge } from '../utils'
 import type { GqlClients } from '#build/gql'
 
 import { getSdk as gqlSdk } from '#build/gql-sdk'
-import type { SdkFunctionWrapper } from '#build/gql-sdk'
 import { ref, useNuxtApp, useRuntimeConfig, useRequestHeaders } from '#imports'
 
 class GqlError extends ClientError {
@@ -39,7 +38,7 @@ interface GqlState {
 
   options?: Record<string, RequestInit>
 
-  onError?: <T>(error: GqlError, retry?: Parameters<SdkFunctionWrapper>[0]) => Promise<T> | any
+  onError?: <T>(error: GqlError | GqlError[] /*, retry?: Parameters<SdkFunctionWrapper>[0] */) => Promise<T> | any
 
   /**
    * Send cookies from the browser to the GraphQL server in SSR mode.
@@ -103,6 +102,8 @@ const useGqlState = (state?: GqlState, reset?: boolean): Ref<GqlState> => {
 
   return nuxtApp._gqlState as Ref<GqlState>
 }
+
+const useGqlErrorState = () => useState<GqlError | GqlError[]>('_gqlErrors', () => null)
 
 const initClients = () => {
   const state = useGqlState()
@@ -281,6 +282,7 @@ export const useGqlCors = ({ mode, credentials, client }: GqlCors) => {
  * */
 export const useGql = (client?: GqlClients): ReturnType<typeof gqlSdk> => {
   const state = useGqlState()
+  const errState = useGqlErrorState()
 
   const { client: gqlClient, instance } = useGqlClient(client)
 
@@ -290,31 +292,55 @@ export const useGql = (client?: GqlClients): ReturnType<typeof gqlSdk> => {
     if (cookie) { instance.setHeader('cookie', cookie) }
   }
 
-  const $gql: ReturnType<typeof gqlSdk> = gqlSdk(instance, (action, operationName, operationType) => {
+  const $gql: ReturnType<typeof gqlSdk> = gqlSdk(instance, async (action, operationName, operationType): Promise<any> => {
     try {
-      return action()
+      return await action()
     } catch (err) {
-      const createGqlErr = (e: ClientError) => ({
-        ...e,
-        response: JSON.parse(JSON.stringify(e?.response)),
+      const gqlError = {
+        ...err,
+        response: JSON.parse(JSON.stringify(err?.response)),
         gqlClient,
         operationName,
         operationType
-      })
-
-      if (state.value.onError) {
-        return state.value.onError(createGqlErr(err), async (headers) => {
-          return await action(headers).catch(e => createGqlErr(e))
-        })
       }
 
-      return createGqlErr(err)
+      errState.value = Array.isArray(errState.value) ? [...errState.value, gqlError] : [gqlError]
+
+      // only trigger `onError` on client side (ie: `onError` is never set on server).
+      // hence allowing usage of nuxt's composables in `useGqlError`
+      // process.client can be removed.
+      if (process.client && state.value.onError) {
+        state.value.onError(gqlError)
+      }
+
+      // return gqlError
+      throw gqlError
     }
   })
 
   return { ...$gql }
 }
 
+/**
+ * `useGqlError` captures errors from GraphQL requests.
+ *
+ * @param {GqlState['onError']} onError Gql Error Handler
+ *
+ * @example <caption>Log error to console.</caption>
+ * ```ts
+ * useGqlError((err) => {
+ *    console.error(err)
+ * })
+ * ```
+ * */
 export const useGqlError = (onError: GqlState['onError']) => {
+  if (process.server) { return }
+
   useGqlState().value.onError = onError
+
+  const errState = useGqlErrorState()
+
+  if (!errState.value) { return }
+
+  onError(errState.value)
 }
