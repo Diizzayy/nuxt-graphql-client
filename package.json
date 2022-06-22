@@ -46,12 +46,12 @@
   "dependencies": {
     "@graphql-codegen/cli": "^2.6.2",
     "@graphql-codegen/typescript": "^2.4.11",
-    "@graphql-codegen/typescript-graphql-request": "^4.4.8",
-    "@graphql-codegen/typescript-operations": "^2.4.0",
+    "@graphql-codegen/typescript-graphql-request": "^4.4.10",
+    "@graphql-codegen/typescript-operations": "^2.4.2",
     "@nuxt/kit": "^3.0.0-rc.3",
     "defu": "^6.0.0",
     "graphql": "^16.5.0",
-    "graphql-request": "^4.2.0",
+    "graphql-request": "^4.3.0",
     "scule": "^0.2.1"
   },
   "devDependencies": {
@@ -59,6 +59,8 @@
     "@nuxt/test-utils": "latest",
     "@nuxtjs/eslint-config-typescript": "10.0.0",
     "eslint": "8.16.0",
+    "nuxt": "^3.0.0-rc.4",
+    "eslint": "8.18.0",
     "nuxt": "^3.0.0-rc.4",
     "standard-version": "^9.3.2",
     "vitest": "latest"
