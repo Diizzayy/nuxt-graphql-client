@@ -224,8 +224,6 @@ type GqlTokenOptions = {
  * @param {object} opts
  * */
 export const useGqlToken = (token: string, opts?: GqlTokenOptions) => {
-  if (!token) { return }
-
   let { client, config } = opts || {}
 
   client = getClient(client)
@@ -239,13 +237,19 @@ export const useGqlToken = (token: string, opts?: GqlTokenOptions) => {
     ...config
   }
 
-  useGqlState({
-    options: {
-      [client]: {
-        headers: { [config.name || DEFAULT_AUTH.name]: `${config.type} ${token}`.trim() }
+  const state = useGqlState()
+
+  if (token) {
+    useGqlState({
+      options: {
+        [client]: {
+          headers: { [config.name]: `${config.type} ${token}`.trim() }
+        }
       }
-    }
-  })
+    })
+  } else if (state.value?.options?.[client]?.headers?.[config.name]) {
+    delete state.value.options[client].headers[config.name]
+  }
 }
 
 interface GqlCors {

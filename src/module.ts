@@ -185,8 +185,10 @@ export default defineNuxtModule<GqlConfig>({
     nuxt.options.runtimeConfig.public['graphql-client'] = defu({}, { clients: {} }, nuxt.options.runtimeConfig.public['graphql-client'])
 
     for (const [k, v] of Object.entries(config.clients)) {
-      const runtimeHost = k === 'default' ? process.env.GQL_HOST : process.env?.[`GQL_${k.toUpperCase()}_HOST`]
-      const runtimeClientHost = k === 'default' ? process.env.GQL_CLIENT_HOST : process.env?.[`GQL_${k.toUpperCase()}_CLIENT_HOST`]
+      const defaultClient = k === 'default' || (typeof v !== 'string' && v?.default) || k === Object.keys(config.clients)[0]
+
+      const runtimeHost = defaultClient ? process.env.GQL_HOST : process.env?.[`GQL_${k.toUpperCase()}_HOST`]
+      const runtimeClientHost = defaultClient ? process.env.GQL_CLIENT_HOST : process.env?.[`GQL_${k.toUpperCase()}_CLIENT_HOST`]
 
       const host = runtimeHost || (typeof v === 'string' ? v : v?.host)
       const clientHost = runtimeClientHost || (typeof v !== 'string' && v.clientHost)
@@ -195,13 +197,13 @@ export default defineNuxtModule<GqlConfig>({
         throw new Error(`GraphQL client (${k}) is missing it's host.`)
       }
 
-      const runtimeToken = k === 'default' ? process.env.GQL_TOKEN : process.env?.[`GQL_${k.toUpperCase()}_TOKEN`]
+      const runtimeToken = defaultClient ? process.env.GQL_TOKEN : process.env?.[`GQL_${k.toUpperCase()}_TOKEN`]
 
       const token = runtimeToken || (
         typeof v !== 'string' && ((typeof v?.token === 'object' && v.token?.value) || (typeof v?.token === 'string' && v.token))
       )
 
-      const runtimeTokenName = k === 'default' ? process.env.GQL_TOKEN_NAME : process.env?.[`GQL_${k.toUpperCase()}_TOKEN_NAME`]
+      const runtimeTokenName = defaultClient ? process.env.GQL_TOKEN_NAME : process.env?.[`GQL_${k.toUpperCase()}_TOKEN_NAME`]
       const tokenName = runtimeTokenName || (typeof v !== 'string' && typeof v?.token === 'object' && v.token.name)
       const tokenType = (typeof v !== 'string' && typeof v?.token === 'object' && v?.token?.type !== undefined) ? v?.token?.type : 'Bearer'
 

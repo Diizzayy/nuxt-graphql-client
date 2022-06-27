@@ -59,16 +59,14 @@ export function prepareContext (ctx: GqlContext, prefix: string) {
 }
 
 export async function prepareOperations (ctx: GqlContext, path: string[]) {
-  const clients = Object.keys(ctx.clientOps)
-
   const scanFile = async (file: string) => {
     let clientToUse: string | undefined
 
-    const reExt = new RegExp(`\\.(${clients.join('|')})\\.(gql|graphql)$`)
+    const reExt = new RegExp(`\\.(${ctx.clients.join('|')})\\.(gql|graphql)$`)
     if (reExt.test(file)) { clientToUse = reExt.exec(file)?.[1] }
 
     const fileName = file.split('/').pop().replace(/\./g, '\\.')
-    const reDir = new RegExp(`\\/(${clients.join('|')})\\/(?=${fileName})`)
+    const reDir = new RegExp(`\\/(${ctx.clients.join('|')})\\/(?=${fileName})`)
 
     if (!clientToUse && reDir.test(file)) { clientToUse = reDir.exec(file)?.[1] }
 
@@ -82,15 +80,20 @@ export async function prepareOperations (ctx: GqlContext, path: string[]) {
     })
 
     for (const op of operations) {
-      const clientName = op?.match(/^([^_]*)/)?.[0]
+      const clientName = new RegExp(`^(${ctx.clients.join('|')}[^_]*)`).exec(op)?.[0]
 
       if (!clientName || !ctx.clientOps?.[clientName]) {
-        if (clientToUse) { ctx.clientOps[clientToUse].push(op) }
+        if (clientToUse && !ctx.clientOps?.[clientToUse]?.includes(op)) {
+          ctx.clientOps[clientToUse].push(op)
+        }
 
         continue
       }
 
-      ctx.clientOps[clientName].push(op.replace(`${clientName}_`, ''))
+      const operationName = op.replace(`${clientName}_`, '')
+      if (!ctx.clientOps?.[clientName]?.includes(operationName)) {
+        ctx.clientOps[clientName].push(operationName)
+      }
     }
   }
 
