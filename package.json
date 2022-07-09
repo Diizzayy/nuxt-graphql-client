@@ -44,11 +44,11 @@
     "release": "yarn lint && standard-version && yarn publish --access public && git push --follow-tags"
   },
   "dependencies": {
-    "@graphql-codegen/cli": "^2.6.4",
-    "@graphql-codegen/typescript": "^2.5.1",
-    "@graphql-codegen/typescript-graphql-request": "^4.4.10",
-    "@graphql-codegen/typescript-operations": "^2.4.2",
-    "@nuxt/kit": "^3.0.0-rc.3",
+    "@graphql-codegen/cli": "^2.8.0",
+    "@graphql-codegen/typescript": "^2.7.1",
+    "@graphql-codegen/typescript-graphql-request": "^4.5.1",
+    "@graphql-codegen/typescript-operations": "^2.5.1",
+    "@nuxt/kit": "^3.0.0-rc.4",
     "defu": "^6.0.0",
     "graphql": "^16.5.0",
     "graphql-request": "^4.3.0",
@@ -61,6 +61,6 @@
     "eslint": "8.19.0",
     "nuxt": "^3.0.0-rc.4",
     "standard-version": "^9.3.2",
-    "vitest": "latest"
+    "vitest": "0.18.0"
   }
 }
