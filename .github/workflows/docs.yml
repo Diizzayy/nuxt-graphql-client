@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "docs/**"
+  workflow_dispatch:
+
+jobs:    
+  publish-docs:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [16]
+    
+    defaults:
+      run:
+        working-directory: docs
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'yarn'
+          node-version: ${{ matrix.node }}
+
+      - name: Install dependencies 👨🏻‍💻
+        run: yarn
+
+      - name: Generate Docs
+        run: yarn generate
+
+      - name: Deploy To Firebase
+        run: |
+          curl -sL firebase.tools | bash > /dev/null
+          firebase use --add "$PROJECT_ID" > /dev/null
+          firebase deploy --only hosting --message "$COMMIT_MESSAGE"
+        env:
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
