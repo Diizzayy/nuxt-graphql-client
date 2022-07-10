@@ -1,4 +1,4 @@
-[![nuxt-graphql-client](./docs/static/preview.png)](https://nuxt-graphql-client.web.app)
+[![nuxt-graphql-client](./docs/public/preview.png)](https://nuxt-graphql-client.web.app)
 
 <h1 align="center">nuxt-graphql-client</h1>
 
