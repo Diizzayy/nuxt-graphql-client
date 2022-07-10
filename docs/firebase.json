@@ -1,7 +1,7 @@
 {
   "hosting": {
     "site": "nuxt-graphql-client",
-    "public": "dist",
+    "public": ".output/public",
     "headers": [
       {
         "source": "**",
