@@ -18,7 +18,7 @@ github:
   releases: false
 
 cover:
-  src: /preview.png
+  src: /cover.png
   alt: The Nuxt GraphQL Client module.
 
 header:
