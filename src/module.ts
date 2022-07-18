@@ -1,14 +1,6 @@
 import { existsSync, statSync } from 'fs'
 import { defu } from 'defu'
-import {
-  useLogger,
-  addTemplate,
-  resolveFiles,
-  addAutoImport,
-  addAutoImportDir,
-  createResolver,
-  defineNuxtModule
-} from '@nuxt/kit'
+import { useLogger, addTemplate, resolveFiles, createResolver, defineNuxtModule } from '@nuxt/kit'
 import { name, version } from '../package.json'
 import generate from './generate'
 import { deepmerge } from './runtime/utils'
@@ -297,8 +289,6 @@ export default defineNuxtModule<GqlConfig>({
       getContents: () => ctx.template
     })
 
-    addAutoImportDir(resolver.resolve('runtime/composables'))
-
     if (config.autoImport) {
       addTemplate({
         filename: 'gql.mjs',
@@ -312,6 +302,12 @@ export default defineNuxtModule<GqlConfig>({
 
       nuxt.hook('autoImports:extend', (autoimports) => {
         autoimports.push(...ctx.fnImports)
+      })
+
+      nuxt.hook('autoImports:dirs', (dirs) => {
+        if (!ctx.template.includes('export function getSdk')) { return }
+
+        dirs.push(resolver.resolve('runtime/composables'))
       })
 
       // TODO: See if needed
