@@ -270,7 +270,7 @@ export default defineNuxtModule<GqlConfig>({
       })
 
       if (multipleClients || !config.clients?.default) {
-        await prepareOperations(ctx, gqlFiles)
+        await prepareOperations(ctx, documents)
         prepareTemplate(ctx)
       }
 
