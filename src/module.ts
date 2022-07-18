@@ -1,14 +1,6 @@
 import { existsSync, statSync } from 'fs'
 import { defu } from 'defu'
-import {
-  useLogger,
-  addTemplate,
-  resolveFiles,
-  addAutoImport,
-  addAutoImportDir,
-  createResolver,
-  defineNuxtModule
-} from '@nuxt/kit'
+import { useLogger, addTemplate, resolveFiles, createResolver, defineNuxtModule } from '@nuxt/kit'
 import { name, version } from '../package.json'
 import generate from './generate'
 import { deepmerge } from './runtime/utils'
@@ -254,23 +246,17 @@ export default defineNuxtModule<GqlConfig>({
 
     const gqlMatch = '**/*.{gql,graphql}'
     async function generateGqlTypes () {
-      const gqlFiles: string[] = []
+      const documents: string[] = []
       for await (const path of documentPaths) {
         const files = (await resolveFiles(path, [gqlMatch, '!**/schemas'])).filter(allowDocument)
 
-        gqlFiles.push(...files)
+        documents.push(...files)
       }
 
       const plugins = ['typescript']
 
-      const documents = []
-
-      if (gqlFiles?.length) {
-        plugins.push('typescript-operations')
-
-        documents.push(...gqlFiles)
-
-        if (documents?.length) { plugins.push('typescript-graphql-request') }
+      if (documents?.length) {
+        plugins.push('typescript-operations', 'typescript-graphql-request')
       }
 
       ctx.template = await generate({
@@ -284,7 +270,7 @@ export default defineNuxtModule<GqlConfig>({
       })
 
       if (multipleClients || !config.clients?.default) {
-        await prepareOperations(ctx, gqlFiles)
+        await prepareOperations(ctx, documents)
         prepareTemplate(ctx)
       }
 
@@ -296,8 +282,6 @@ export default defineNuxtModule<GqlConfig>({
       filename: 'gql-sdk.ts',
       getContents: () => ctx.template
     })
-
-    addAutoImportDir(resolver.resolve('runtime/composables'))
 
     if (config.autoImport) {
       addTemplate({
@@ -312,6 +296,12 @@ export default defineNuxtModule<GqlConfig>({
 
       nuxt.hook('autoImports:extend', (autoimports) => {
         autoimports.push(...ctx.fnImports)
+      })
+
+      nuxt.hook('autoImports:dirs', (dirs) => {
+        if (!ctx.template.includes('export function getSdk')) { return }
+
+        dirs.push(resolver.resolve('runtime/composables'))
       })
 
       // TODO: See if needed

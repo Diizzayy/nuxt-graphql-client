@@ -5,6 +5,8 @@ import type { GqlClient, GqlConfig } from '../../module'
 import { deepmerge } from '../utils'
 import type { GqlClients } from '#build/gql'
 
+// @ts-ignore
+// eslint-disable-next-line import/named
 import { getSdk as gqlSdk } from '#build/gql-sdk'
 import { ref, useNuxtApp, useRuntimeConfig, useRequestHeaders } from '#imports'
 
