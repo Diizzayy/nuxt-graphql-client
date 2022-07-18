@@ -44,7 +44,7 @@
     "release": "yarn lint && standard-version && yarn publish --access public && git push --follow-tags"
   },
   "dependencies": {
-    "@graphql-codegen/cli": "^2.8.0",
+    "@graphql-codegen/cli": "^2.8.1",
     "@graphql-codegen/typescript": "^2.7.1",
     "@graphql-codegen/typescript-graphql-request": "^4.5.1",
     "@graphql-codegen/typescript-operations": "^2.5.1",
