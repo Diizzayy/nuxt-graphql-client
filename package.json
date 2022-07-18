@@ -61,6 +61,6 @@
     "eslint": "8.19.0",
     "nuxt": "^3.0.0-rc.4",
     "standard-version": "^9.3.2",
-    "vitest": "0.18.0"
+    "vitest": "0.18.1"
   }
 }
