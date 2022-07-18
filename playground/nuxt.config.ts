@@ -1,8 +1,7 @@
 import { defineNuxtConfig } from 'nuxt'
-import MyModule from '..'
 
 export default defineNuxtConfig({
-  modules: [MyModule],
+  modules: ['nuxt-graphql-client'],
 
   'graphql-client': { },
 

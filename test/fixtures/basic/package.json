@@ -1,4 +1,8 @@
 {
-    "private": true,
-    "name": "fixture-basic"
+  "private": true,
+  "version": "0.0.0",
+  "name": "fixture-basic",
+  "devDependencies": {
+    "nuxt-graphql-client": "*"
+  }
 }
