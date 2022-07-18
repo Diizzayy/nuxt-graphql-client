@@ -1,12 +1,12 @@
 import { defu } from 'defu'
 import { GraphQLClient } from 'graphql-request'
 import type { Ref } from 'vue'
-import type { GqlClient, GqlConfig } from '../../module'
-import { deepmerge } from '../utils'
 import type { GqlClients } from '#build/gql'
 
 import { getSdk as gqlSdk } from '#build/gql-sdk'
 import { ref, useNuxtApp, useRuntimeConfig, useRequestHeaders } from '#imports'
+import { deepmerge } from '../utils'
+import type { GqlConfig } from '../../module'
 
 interface GqlState {
   clients?: Record<string, GraphQLClient>
@@ -199,7 +199,7 @@ export const useGqlToken = (token: string, opts?: GqlTokenOptions) => {
 
   client = getClient(client)
 
-  const clientConfig: GqlClient<object> = useRuntimeConfig()?.public?.['graphql-client']?.clients?.[client]
+  const clientConfig = (useRuntimeConfig()?.public?.['graphql-client'] as GqlConfig)?.clients?.[client]
 
   config = {
     ...DEFAULT_AUTH,
