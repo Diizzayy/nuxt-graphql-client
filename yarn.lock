@@ -1022,7 +1022,7 @@
     unimport "^0.1.6"
     untyped "^0.4.4"
 
-"@nuxt/kit@^3.0.0-rc.6":
+"@nuxt/kit@^3.0.0-rc.4", "@nuxt/kit@^3.0.0-rc.6":
   version "3.0.0-rc.6"
   resolved "https://registry.yarnpkg.com/@nuxt/kit/-/kit-3.0.0-rc.6.tgz#b59c10639cb591bdc5a63164fb352b344230a065"
   integrity sha512-+lxSd6dSWlAzMXfGOPcY4856xnMF1Ck1rycFUZ+K2QYiDXphq/fiW2eMaWLVvqgPyL2Box2WzVDZJ6C5ceptcw==
@@ -1099,7 +1099,7 @@
     rc9 "^1.2.2"
     std-env "^3.1.1"
 
-"@nuxt/test-utils@^3.0.0-rc.6":
+"@nuxt/test-utils@latest":
   version "3.0.0-rc.6"
   resolved "https://registry.yarnpkg.com/@nuxt/test-utils/-/test-utils-3.0.0-rc.6.tgz#b492bb3956f8edfb309871ca0d755f0214d2c841"
   integrity sha512-ieNjq6MiPmYVGqECVSoUveaNTSCqZdD8KXbnmn13/qxrxR/tRpbBaGFWyann+efz5bIJhWGdWN1BLBe8DoHnpQ==
@@ -5640,7 +5640,7 @@ nuxi@^3.0.0-rc.6:
   optionalDependencies:
     fsevents "~2.3.2"
 
-nuxt@^3.0.0-rc.6:
+nuxt@^3.0.0-rc.4:
   version "3.0.0-rc.6"
   resolved "https://registry.yarnpkg.com/nuxt/-/nuxt-3.0.0-rc.6.tgz#c0a81f53d1c39fefae87abebaba8c63949e40751"
   integrity sha512-Ko/LBIUBf25bSXKoRnPEplMngw2dHU8qkV5Twdm7yZ0DfdFkwaTVzTtwvbWsFt+H9vh1aUUTCSyEWnmNorkkxQ==
