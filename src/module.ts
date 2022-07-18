@@ -246,23 +246,17 @@ export default defineNuxtModule<GqlConfig>({
 
     const gqlMatch = '**/*.{gql,graphql}'
     async function generateGqlTypes () {
-      const gqlFiles: string[] = []
+      const documents: string[] = []
       for await (const path of documentPaths) {
         const files = (await resolveFiles(path, [gqlMatch, '!**/schemas'])).filter(allowDocument)
 
-        gqlFiles.push(...files)
+        documents.push(...files)
       }
 
       const plugins = ['typescript']
 
-      const documents = []
-
-      if (gqlFiles?.length) {
-        plugins.push('typescript-operations')
-
-        documents.push(...gqlFiles)
-
-        if (documents?.length) { plugins.push('typescript-graphql-request') }
+      if (documents?.length) {
+        plugins.push('typescript-operations', 'typescript-graphql-request')
       }
 
       ctx.template = await generate({
