@@ -15,19 +15,14 @@
     "test": "vitest run --dir test",
     "lint": "eslint --ext .js,.ts,.vue .",
     "lint:fix": "eslint --fix --ext .js,.ts,.vue .",
-    "prepare": "nuxt-module-build module --stub && nuxi prepare playground",
-    "release": "release-it && yarn publish --cwd module --access public",
-    "release:old": "yarn lint && standard-version && yarn publish --access public && git push --follow-tags"
-
+    "prepare": "nuxt-module-build module --stub && nuxi prepare playground"
   },
   "devDependencies": {
     "@nuxt/module-builder": "latest",
     "@nuxt/test-utils": "latest",
     "@nuxtjs/eslint-config-typescript": "10.0.0",
-    "@release-it/conventional-changelog": "^5.0.0",
     "eslint": "8.20.0",
     "nuxt": "^3.0.0-rc.6",
-    "release-it": "^15.1.2",
     "vitest": "0.18.1"
   },
   "resolutions": {

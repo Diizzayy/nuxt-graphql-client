@@ -48,7 +48,6 @@ jobs:
       matrix:
         node: [16]
         os: [ubuntu-latest]
-      fail-fast: false
 
     steps:
       - name: Checkout
@@ -73,6 +72,7 @@ jobs:
       matrix:
         node: [16]
         os: [ubuntu-latest]
+      fail-fast: false
 
     steps:
       - name: Checkout
@@ -113,20 +113,5 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
 
-      - uses: actions/setup-node@v3
-        with:
-          cache: 'yarn'
-          node-version: ${{ matrix.node }}
-          registry-url: 'https://registry.npmjs.org/'
-
-      - name: Install dependencies 👨🏻‍💻
-        run: yarn install
-
-      - name: Publish Package
-        run: yarn release
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npx bumpp module/package.json
