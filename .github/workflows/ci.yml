@@ -114,4 +114,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - run: npx bumpp module/package.json
+      - run: npx bumpp module/package.json -y
