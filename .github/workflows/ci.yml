@@ -33,7 +33,7 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn install
 
       - name: Build
         run: yarn build
@@ -60,7 +60,7 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn install
 
       - name: Lint
         run: yarn lint
@@ -84,7 +84,7 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn install
 
       - name: Run Tests
         run: yarn test
@@ -123,7 +123,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org/'
 
       - name: Install dependencies 👨🏻‍💻
-        run: yarn --frozen-lockfile
+        run: yarn install
 
       - name: Publish Package
         run: yarn release
