@@ -48,7 +48,7 @@
     "@graphql-codegen/typescript": "^2.7.1",
     "@graphql-codegen/typescript-graphql-request": "^4.5.1",
     "@graphql-codegen/typescript-operations": "^2.5.1",
-    "@nuxt/kit": "^3.0.0-rc.4",
+    "@nuxt/kit": "^3.0.0-rc.5",
     "defu": "^6.0.0",
     "graphql": "^16.5.0",
     "graphql-request": "^4.3.0",
