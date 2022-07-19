@@ -1,6 +1,6 @@
 import { existsSync, statSync } from 'fs'
 import { defu } from 'defu'
-import { useLogger, addTemplate, resolveFiles, createResolver, defineNuxtModule } from '@nuxt/kit'
+import { useLogger, addTemplate, resolveFiles, createResolver, defineNuxtModule, extendViteConfig } from '@nuxt/kit'
 import { name, version } from '../package.json'
 import generate from './generate'
 import { deepmerge } from './runtime/utils'
@@ -328,6 +328,10 @@ export default defineNuxtModule<GqlConfig>({
     }
 
     await generateGqlTypes()
+
+    extendViteConfig((config) => {
+      config.optimizeDeps?.include?.push('graphql-request')
+    })
   }
 })
 
