@@ -13,16 +13,18 @@ export default defineNuxtPlugin(() => {
     const config = useRuntimeConfig()
     const { clients }: GqlConfig = deepmerge({}, defu(config?.['graphql-client'], config?.public?.['graphql-client']))
 
-    const proxyCookie = (process.server && useRequestHeaders(['cookie'])?.cookie) || undefined
+    const cookie = (process.server && useRequestHeaders(['cookie'])?.cookie) || undefined
 
     for (const [name, v] of Object.entries(clients)) {
       const host = (process.client && v?.clientHost) || v.host
+
+      const proxyCookie = v?.proxyCookies && !!cookie
 
       const opts = {
         ...((proxyCookie || v?.token?.value) && {
           headers: {
             ...(v?.headers && { ...v.headers }),
-            ...(proxyCookie && { cookie: proxyCookie }),
+            ...(proxyCookie && { cookie }),
             ...(v?.token?.value && { [v.token.name]: `${v.token.type} ${v.token.value}` })
           }
         })
