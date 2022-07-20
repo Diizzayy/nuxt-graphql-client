@@ -38,7 +38,6 @@
 </template>
 
 <script lang="ts" setup>
-// const { data } = await useAsyncData('starlink', () => useGql().launches())
 const { data, error } = await useAsyncData('starlink', () => GqlLaunches())
 
 if (error.value) {

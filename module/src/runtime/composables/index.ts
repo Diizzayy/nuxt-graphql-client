@@ -1,130 +1,62 @@
-import { defu } from 'defu'
-import { GraphQLClient } from 'graphql-request'
 import type { Ref } from 'vue'
 import type { GqlClients } from '#build/gql'
-
 import { getSdk as gqlSdk } from '#build/gql-sdk'
-import { ref, useNuxtApp, useRuntimeConfig, useRequestHeaders } from '#imports'
+import type { GqlState, GqlConfig } from '../../types'
 import { deepmerge } from '../utils'
-import type { GqlConfig } from '../../module'
 
-interface GqlState {
-  clients?: Record<string, GraphQLClient>
+const useGqlState = (): Ref<GqlState> => {
+  const nuxtApp = useNuxtApp() as Partial<{ _gqlState: Ref<GqlState> }>
 
-  options?: Record<string, RequestInit>
-
-  /**
-   * Send cookies from the browser to the GraphQL server in SSR mode.
-   *
-   * @default true
-   * */
-  proxyCookies?: boolean
+  return nuxtApp?._gqlState
 }
-
-const DEFAULT_STATE: GqlState = { proxyCookies: true }
 
 /**
  *
- * @param {object} state
- * @param {boolean} reset
+ * @param {object} options Changes to be made to gqlState
  *
  * */
 // The decision was made to avert using `GraphQLClient's` `setHeader(s)` helper in favor of reactivity and more granular control.
-const useGqlState = (state?: GqlState, reset?: boolean): Ref<GqlState> => {
-  const nuxtApp = useNuxtApp()
+const setGqlState = ({ client = 'default', patch }: {client: GqlClients, patch: RequestInit}) => {
+  const state = useGqlState()
 
-  if (!nuxtApp._gqlState) {
-    nuxtApp._gqlState = ref<GqlState>(Object.assign({}, DEFAULT_STATE))
-  }
+  const reset = !Object.keys(patch).length
+  const partial = !reset && Object.keys(patch).some(key => typeof patch[key] !== 'object'
+    ? !patch[key]
+    : (!Object.keys(patch[key]).length || Object.keys(patch[key]).some(subKey => !patch[key][subKey])))
 
-  if (state) {
-    if (state.options) {
-      const optionKeys = Object.keys(state.options || {})
-
-      for (const k of optionKeys) {
-        if (!nuxtApp._gqlState.value.clients?.[k]) { delete state.options[k] }
-      }
-    }
-
-    if (reset === undefined) { reset = !Object.keys(state).length }
-
-    if (reset) {
-      nuxtApp._gqlState.value = Object.assign(DEFAULT_STATE, {
-        clients: nuxtApp._gqlState.value.clients
-      })
-    } else { nuxtApp._gqlState.value = deepmerge(nuxtApp._gqlState.value, state) }
-
-    const clients = (nuxtApp._gqlState.value as GqlState).clients
-
-    if (clients) {
-      for (const [k, v] of Object.entries(clients)) {
-        if (reset) {
-          // @ts-ignore
-          v.options = {}
-
-          continue
+  if (reset) {
+    state.value[client].options = {}
+  } else if (partial) {
+    for (const key in patch) {
+      if (typeof patch[key] !== 'object') {
+        if (patch[key]) {
+          state.value[client].options[key] = patch[key]
+        } else if (key in state.value[client].options) {
+          delete state.value[client].options[key]
         }
 
-        if (!state?.options?.[k]) { continue }
+        continue
+      }
 
-        // @ts-ignore
-        v.options = nuxtApp._gqlState.value.options[k]
+      if (!Object.keys(patch[key]).length && key in state.value[client].options) {
+        delete state.value[client].options[key]
+        continue
+      }
+
+      for (const subKey in patch[key]) {
+        if (patch[key][subKey]) {
+          state.value[client].options[key][subKey] = patch[key][subKey]
+        } else if (typeof state.value[client].options?.[key] === 'object' && subKey in state.value[client].options?.[key]) {
+          delete state.value[client].options[key][subKey]
+        }
       }
     }
+  } else {
+    state.value[client].options = deepmerge(state.value[client].options, patch)
   }
 
-  return nuxtApp._gqlState as Ref<GqlState>
-}
-
-const initClients = () => {
-  const state = useGqlState()
-
-  const config = useRuntimeConfig()
-  const { clients } = deepmerge({}, defu(config?.['graphql-client'], config?.public?.['graphql-client'])) as GqlConfig
-
-  state.value.clients = state.value?.clients || {}
-  state.value.options = state.value?.options || {}
-
-  for (const [name, v] of Object.entries(clients)) {
-    if (state.value?.clients[name]) { continue }
-
-    if (!state.value?.options[name]) { state.value.options[name] = {} }
-
-    const host = (process.client && v?.clientHost) || v.host
-
-    const c = new GraphQLClient(host, state.value.options[name])
-    state.value.clients[name] = c
-
-    if (v?.token?.value) { useGqlToken(v.token.value, { client: name as GqlClients }) }
-  }
-}
-
-const getClient = (client?: GqlClients): GqlClients => {
-  const state = useGqlState()
-
-  if (client && state.value?.clients?.[client]) { return client }
-
-  const { clients } = useRuntimeConfig()?.public?.['graphql-client'] as GqlConfig
-
-  if (!state.value.clients || !state.value.options) { initClients() }
-
-  if (!client && Object.keys(clients)?.length) {
-    const defaultClient = Object.entries(clients).find(
-      ([k, v]) => k === 'default' || v?.default
-    )
-
-    if (defaultClient) { client = defaultClient[0] as GqlClients } else { client = Object.keys(clients)[0] as GqlClients }
-  }
-
-  return client
-}
-
-const useGqlClient = (client?: GqlClients): GraphQLClient => {
-  const state = useGqlState()
-
-  client = getClient(client)
-
-  return state.value.clients[client]
+  // @ts-ignore
+  state.value[client].instance.options = state.value[client].options
 }
 
 /**
@@ -141,15 +73,29 @@ const useGqlClient = (client?: GqlClients): GraphQLClient => {
  *
  * - Set headers for a specific client (multi-client mode)
  * ```ts
- * useGqlHeaders({
- *   'X-Custom-Header': 'Custom Value'
- * }, 'my-client')
+ * useGqlHeaders({'X-Custom-Header': 'Custom Value'}, 'my-client')
+ * ```
+ *
+ * - Reset headers for a specific client
+ * ```ts
+ * useGqlHeaders(null, 'my-client')
  * ```
  * */
-export const useGqlHeaders = (headers: HeadersInit, client?: GqlClients) => {
-  client = getClient(client)
+export function useGqlHeaders (headers: Record<string, string>, client?: GqlClients): void
+export function useGqlHeaders (opts :{headers: Record<string, string>, client?: GqlClients, respectDefaults?: boolean}): void
+export function useGqlHeaders (...args: any[]) {
+  const client = args[1] || args?.[0]?.client
+  let headers = (args[0] && typeof args[0] !== 'undefined' && 'headers' in args[0]) ? args[0].headers : args[0]
+  const respectDefaults = args?.[0]?.respectDefaults
 
-  useGqlState({ options: { [client]: { headers } } })
+  headers = headers || {}
+
+  setGqlState({ client, patch: { headers } })
+
+  if (respectDefaults && !Object.keys(headers).length) {
+    const defaultHeaders = (useRuntimeConfig()?.public?.['graphql-client'] as GqlConfig)?.clients?.[client || 'default']?.headers
+    setGqlState({ client, patch: { headers: defaultHeaders } })
+  }
 }
 
 interface GqlTokenConfig {
@@ -175,7 +121,7 @@ type GqlTokenOptions = {
    * Configure the auth token
    *
    * @default
-   * `{ type: 'Bearer', name: 'authorization' }`
+   * `{ type: 'Bearer', name: 'Authorization' }`
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization
    * */
@@ -191,15 +137,24 @@ type GqlTokenOptions = {
 /**
  * `useGqlToken` adds an Authorization header to every request.
  *
- * @param {string} token
- * @param {object} opts
+ * @param {string} token The token to be used for authentication
+ * @param {object} opts Options for the auth token
  * */
-export const useGqlToken = (token: string, opts?: GqlTokenOptions) => {
-  let { client, config } = opts || {}
+export function useGqlToken (token: string, opts?: GqlTokenOptions): void
+/**
+ * `useGqlToken` adds an Authorization header to every request.
+ *
+ * @param {object} opts Options for the auth token
+ * */
+export function useGqlToken (opts: GqlTokenOptions & {token: string}): void
+export function useGqlToken (...args: any[]) {
+  args = args || []
 
-  client = getClient(client)
+  const token = typeof args[0] === 'string' ? args[0] : args?.[0]?.token
+  const client = args[0]?.client || args?.[1]?.client
+  let config = args[0]?.config || args?.[1]?.config
 
-  const clientConfig = (useRuntimeConfig()?.public?.['graphql-client'] as GqlConfig)?.clients?.[client]
+  const clientConfig = (useRuntimeConfig()?.public?.['graphql-client'] as GqlConfig)?.clients?.[client || 'default']
 
   config = {
     ...DEFAULT_AUTH,
@@ -208,24 +163,15 @@ export const useGqlToken = (token: string, opts?: GqlTokenOptions) => {
     ...config
   }
 
-  const state = useGqlState()
-
-  if (token) {
-    useGqlState({
-      options: {
-        [client]: {
-          headers: { [config.name]: `${config.type} ${token}`.trim() }
-        }
-      }
-    })
-  } else if (state.value?.options?.[client]?.headers?.[config.name]) {
-    delete state.value.options[client].headers[config.name]
-  }
+  setGqlState({
+    client,
+    patch: { headers: { [config.name]: !token ? undefined : `${config.type} ${token}`.trim() } }
+  })
 }
 
 interface GqlCors {
   mode?: RequestMode
-  credentials: RequestCredentials
+  credentials?: RequestCredentials
 
   /**
    * The name of your GraphQL client.
@@ -237,36 +183,24 @@ interface GqlCors {
 /**
  * `useGqlCors` adds CORS headers to every request.
  *
- * @param {object} opts
+ * @param {object} cors Options for the CORS headers
  * */
-export const useGqlCors = ({ mode, credentials, client }: GqlCors) => {
-  client = getClient(client)
+export const useGqlCors = (cors: GqlCors) => {
+  const { mode, credentials, client } = cors || {}
 
-  const corsOptions = {
-    ...(mode && { mode }),
-    ...(credentials && { credentials })
-  }
-
-  useGqlState({ options: { [client]: corsOptions } })
+  setGqlState({ client, patch: { mode, credentials } })
 }
 
-/**
- * @param {string} client
- *
- * @note `client` should match the name of the GraphQL client used for the operation being executed.
- * */
-export const useGql = (client?: GqlClients): ReturnType<typeof gqlSdk> => {
+export const useGql = () => {
   const state = useGqlState()
 
-  const gqlClient = useGqlClient(client)
+  const handle = (client?: GqlClients) => {
+    const { instance } = state.value?.[client || 'default']
 
-  if (process.server && state.value?.proxyCookies) {
-    const { cookie } = useRequestHeaders(['cookie'])
+    const $gql: ReturnType<typeof gqlSdk> = gqlSdk(instance)
 
-    if (cookie) { gqlClient.setHeader('cookie', cookie) }
+    return { ...$gql }
   }
 
-  const $gql: ReturnType<typeof gqlSdk> = gqlSdk(gqlClient)
-
-  return { ...$gql }
+  return { handle }
 }
