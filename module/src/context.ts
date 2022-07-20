@@ -24,38 +24,34 @@ export function prepareContext (ctx: GqlContext, prefix: string) {
     if (!typed) {
       const client = ctx?.clients.find(c => ctx?.clientOps?.[c]?.includes(fn))
 
-      if (!client) { return `export const ${name} = (...params) => useGql()['${fn}'](...params)` } else { return `export const ${name} = (...params) => useGql('${client}')['${fn}'](...params)` }
+      return `export const ${name} = (...params) => GqlInstance().handle(${client ? `'${client}'` : ''})['${fn}'](...params)`
     }
 
     return `  export const ${name}: (...params: Parameters<GqlFunc['${fn}']>) => ReturnType<GqlFunc['${fn}']>`
   }
 
-  ctx.generateImports = () => {
-    return [
-      'import { useGql } from \'#imports\'',
-      ...ctx.fns.map(f => fnExp(f))
-    ].join('\n')
-  }
+  ctx.generateImports = () => [
+    'import { useGql } from \'#imports\'',
+    'const ctx = { instance: null }',
+    'const GqlInstance = () => {',
+    ' if (!ctx?.instance) {ctx.instance = useGql()}',
+    ' return ctx.instance',
+    '}',
+    ...ctx.fns.map(f => fnExp(f))
+  ].join('\n')
 
-  ctx.generateDeclarations = () => {
-    return [
-      'declare module \'#build/gql\' {',
-      `  type GqlClients = '${ctx.clients.join("' | '")}'`,
-      '  type GqlFunc = ReturnType<typeof import(\'#imports\')[\'useGql\']>',
+  ctx.generateDeclarations = () => [
+    'declare module \'#build/gql\' {',
+      `  type GqlClients = '${ctx.clients.join("' | '") || 'default'}'`,
+      '  type GqlFunc = ReturnType<ReturnType<typeof import(\'#imports\')[\'useGql\']>[\'handle\']>',
       ...ctx.fns.map(f => fnExp(f, true)),
       '}'
-    ].join('\n')
-  }
+  ].join('\n')
 
-  ctx.fnImports = ctx.fns.map((fn) => {
-    const name = fnName(fn)
-
-    return {
-      name,
-      as: name,
-      from: '#build/gql'
-    }
-  })
+  ctx.fnImports = ctx.fns.map((fn): Import => ({
+    name: fnName(fn),
+    from: '#build/gql'
+  }))
 }
 
 export async function prepareOperations (ctx: GqlContext, path: string[]) {
@@ -80,19 +76,16 @@ export async function prepareOperations (ctx: GqlContext, path: string[]) {
     })
 
     for (const op of operations) {
-      const clientName = new RegExp(`^(${ctx.clients.join('|')}[^_]*)`).exec(op)?.[0]
+      clientToUse = new RegExp(`^(${ctx.clients.join('|')}[^_]*)`).exec(op)?.[0] || clientToUse
 
-      if (!clientName || !ctx.clientOps?.[clientName]) {
-        if (clientToUse && !ctx.clientOps?.[clientToUse]?.includes(op)) {
-          ctx.clientOps[clientToUse].push(op)
-        }
-
-        continue
+      if (!clientToUse || !ctx.clientOps?.[clientToUse]) {
+        clientToUse = clientToUse || ctx.clients.find(c => c === 'default') || ctx.clients[0]
       }
 
-      const operationName = op.replace(`${clientName}_`, '')
-      if (!ctx.clientOps?.[clientName]?.includes(operationName)) {
-        ctx.clientOps[clientName].push(operationName)
+      const operationName = op.replace(`${clientToUse}_`, '').replace(op.split('_')[0] + '_', '')
+
+      if (!ctx.clientOps?.[clientToUse]?.includes(operationName)) {
+        ctx.clientOps[clientToUse].push(operationName)
       }
     }
   }
@@ -101,22 +94,40 @@ export async function prepareOperations (ctx: GqlContext, path: string[]) {
 }
 
 export function prepareTemplate (ctx: GqlContext) {
+  const toPSCase = (s: string) => s.split('_').map(upperFirst).join('_')
+
+  const oust = (from: string, to: string) => ctx.template
+    .replace(new RegExp(from, 'g'), to)
+    .replace(new RegExp(toPSCase(from), 'g'), toPSCase(to))
+
   for (const [client, ops] of Object.entries(ctx.clientOps)) {
     if (!ops?.length) { continue }
 
     for (const op of ops) {
       const originalName = `${client}_${op}`
-      const originalNameRe = new RegExp(originalName, 'g')
 
-      const toPSCase = (s: string) => s.split('_').map(upperFirst).join('_')
+      const [basic, special] = [op, originalName].map(n =>
+        new RegExp(`\\s${n}\\s*(?=\\(variables)`, 'g').test(ctx.template))
 
-      const secondCase = toPSCase(originalName)
-      const secondCaseRe = new RegExp(secondCase, 'g')
-      const secondResult = toPSCase(op)
+      if (basic) { continue }
 
-      ctx.template = ctx.template
-        .replace(originalNameRe, op)
-        .replace(secondCaseRe, secondResult)
+      if (special) {
+        ctx.template = oust(originalName, op)
+
+        continue
+      }
+
+      if (!basic && !special) {
+        const reInvalid = new RegExp(`\\w+_(${op})\\s*(?=\\(variables)`)
+
+        if (!reInvalid.test(ctx.template)) { continue }
+
+        const [invalidName, opName] = reInvalid.exec(ctx.template)
+
+        ctx.template = oust(invalidName, opName)
+
+        continue
+      }
     }
   }
 }

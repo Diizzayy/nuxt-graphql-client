@@ -4,9 +4,13 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'docs/**'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - 'docs/**'
   workflow_dispatch:
 
 jobs:
@@ -29,7 +33,7 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn install
 
       - name: Build
         run: yarn build
@@ -56,7 +60,7 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn install
 
       - name: Lint
         run: yarn lint
@@ -68,6 +72,7 @@ jobs:
       matrix:
         node: [16]
         os: [ubuntu-latest]
+      fail-fast: false
 
     steps:
       - name: Checkout
@@ -80,7 +85,7 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn install
 
       - name: Run Tests
         run: yarn test
@@ -107,70 +112,9 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
 
-      - uses: actions/setup-node@v3
-        with:
-          cache: 'yarn'
-          node-version: ${{ matrix.node }}
-          registry-url: 'https://registry.npmjs.org/'
-
-      - name: Install dependencies 👨🏻‍💻
-        run: yarn --frozen-lockfile
-
-      - name: Publish Package
-        run: yarn release
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-    
-  publish-docs:
-    if: |
-      github.event_name == 'push' &&
-      contains(github.event.head_commit.message, 'docs')
-
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node: [16]
-    
-    defaults:
-      run:
-        working-directory: docs
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/setup-node@v3
-        with:
-          cache: 'yarn'
-          node-version: ${{ matrix.node }}
-
-      - name: Install dependencies 👨🏻‍💻
-        run: yarn --frozen-lockfile
-
-      - name: Cache Nuxt Build
-        uses: actions/cache@v2
-        id: nuxt-cache
-        with:
-          path: ./node_modules/.cache
-          key: ${{ runner.os }}-nuxt-${{ hashFiles('**/lockfiles') }}
-          restore-keys: |
-            ${{ runner.os }}-nuxt-
-
-      - name: Generate Docs
-        run: yarn generate
-
-      - name: Deploy To Firebase
-        run: |
-          curl -sL firebase.tools | bash > /dev/null
-          firebase use --add "$PROJECT_ID" > /dev/null
-          firebase deploy --only hosting --message "$COMMIT_MESSAGE"
-        env:
-          PROJECT_ID: ${{ secrets.PROJECT_ID }}
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+      - run: yes | npx bumpp module/package.json

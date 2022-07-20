@@ -1,6 +1,12 @@
-# Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [0.0.34](https://github.com/Diizzayy/nuxt-graphql-client/compare/v0.0.33...v0.0.34) (2022-07-18)
+
+
+### Bug Fixes
+
+* only import composables when necessary ([a7dac71](https://github.com/Diizzayy/nuxt-graphql-client/commit/a7dac718960603d806fc3de98806d314b534eb67))
+
 
 ### 0.0.33 (2022-06-22)
 

@@ -3,5 +3,10 @@
 </template>
 
 <script lang="ts" setup>
-const { data } = await useAsyncData('launches', () => GqlLaunches())
+const { data, error } = await useAsyncData('launches', () => GqlLaunches())
+
+if (error.value) {
+  // eslint-disable-next-line no-console
+  console.error(error.value)
+}
 </script>

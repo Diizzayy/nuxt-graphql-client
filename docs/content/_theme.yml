@@ -1,0 +1,39 @@
+title: Nuxt GraphQL Client
+
+layout: docs
+
+url: "https://nuxt-graphql-client.web.app"
+
+description: Minimal GraphQL Client + Code Generation for Nuxt.
+
+socials:
+  twitter: "@diizzayy"
+  github: "diizzayy/nuxt-graphql-client"
+
+debug: false
+
+github: 
+  root: docs/content
+  edit: true
+  releases: false
+
+cover:
+  src: /cover.png
+  alt: The Nuxt GraphQL Client module.
+
+header:
+  title: false
+  logo: true
+
+footer:
+  credits:
+    icon: IconDocus
+    text: Powered by Docus
+    href: https://docus.com
+  icons:
+  - label: NuxtJS
+    href: https://nuxtjs.org
+    component: IconNuxt
+  - label: Vue Telescope
+    href: https://vuetelescope.com
+    component: IconVueTelescope

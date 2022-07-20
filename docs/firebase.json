@@ -1,7 +1,16 @@
 {
   "hosting": {
     "site": "nuxt-graphql-client",
-    "public": "dist",
+    "public": ".output/public",
+    "rewrites": [
+      {
+        "source": "/query",
+        "run": {
+          "serviceId": "nuxt-gql-server",
+          "region": "us-east1"
+        }
+      }
+    ],
     "headers": [
       {
         "source": "**",

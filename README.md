@@ -1,4 +1,4 @@
-[![nuxt-graphql-client](./docs/static/preview.png)](https://nuxt-graphql-client.web.app)
+[![nuxt-graphql-client](./docs/public/cover.png)](https://nuxt-graphql-client.web.app)
 
 <h1 align="center">nuxt-graphql-client</h1>
 
@@ -36,7 +36,7 @@
 
 ## Preview
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/diizzayy/nuxt-graphql-client-demo)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/nuxt-graphql)
 
 ## Credits
 
