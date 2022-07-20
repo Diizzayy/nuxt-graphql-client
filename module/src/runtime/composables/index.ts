@@ -82,17 +82,17 @@ const setGqlState = ({ client = 'default', patch }: {client: GqlClients, patch: 
  * ```
  * */
 export function useGqlHeaders (headers: Record<string, string>, client?: GqlClients): void
-export function useGqlHeaders (opts :{headers: Record<string, string>, client?: GqlClients, applyDefault?: boolean}): void
+export function useGqlHeaders (opts :{headers: Record<string, string>, client?: GqlClients, respectDefaults?: boolean}): void
 export function useGqlHeaders (...args: any[]) {
   const client = args[1] || args?.[0]?.client
   let headers = (args[0] && typeof args[0] !== 'undefined' && 'headers' in args[0]) ? args[0].headers : args[0]
-  const applyDefault = args?.[0]?.applyDefault
+  const respectDefaults = args?.[0]?.respectDefaults
 
   headers = headers || {}
 
   setGqlState({ client, patch: { headers } })
 
-  if (applyDefault && !Object.keys(headers).length) {
+  if (respectDefaults && !Object.keys(headers).length) {
     const defaultHeaders = (useRuntimeConfig()?.public?.['graphql-client'] as GqlConfig)?.clients?.[client || 'default']?.headers
     setGqlState({ client, patch: { headers: defaultHeaders } })
   }

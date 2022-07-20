@@ -21,7 +21,7 @@ export default defineNuxtPlugin(() => {
       const proxyCookie = v?.proxyCookies && !!cookie
 
       const opts = {
-        ...((proxyCookie || v?.token?.value) && {
+        ...((proxyCookie || v?.token?.value || v?.headers) && {
           headers: {
             ...(v?.headers && { ...v.headers }),
             ...(proxyCookie && { cookie }),
