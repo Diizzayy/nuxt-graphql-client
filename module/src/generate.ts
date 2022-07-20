@@ -6,7 +6,7 @@ import * as PluginTSGraphqlRequest from '@graphql-codegen/typescript-graphql-req
 
 import type { Types } from '@graphql-codegen/plugin-helpers'
 import type { Resolver } from '@nuxt/kit'
-import type { GqlConfig } from './module'
+import type { GqlConfig } from './types'
 
 interface GenerateOptions {
   clients?: GqlConfig['clients']
@@ -30,10 +30,9 @@ function prepareConfig (options: GenerateOptions): Types.Config {
 
     if (!v?.token?.value) { return v.host }
 
-    const tokenName = v?.token?.name || 'Authorization'
     const token = `${v?.token?.type} ${v?.token?.value}`.trim()
 
-    return { [v.host]: { headers: { [tokenName]: token } } }
+    return { [v.host]: { headers: { ...(v?.headers && { ...v.headers }), [v?.token?.name]: token } } }
   })
 
   return {

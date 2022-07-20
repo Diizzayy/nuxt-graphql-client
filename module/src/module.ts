@@ -1,120 +1,13 @@
 import { existsSync, statSync } from 'fs'
 import { defu } from 'defu'
-import { useLogger, addTemplate, resolveFiles, createResolver, defineNuxtModule, extendViteConfig } from '@nuxt/kit'
+import { useLogger, addPlugin, addTemplate, resolveFiles, createResolver, defineNuxtModule, extendViteConfig } from '@nuxt/kit'
 import { name, version } from '../package.json'
 import generate from './generate'
 import { deepmerge } from './runtime/utils'
+import type { GqlConfig, GqlClient, TokenOpts } from './types'
 import { prepareContext, GqlContext, prepareOperations, prepareTemplate } from './context'
 
 const logger = useLogger('nuxt-graphql-client')
-
-type TokenOpts = { name?: string, value?: string, type?: string}
-
-export interface GqlClient<T = string> {
-  host: string
-
-  /**
-   * Specify a host to be used for client side requests.
-   *
-   * @type string
-   * */
-  clientHost?: string
-
-  /**
-   * Specify the path to a GraphQL Schema file to be used for code generation. When omitted, the `host` will be used.
-   *
-   * @type string
-   * */
-  schema?: string
-
-  /**
-   * This option allows you to manually specify the `default` client. When using multiple clients, the `default` client is set either to the client named `default` or the first client in the list.
-   *
-   * @type boolean
-   * */
-  default?: boolean
-
-  token?: T extends object ? TokenOpts : string | TokenOpts
-
-  /**
-   * When enabled, this flag will force tokens set at config-level to be retained client-side.
-   * By default, tokens set by `runtimeConfig` or `environment variables` only live server-side (for Code Generation & SSR requests).
-   *
-   * @type boolean
-   * @default false
-   * */
-  retainToken?: boolean
-}
-
-export interface GqlConfig<T = GqlClient> {
-  /**
-   * Prevent codegen from printing to console in dev mode
-   *
-   * @type boolean
-   * @default true
-   */
-  silent?: boolean
-
-  /**
-   * Enable hot reloading for GraphQL documents
-   *
-   * @type boolean
-   * @default true
-   */
-  watch?: boolean
-
-  /**
-   * Auto import functions based on the operation names of your queries & mutations. When set to true, you can write
-   * ```ts
-   * const { launches } = await GqlLaunches()
-   * ```
-   * instead of
-   * ```ts
-   * const { launches } = await useGql().launches()
-   * ```
-   *
-   * @type boolean
-   * @default true
-   */
-  autoImport?: boolean
-
-  /**
-   * Prefix for auto imported functions
-   *
-   * @type string
-   * @default 'Gql'
-   */
-  functionPrefix?: string
-
-  /**
-   * Path to folder(s) containing .gql or .graphql files. Can be omitted, module will automatically search for GraphQL Documents in the project's root directory.
-   *
-   * @note Useful for mono repos.
-   *
-   * @type string[]
-   * @example ['../shared/queries']
-   * */
-  documentPaths?: string[]
-
-  /**
-   * Only generate the types for the operations in your GraphQL documents.
-   * When set to true, only the types needed for your operations will be generated.
-   * When set to false, all types from the GraphQL schema will be generated.
-   *
-   * @type boolean
-   * @default true
-   * */
-  onlyOperationTypes?: boolean
-
-  /**
-   * Allows generating multiple clients with different GraphQL hosts.
-   *
-   * @note this option overrides the `GQL_HOST` in `runtimeConfig`.
-   * */
-  clients?: Record<string, T extends GqlClient ? Partial<GqlClient<T>> : string | GqlClient<T>>
-}
-
-export type ModuleOptions = GqlConfig
 
 export default defineNuxtModule<GqlConfig>({
   meta: {
@@ -159,18 +52,6 @@ export default defineNuxtModule<GqlConfig>({
       config.clients = !clientHost ? { default: host } : { default: { host, clientHost } }
     }
 
-    const multipleClients = ctx?.clients?.length > 1
-
-    if (multipleClients) {
-      const defaults = Object.entries(config.clients).reduce((i, [k, v]) => {
-        if (k === 'default' || (typeof v !== 'string' && v.default)) { i++ }
-
-        return i
-      }, 0)
-
-      if (defaults > 1) { throw new Error('Only one client can have the default flag set.') }
-    }
-
     // @ts-ignore
     nuxt.options.runtimeConfig['graphql-client'] = { clients: {} }
     nuxt.options.runtimeConfig.public['graphql-client'] = defu(nuxt.options.runtimeConfig.public['graphql-client'], { clients: {} })
@@ -191,7 +72,7 @@ export default defineNuxtModule<GqlConfig>({
       )
 
       const runtimeTokenName = k === 'default' ? process.env.GQL_TOKEN_NAME : process.env?.[`GQL_${k.toUpperCase()}_TOKEN_NAME`]
-      const tokenName = runtimeTokenName || (typeof v !== 'string' && typeof v?.token === 'object' && v.token.name)
+      const tokenName = runtimeTokenName || (typeof v !== 'string' && typeof v?.token === 'object' && v.token.name) || 'Authorization'
       const tokenType = (typeof v !== 'string' && typeof v?.token === 'object' && v?.token?.type !== undefined) ? v?.token?.type : 'Bearer'
 
       const schema = (typeof v !== 'string' && v?.schema) && srcResolver.resolve(v.schema)
@@ -264,7 +145,7 @@ export default defineNuxtModule<GqlConfig>({
         resolver: srcResolver
       })
 
-      if (multipleClients || !config.clients?.default) {
+      if (Object.keys(config.clients).length > 1 || !config.clients?.default) {
         await prepareOperations(ctx, documents)
         prepareTemplate(ctx)
       }
@@ -277,6 +158,8 @@ export default defineNuxtModule<GqlConfig>({
       filename: 'gql-sdk.ts',
       getContents: () => ctx.template
     })
+
+    addPlugin(resolver.resolve('runtime/plugin'))
 
     if (config.autoImport) {
       addTemplate({
