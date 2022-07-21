@@ -1,6 +1,7 @@
 import type { Ref } from 'vue'
 import type { GqlClients } from '#build/gql'
 import { getSdk as gqlSdk } from '#build/gql-sdk'
+import { useNuxtApp, useRuntimeConfig } from '#imports'
 import type { GqlState, GqlConfig, GqlError, OnGqlError } from '../../types'
 import { deepmerge } from '../utils'
 

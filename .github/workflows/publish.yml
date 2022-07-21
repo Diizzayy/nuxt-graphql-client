@@ -43,7 +43,6 @@ jobs:
       - name: Publish Package
         run: |
           cp README.md module
-          sed -i 's/\.\/docs/\.\.\/docs/g' module/README.md
           yarn --cwd module publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
