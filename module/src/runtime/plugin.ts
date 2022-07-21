@@ -9,7 +9,7 @@ export default defineNuxtPlugin(() => {
   const nuxtApp = useNuxtApp() as Partial<{ _gqlState: Ref<GqlState> }>
 
   if (!nuxtApp?._gqlState) {
-    nuxtApp._gqlState = ref<GqlState>({})
+    nuxtApp._gqlState = ref({})
 
     const config = useRuntimeConfig()
     const { clients }: GqlConfig = deepmerge({}, defu(config?.['graphql-client'], config?.public?.['graphql-client']))

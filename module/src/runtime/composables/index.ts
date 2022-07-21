@@ -2,7 +2,7 @@ import type { Ref } from 'vue'
 import type { GqlClients } from '#build/gql'
 import { getSdk as gqlSdk } from '#build/gql-sdk'
 import { useNuxtApp, useRuntimeConfig } from '#imports'
-import type { GqlState, GqlConfig } from '../../types'
+import type { GqlState, GqlConfig, GqlError, OnGqlError } from '../../types'
 import { deepmerge } from '../utils'
 
 const useGqlState = (): Ref<GqlState> => {
@@ -194,14 +194,61 @@ export const useGqlCors = (cors: GqlCors) => {
 
 export const useGql = () => {
   const state = useGqlState()
+  const errState = useGqlErrorState()
 
   const handle = (client?: GqlClients) => {
-    const { instance } = state.value?.[client || 'default']
+    client = client || 'default'
+    const { instance } = state.value?.[client]
 
-    const $gql: ReturnType<typeof gqlSdk> = gqlSdk(instance)
+    const $gql: ReturnType<typeof gqlSdk> = gqlSdk(instance, async (action, operationName, operationType): Promise<any> => {
+      try {
+        return await action()
+      } catch (err) {
+        errState.value = {
+          client,
+          operationType,
+          operationName,
+          statusCode: err?.response?.status,
+          gqlErrors: err?.response?.errors
+        }
+
+        if (state.value.onError) {
+          state.value.onError(errState.value)
+        }
+
+        throw errState.value
+      }
+    })
 
     return { ...$gql }
   }
 
   return { handle }
 }
+
+/**
+ * `useGqlError` captures GraphQL Errors.
+ *
+ * @param {OnGqlError} onError Gql error handler
+ *
+ * @example <caption>Log error to console.</caption>
+ * ```ts
+ * useGqlError((err) => {
+ *    console.error(err)
+ * })
+ * ```
+ * */
+export const useGqlError = (onError: OnGqlError) => {
+  // proactive measure to prevent context reliant calls
+  useGqlState().value.onError = process.client
+    ? onError
+    : process.env.NODE_ENV !== 'production' && (e => console.error('[nuxt-graphql-client] [GraphQL error]', e))
+
+  const errState = useGqlErrorState()
+
+  if (!errState.value) { return }
+
+  onError(errState.value)
+}
+
+const useGqlErrorState = () => useState<GqlError>('_gqlErrors', () => null)
