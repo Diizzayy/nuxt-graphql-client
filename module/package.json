@@ -36,10 +36,10 @@
     "prepack": "nuxt-module-build"
   },
   "dependencies": {
-    "@graphql-codegen/cli": "^2.8.0",
-    "@graphql-codegen/typescript": "^2.7.1",
-    "@graphql-codegen/typescript-graphql-request": "^4.5.1",
-    "@graphql-codegen/typescript-operations": "^2.5.1",
+    "@graphql-codegen/cli": "^2.9.1",
+    "@graphql-codegen/typescript": "^2.7.2",
+    "@graphql-codegen/typescript-graphql-request": "^4.5.2",
+    "@graphql-codegen/typescript-operations": "^2.5.2",
     "@nuxt/kit": "^3.0.0-rc.6",
     "defu": "^6.0.0",
     "graphql": "^16.5.0",
