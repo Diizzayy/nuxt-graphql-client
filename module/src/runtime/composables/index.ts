@@ -242,7 +242,7 @@ export const useGqlError = (onError: OnGqlError) => {
   // proactive measure to prevent context reliant calls
   useGqlState().value.onError = process.client
     ? onError
-    : e => console.error('[nuxt-graphql-client] [GraphQL error]', e)
+    : process.env.NODE_ENV !== 'production' && (e => console.error('[nuxt-graphql-client] [GraphQL error]', e))
 
   const errState = useGqlErrorState()
 
