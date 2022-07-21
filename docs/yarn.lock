@@ -5861,9 +5861,9 @@ unctx@^1.1.4:
     unplugin "^0.6.1"
 
 undici@^5.2.0:
-  version "5.6.1"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-5.6.1.tgz#7e5c56d15032d06738358dea433f98130e2a0561"
-  integrity sha512-yYVqywdCbNb99f/w045wqmv++WExXDjY0FEvLSB7QUZZH6izxrVkF4dJn1aimcvN0+WAhv75Gg7v6VJoqmRtJQ==
+  version "5.8.0"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-5.8.0.tgz#dec9a8ccd90e5a1d81d43c0eab6503146d649a4f"
+  integrity sha512-1F7Vtcez5w/LwH2G2tGnFIihuWUlc58YidwLiCv+jR2Z50x0tNXpRRw7eOIJ+GvqCqIkg9SB7NWAJ/T9TLfv8Q==
 
 unenv@^0.5.2:
   version "0.5.2"
