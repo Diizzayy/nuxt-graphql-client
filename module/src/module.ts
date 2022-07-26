@@ -24,7 +24,8 @@ export default defineNuxtModule<GqlConfig>({
     silent: true,
     autoImport: true,
     functionPrefix: 'Gql',
-    onlyOperationTypes: true
+    onlyOperationTypes: true,
+    skipDocumentsValidation: {}
   },
   async setup (opts, nuxt) {
     const resolver = createResolver(import.meta.url)
@@ -143,6 +144,7 @@ export default defineNuxtModule<GqlConfig>({
         plugins,
         documents,
         onlyOperationTypes: config.onlyOperationTypes,
+        skipDocumentsValidation: config.skipDocumentsValidation,
         resolver: srcResolver
       })
 
