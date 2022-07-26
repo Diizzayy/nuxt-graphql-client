@@ -15,6 +15,7 @@ interface GenerateOptions {
   plugins?: string[]
   documents?: string[]
   onlyOperationTypes?: boolean
+  skipDocumentsValidation?: object
   resolver? : Resolver
 }
 
@@ -54,6 +55,7 @@ function prepareConfig (options: GenerateOptions): Types.Config {
         }
       }
     }
+    skipDocumentsValidation: options.skipDocumentsValidation,
   }
 }
 
