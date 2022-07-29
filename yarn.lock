@@ -2464,10 +2464,10 @@ cosmiconfig-toml-loader@1.0.0:
   dependencies:
     "@iarna/toml" "^2.2.5"
 
-cosmiconfig-typescript-loader@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/cosmiconfig-typescript-loader/-/cosmiconfig-typescript-loader-3.0.0.tgz#1925ca6f5d6c578acb6bf91d888f7cbb3d5e69f5"
-  integrity sha512-koBea9l2wvqoq4CWsoHdKb+RFyjgzTR7uw0F1CVvHrlGIHSGCMY5YwGj8+HN2iwqzpHPTst6LFUhCgTPwVOGpA==
+cosmiconfig-typescript-loader@3.0.0, cosmiconfig-typescript-loader@^3.1.0:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/cosmiconfig-typescript-loader/-/cosmiconfig-typescript-loader-3.1.1.tgz#9cdc2ae1a219cf52b0bc0647596c6691b9ab56a3"
+  integrity sha512-SR5/NciF0vyYqcGsmB9WJ4QOKkcSSSzcBPLrnT6094BYahMy0eImWvlH3zoEOYqpF2zgiyAKHtWTXTo+fqgxPg==
 
 cosmiconfig@7.0.1, cosmiconfig@^7.0.0:
   version "7.0.1"
@@ -5252,6 +5252,10 @@ nuxi@^3.0.0-rc.6:
   integrity sha512-IYzpHrpi+T8kdeaJUSGBbfTuEe8uB4CQXI/h74J7tFY7Fa87czRl0HQjBHE59WkMa7Vu+GvO991aKrmRAvmAYw==
   optionalDependencies:
     fsevents "~2.3.2"
+
+nuxt-graphql-client@*:
+  version "0.0.0"
+  uid ""
 
 "nuxt-graphql-client@link:./module":
   version "0.0.0"
