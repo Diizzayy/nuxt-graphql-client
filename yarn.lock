@@ -540,10 +540,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@graphql-codegen/cli@^2.11.2":
-  version "2.11.2"
-  resolved "https://registry.yarnpkg.com/@graphql-codegen/cli/-/cli-2.11.2.tgz#f502d0e9e19305acffca5f07789dde8d4e0fa656"
-  integrity sha512-dt70+et0QFmhL3krrlYWcsp7T6pvChEQ1vEGoNn46Rn53velGDwP546DtSPpHJmajY/eJ11CueoI0J/3o0/BTA==
+"@graphql-codegen/cli@^2.11.3":
+  version "2.11.3"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/cli/-/cli-2.11.3.tgz#6cb0fd6da0773957b531cccf7459303a23ee1c05"
+  integrity sha512-C1d88Kx0a0PF1tOR00UIZjHq5aWNNcw5fM2k08rOY9O5b4sU7kEb+YbGKP6EExTtJnYb49fePLKVvrIv1ejDFg==
   dependencies:
     "@graphql-codegen/core" "2.6.0"
     "@graphql-codegen/plugin-helpers" "^2.6.1"
@@ -5253,23 +5253,10 @@ nuxi@^3.0.0-rc.6:
   optionalDependencies:
     fsevents "~2.3.2"
 
-nuxt-graphql-client@*:
-  version "0.1.7-beta.0"
-  dependencies:
-    "@graphql-codegen/cli" "^2.11.2"
-    "@graphql-codegen/typescript" "^2.7.2"
-    "@graphql-codegen/typescript-graphql-request" "^4.5.2"
-    "@graphql-codegen/typescript-operations" "^2.5.2"
-    "@nuxt/kit" "^3.0.0-rc.6"
-    defu "^6.0.0"
-    graphql "^16.5.0"
-    graphql-request "^4.3.0"
-    scule "^0.2.1"
-
 "nuxt-graphql-client@link:./module":
-  version "0.1.7-beta.0"
+  version "0.1.7"
   dependencies:
-    "@graphql-codegen/cli" "^2.11.2"
+    "@graphql-codegen/cli" "^2.11.3"
     "@graphql-codegen/typescript" "^2.7.2"
     "@graphql-codegen/typescript-graphql-request" "^4.5.2"
     "@graphql-codegen/typescript-operations" "^2.5.2"
