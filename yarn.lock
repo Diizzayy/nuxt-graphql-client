@@ -5253,21 +5253,8 @@ nuxi@^3.0.0-rc.6:
   optionalDependencies:
     fsevents "~2.3.2"
 
-nuxt-graphql-client@*:
-  version "0.1.7-beta.0"
-  dependencies:
-    "@graphql-codegen/cli" "^2.11.2"
-    "@graphql-codegen/typescript" "^2.7.2"
-    "@graphql-codegen/typescript-graphql-request" "^4.5.2"
-    "@graphql-codegen/typescript-operations" "^2.5.2"
-    "@nuxt/kit" "^3.0.0-rc.6"
-    defu "^6.0.0"
-    graphql "^16.5.0"
-    graphql-request "^4.3.0"
-    scule "^0.2.1"
-
 "nuxt-graphql-client@link:./module":
-  version "0.1.7-beta.0"
+  version "0.1.7"
   dependencies:
     "@graphql-codegen/cli" "^2.11.2"
     "@graphql-codegen/typescript" "^2.7.2"
@@ -5277,7 +5264,7 @@ nuxt-graphql-client@*:
     defu "^6.0.0"
     graphql "^16.5.0"
     graphql-request "^4.3.0"
-    scule "^0.2.1"
+    scule "^0.3.2"
 
 nuxt@^3.0.0-rc.6:
   version "3.0.0-rc.6"
@@ -6315,6 +6302,11 @@ scule@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/scule/-/scule-0.2.1.tgz#0c1dc847b18e07219ae9a3832f2f83224e2079dc"
   integrity sha512-M9gnWtn3J0W+UhJOHmBxBTwv8mZCan5i1Himp60t6vvZcor0wr+IM0URKmIglsWJ7bRujNAVVN77fp+uZaWoKg==
+
+scule@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/scule/-/scule-0.3.2.tgz#472445cecd8357165a94a067f78cee40e700b596"
+  integrity sha512-zIvPdjOH8fv8CgrPT5eqtxHQXmPNnV/vHJYffZhE43KZkvULvpCTvOt1HPlFaCZx287INL9qaqrZg34e8NgI4g==
 
 selfsigned@^2.0.1:
   version "2.0.1"
