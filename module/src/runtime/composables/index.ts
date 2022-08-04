@@ -105,7 +105,7 @@ interface GqlTokenConfig {
    *
    * @default 'Authorization'
    * */
-  name: string
+  name?: string
 
   /**
    * The HTTP Authentication scheme.
