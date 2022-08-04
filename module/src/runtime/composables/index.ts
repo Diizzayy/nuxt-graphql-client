@@ -196,7 +196,7 @@ export const useGql = () => {
   const state = useGqlState()
   const errState = useGqlErrorState()
 
-  const handle = (client?: GqlClients) => {
+  const handle = (client?: GqlClients): ReturnType<typeof gqlSdk> => {
     client = client || 'default'
     const { instance } = state.value?.[client]
 
