@@ -24,7 +24,7 @@
     "@nuxtjs/eslint-config-typescript": "10.0.0",
     "eslint": "8.20.0",
     "nuxt": "^3.0.0-rc.6",
-    "vitest": "0.19.1"
+    "vitest": "0.20.2"
   },
   "resolutions": {
     "nuxt-graphql-client": "link:./module",
