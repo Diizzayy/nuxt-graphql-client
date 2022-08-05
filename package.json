@@ -1,5 +1,6 @@
 {
   "private": true,
+  "name": "nuxt-graphql-client",
   "license": "MIT",
   "type": "module",
   "workspaces": [
