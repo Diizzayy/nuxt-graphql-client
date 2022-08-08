@@ -1,7 +1,11 @@
+import { hash } from 'ohash'
 import type { Ref } from 'vue'
-import type { GqlClients } from '#build/gql'
+// @ts-ignore
+import { GqlOperations, GqlInstance } from '#build/gql'
+import type { GqlClients, GqlFunc } from '#build/gql'
 import { getSdk as gqlSdk } from '#build/gql-sdk'
-import { useState, useNuxtApp, useRuntimeConfig } from '#imports'
+import { useState, useNuxtApp, useAsyncData, useRuntimeConfig } from '#imports'
+import type { AsyncData } from 'nuxt/dist/app/composables'
 import type { GqlState, GqlConfig, GqlError, OnGqlError } from '../../types'
 import { deepmerge } from '../utils'
 
@@ -252,3 +256,39 @@ export const useGqlError = (onError: OnGqlError) => {
 }
 
 const useGqlErrorState = () => useState<GqlError>('_gqlErrors', () => null)
+
+/**
+ * Asynchronously query data that is required to load a page or component.
+ *
+ * @param {Object} options
+ * @param {string} options.operation Name of the query to be executed.
+ * @param {string} options.variables Variables to be passed to the query.
+ * @param {Object} options.options AsyncData options.
+ */
+export function useAsyncGql<
+T extends keyof GqlFunc,
+P extends Parameters<GqlFunc[T]>['0'],
+R extends AsyncData<Awaited<ReturnType<GqlFunc[T]>>, GqlError>,
+O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variables?: P, options?: O }): Promise<R>
+
+/**
+ * Asynchronously query data that is required to load a page or component.
+ *
+ * @param {string} operation Name of the query to be executed.
+ * @param {string} variables Variables to be passed to the query.
+ * @param {Object} options AsyncData options.
+ */
+export function useAsyncGql<
+T extends keyof GqlFunc,
+P extends Parameters<GqlFunc[T]>['0'],
+R extends AsyncData<Awaited<ReturnType<GqlFunc[T]>>, GqlError>,
+O extends Parameters<typeof useAsyncData>['2']> (operation: T, variables?: P, options?: O): Promise<R>
+
+export function useAsyncGql (...args: any[]) {
+  const operation = (typeof args?.[0] !== 'string' && 'operation' in args?.[0] ? args[0].operation : args[0]) ?? undefined
+  const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? args[0].variables : args[1]) ?? undefined
+  const options = (typeof args?.[0] !== 'string' && 'options' in args?.[0] ? args[0].options : args[2]) ?? undefined
+  const client = Object.keys(GqlOperations).find(k => GqlOperations[k].includes(operation)) ?? 'default'
+  const key = hash({ operation, client, variables })
+  return useAsyncData(key, () => GqlInstance().handle(client as GqlClients)[operation](variables), options)
+}

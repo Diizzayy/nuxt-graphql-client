@@ -38,7 +38,10 @@
 </template>
 
 <script lang="ts" setup>
-const { data, error } = await useAsyncData('starlink', () => GqlLaunches())
+const { data, error } = await useAsyncGql({
+  operation: 'launches',
+  variables: { limit: 1 }
+})
 
 if (error.value) {
   // eslint-disable-next-line no-console

@@ -49,6 +49,7 @@ export default defineNuxtModule<GqlConfig>({
 
       if (!host) { throw new Error('GQL_HOST is not set in public runtimeConfig') }
 
+      ctx.clients = ['default']
       config.clients = !clientHost ? { default: host } : { default: { host, clientHost } }
     }
 
@@ -147,10 +148,10 @@ export default defineNuxtModule<GqlConfig>({
       })
 
       if (Object.keys(config.clients).length > 1 || !config.clients?.default) {
-        await prepareOperations(ctx, documents)
         prepareTemplate(ctx)
       }
 
+      await prepareOperations(ctx, documents)
       prepareContext(ctx, config.functionPrefix)
     }
 
