@@ -33,10 +33,11 @@ export function prepareContext (ctx: GqlContext, prefix: string) {
   ctx.generateImports = () => [
     'import { useGql } from \'#imports\'',
     'const ctx = { instance: null }',
-    'const GqlInstance = () => {',
+    'export const GqlInstance = () => {',
     ' if (!ctx?.instance) {ctx.instance = useGql()}',
     ' return ctx.instance',
     '}',
+    `export const GqlOperations = ${JSON.stringify(ctx.clientOps)}`,
     ...ctx.fns.map(f => fnExp(f))
   ].join('\n')
 
@@ -76,7 +77,7 @@ export async function prepareOperations (ctx: GqlContext, path: string[]) {
     })
 
     for (const op of operations) {
-      clientToUse = new RegExp(`^(${ctx.clients.join('|')}[^_]*)`).exec(op)?.[0] || clientToUse
+      clientToUse = new RegExp(`^(${ctx.clients.join('|')})(?=\\_)`).exec(op)?.[0] || clientToUse
 
       if (!clientToUse || !ctx.clientOps?.[clientToUse]) {
         clientToUse = clientToUse || ctx.clients.find(c => c === 'default') || ctx.clients[0]

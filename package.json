@@ -22,13 +22,12 @@
     "@nuxt/module-builder": "latest",
     "@nuxt/test-utils": "latest",
     "@nuxtjs/eslint-config-typescript": "10.0.0",
-    "eslint": "8.20.0",
+    "eslint": "8.21.0",
     "nuxt": "^3.0.0-rc.6",
-    "vitest": "0.20.2"
+    "vitest": "0.21.0"
   },
   "resolutions": {
-    "nuxt-graphql-client": "link:./module",
-    "cosmiconfig-typescript-loader": "^3.1.0"
+    "nuxt-graphql-client": "link:./module"
   },
   "version": "0.0.34"
 }
