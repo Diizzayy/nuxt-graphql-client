@@ -30,6 +30,8 @@ export default defineNuxtModule<GqlConfig>({
     const resolver = createResolver(import.meta.url)
     const srcResolver = createResolver(nuxt.options.srcDir)
 
+    nuxt.options.build.transpile.push(resolver.resolve('runtime'))
+
     const ctx: GqlContext = { clients: [], clientOps: {} }
 
     const config: GqlConfig<string | GqlClient> = defu(
