@@ -10,7 +10,7 @@
         <div v-if="entry?.links.flickr_images[0]" class="thumbnail">
           <img
             class="lazyload"
-            src="https://via.placeholder.com/150"
+            src="https://placehold.co/150"
             :data-src="entry?.links.flickr_images[0]"
             :alt="entry.mission_name"
           />
@@ -19,7 +19,7 @@
         <div v-else>
           <div class="thumbnail">
             <img
-              src="https://via.placeholder.com/150"
+              src="https://placehold.co/150"
               :alt="entry.mission_name"
             />
           </div>
@@ -40,7 +40,7 @@
 <script lang="ts" setup>
 const { data, error } = await useAsyncGql({
   operation: 'launches',
-  variables: { limit: 1 }
+  variables: { limit: 8 }
 })
 
 if (error.value) {
