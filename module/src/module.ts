@@ -94,7 +94,7 @@ export default defineNuxtModule<GqlConfig>({
           ...(tokenName && { name: tokenName }),
           type: typeof tokenType !== 'string' ? '' : tokenType
         },
-        proxyCookies: (typeof v !== 'string' && v?.proxyCookies) || true
+        proxyCookies: (typeof v !== 'string' && v?.proxyCookies) ?? true
       }
 
       ctx.clientOps[k] = []
