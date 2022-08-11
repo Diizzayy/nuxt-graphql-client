@@ -192,7 +192,11 @@ export default defineNuxtModule<GqlConfig>({
       // })
     }
 
-    const allowDocument = (f: string) => !!statSync(srcResolver.resolve(f)).size
+    const allowDocument = (f: string) => {
+      const isSchema = f.match(/([^/]+)\.(gql|graphql)$/)?.[0]?.toLowerCase().includes('schema')
+
+      return !isSchema && !!statSync(srcResolver.resolve(f)).size
+    }
 
     if (config.watch) {
       nuxt.hook('builder:watch', async (event, path) => {
