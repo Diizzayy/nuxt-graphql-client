@@ -43,7 +43,7 @@
     "prepare": "nuxt-module-build --stub && nuxi prepare playground"
   },
   "dependencies": {
-    "@graphql-codegen/cli": "^2.11.5",
+    "@graphql-codegen/cli": "^2.11.6",
     "@graphql-codegen/typescript": "^2.7.3",
     "@graphql-codegen/typescript-graphql-request": "^4.5.3",
     "@graphql-codegen/typescript-operations": "^2.5.3",
@@ -57,10 +57,10 @@
   "devDependencies": {
     "@nuxt/module-builder": "latest",
     "@nuxt/test-utils": "latest",
-    "@nuxtjs/eslint-config-typescript": "10.0.0",
-    "eslint": "8.21.0",
+    "@nuxtjs/eslint-config-typescript": "latest",
+    "eslint": "latest",
     "nuxt": "^3.0.0-rc.7",
-    "vitest": "0.21.0"
+    "vitest": "latest"
   },
   "resolutions": {
     "nuxt-graphql-client": "link:."
