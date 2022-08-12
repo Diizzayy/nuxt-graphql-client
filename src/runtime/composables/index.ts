@@ -1,13 +1,13 @@
 import { hash } from 'ohash'
 import type { Ref } from 'vue'
+import type { AsyncData } from 'nuxt/dist/app/composables'
+import type { GqlState, GqlConfig, GqlError, OnGqlError } from '../../types'
+import { deepmerge } from '../utils'
 // @ts-ignore
 import { GqlOperations, GqlInstance } from '#build/gql'
 import type { GqlClients, GqlFunc } from '#build/gql'
 import { getSdk as gqlSdk } from '#build/gql-sdk'
 import { useState, useNuxtApp, useAsyncData, useRuntimeConfig } from '#imports'
-import type { AsyncData } from 'nuxt/dist/app/composables'
-import type { GqlState, GqlConfig, GqlError, OnGqlError } from '../../types'
-import { deepmerge } from '../utils'
 
 const useGqlState = (): Ref<GqlState> => {
   const nuxtApp = useNuxtApp() as Partial<{ _gqlState: Ref<GqlState> }>
