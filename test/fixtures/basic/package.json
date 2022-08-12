@@ -3,6 +3,6 @@
   "version": "0.0.0",
   "name": "fixture-basic",
   "devDependencies": {
-    "nuxt-graphql-client": "*"
+    "nuxt-graphql-client": "workspace:*"
   }
 }

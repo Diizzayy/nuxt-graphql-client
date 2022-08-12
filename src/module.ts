@@ -128,7 +128,7 @@ export default defineNuxtModule<GqlConfig>({
     async function generateGqlTypes () {
       const documents: string[] = []
       for await (const path of documentPaths) {
-        const files = (await resolveFiles(path, [gqlMatch, '!**/schemas'])).filter(allowDocument)
+        const files = (await resolveFiles(path, [gqlMatch, '!**/schemas'], { followSymbolicLinks: false })).filter(allowDocument)
 
         documents.push(...files)
       }

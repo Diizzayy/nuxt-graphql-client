@@ -1,8 +1,8 @@
 {
     "private": true,
     "version": "0.0.0",
-    "name": "nuxt-graphql-client-playground",
+    "name": "playground",
     "devDependencies": {
-      "nuxt-graphql-client": "*"
+      "nuxt-graphql-client": "workspace:*"
     }
 }

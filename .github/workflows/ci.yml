@@ -26,20 +26,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
+      - run: corepack enable
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          cache: 'yarn'
+          cache: 'pnpm'
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: yarn build
+        run: pnpm build
 
       - name: Build Playground
-        run: yarn dev:build
+        run: pnpm dev:build
 
   lint:
     runs-on: ${{ matrix.os }}
@@ -53,17 +55,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
+      - run: corepack enable
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          cache: 'yarn'
+          cache: 'pnpm'
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: yarn lint
+        run: pnpm lint
   
   test:
     runs-on: ${{ matrix.os }}
@@ -78,17 +82,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
+      - run: corepack enable
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          cache: 'yarn'
+          cache: 'pnpm'
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install --frozen-lockfile
 
       - name: Run Tests
-        run: yarn test
+        run: pnpm test
   
   release-build:
     if: |
@@ -117,4 +123,4 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
 
-      - run: yes | npx bumpp module/package.json
+      - run: yes | npx bumpp package.json
