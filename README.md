@@ -44,6 +44,12 @@
 
 Special thanks to [@danielroe](https://github.com/danielroe) for helping me navigate and making this possible!
 
+## 💻 Development
+
+- Clone this repository
+- Enable [Corepack](https://github.com/nodejs/corepack) using `corepack enable` (use `npm i -g corepack` for Node.js < 16.10)
+- Install dependencies using `pnpm install`
+- Open playground with `pnpm dev`
 
 ## License
 
