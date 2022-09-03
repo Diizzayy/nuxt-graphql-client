@@ -1,6 +1,6 @@
 import { existsSync, statSync } from 'fs'
 import { defu } from 'defu'
-import { useLogger, addPlugin, addTemplate, resolveFiles, createResolver, defineNuxtModule, extendViteConfig } from '@nuxt/kit'
+import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createResolver, defineNuxtModule, extendViteConfig } from '@nuxt/kit'
 import { name, version } from '../package.json'
 import generate from './generate'
 import { deepmerge } from './runtime/utils'
@@ -15,7 +15,7 @@ export default defineNuxtModule<GqlConfig>({
     version,
     configKey: 'graphql-client',
     compatibility: {
-      nuxt: '^3.0.0-rc.7'
+      nuxt: '^3.0.0-rc.9'
     }
   },
   defaults: {
@@ -32,7 +32,7 @@ export default defineNuxtModule<GqlConfig>({
 
     nuxt.options.build.transpile.push(resolver.resolve('runtime'))
 
-    const ctx: GqlContext = { clients: [], clientOps: {} }
+    const ctx: GqlContext = { clients: [], clientOps: {}, fnImports: [] }
 
     const config: GqlConfig<string | GqlClient> = defu(
       {},
@@ -176,20 +176,11 @@ export default defineNuxtModule<GqlConfig>({
         getContents: () => ctx.generateDeclarations()
       })
 
-      nuxt.hook('autoImports:extend', (autoimports) => {
+      nuxt.hook('imports:extend', (autoimports) => {
         autoimports.push(...ctx.fnImports)
       })
 
-      nuxt.hook('autoImports:dirs', (dirs) => {
-        if (!ctx.template.includes('export function getSdk')) { return }
-
-        dirs.push(resolver.resolve('runtime/composables'))
-      })
-
-      // TODO: See if needed
-      // nuxt.hook('prepare:types', ({ references }) => {
-      //   references.push({ path: 'gql.d.ts' })
-      // })
+      addImportsDir(resolver.resolve('runtime/composables'))
     }
 
     const allowDocument = (f: string) => {
