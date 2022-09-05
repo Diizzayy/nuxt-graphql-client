@@ -60,7 +60,7 @@
     "@nuxtjs/eslint-config-typescript": "latest",
     "eslint": "^8.23.0",
     "nuxt": "^3.0.0-rc.9",
-    "vitest": "^0.22.1"
+    "vitest": "^0.23.1"
   },
   "resolutions": {
     "nuxt-graphql-client": "link:."
