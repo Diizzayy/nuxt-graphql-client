@@ -46,6 +46,7 @@ function prepareConfig (options: GenerateOptions): Types.Config {
         config: {
           skipTypename: true,
           useTypeImports: true,
+          dedupeFragments: true,
           gqlImport: 'graphql-request#gql',
           onlyOperationTypes: options.onlyOperationTypes,
           namingConvention: {
