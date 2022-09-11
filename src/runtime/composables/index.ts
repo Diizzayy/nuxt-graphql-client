@@ -139,19 +139,21 @@ type GqlTokenOptions = {
   client?: GqlClients
 }
 
+type GqlToken = string | null
+
 /**
  * `useGqlToken` adds an Authorization header to every request.
  *
- * @param {string} token The token to be used for authentication
+ * @param {GqlToken} token The token to be used for authentication
  * @param {object} opts Options for the auth token
  * */
-export function useGqlToken (token: string, opts?: GqlTokenOptions): void
+export function useGqlToken (token: GqlToken, opts?: GqlTokenOptions): void
 /**
  * `useGqlToken` adds an Authorization header to every request.
  *
  * @param {object} opts Options for the auth token
  * */
-export function useGqlToken (opts: GqlTokenOptions & {token: string}): void
+export function useGqlToken (opts: GqlTokenOptions & {token: GqlToken}): void
 export function useGqlToken (...args: any[]) {
   args = args || []
 
