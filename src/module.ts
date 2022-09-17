@@ -149,11 +149,12 @@ export default defineNuxtModule<GqlConfig>({
         resolver: srcResolver
       })
 
+      await prepareOperations(ctx, documents)
+
       if (Object.keys(config.clients).length > 1 || !config.clients?.default) {
         prepareTemplate(ctx)
       }
 
-      await prepareOperations(ctx, documents)
       prepareContext(ctx, config.functionPrefix)
     }
 
