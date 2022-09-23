@@ -28,11 +28,16 @@ function prepareConfig (options: GenerateOptions): Types.Config {
   const schema: Types.Config['schema'] = Object.values(options.clients).map((v) => {
     if (v.schema) { return v.schema }
 
-    if (!v?.token?.value) { return v.host }
+    if (!v?.token?.value && !v?.headers) { return v.host }
 
-    const token = `${v?.token?.type} ${v?.token?.value}`.trim()
+    const token = v?.token?.value && `${v?.token?.type} ${v?.token?.value}`.trim()
 
-    return { [v.host]: { headers: { ...(v?.headers && { ...v.headers }), [v?.token?.name]: token } } }
+    const serverHeaders = typeof v?.headers?.serverOnly === 'object' && v?.headers?.serverOnly
+    if (v?.headers?.serverOnly) { delete v.headers.serverOnly }
+
+    const headers = v?.headers && { ...(v.headers as Record<string, string>), ...serverHeaders }
+
+    return { [v.host]: { headers: { ...headers, ...(token && { [v.token.name]: token }) } } }
   })
 
   return {
