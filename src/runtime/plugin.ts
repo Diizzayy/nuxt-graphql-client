@@ -34,8 +34,6 @@ export default defineNuxtPlugin(() => {
         })
       }
 
-      console.warn('🟨', opts)
-
       nuxtApp._gqlState.value[name] = {
         options: opts,
         instance: new GraphQLClient(host, opts)
