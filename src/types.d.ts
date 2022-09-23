@@ -44,7 +44,7 @@ export interface GqlClient<T = string> {
    * */
   headers?: Record<string, string> | {
     /**
-     * Declare headers that should only be passed to the GraphQL client on the server side.
+     * Declare headers that should only be applied on server side.
      * */
     serverOnly: Record<string, string>
   }
