@@ -21,15 +21,20 @@ export default defineNuxtPlugin(() => {
 
       const proxyCookie = v?.proxyCookies && !!cookie
 
+      const serverHeaders = (process.server && (typeof v?.headers?.serverOnly === 'object' && v?.headers?.serverOnly)) || undefined
+      if (v?.headers?.serverOnly) { delete v.headers.serverOnly }
+
       const opts = {
         ...((proxyCookie || v?.token?.value || v?.headers) && {
           headers: {
-            ...(v?.headers && { ...v.headers }),
+            ...(v?.headers && { ...(v.headers as Record<string, string>), ...serverHeaders }),
             ...(proxyCookie && { cookie }),
             ...(v?.token?.value && { [v.token.name]: `${v.token.type} ${v.token.value}` })
           }
         })
       }
+
+      console.warn('🟨', opts)
 
       nuxtApp._gqlState.value[name] = {
         options: opts,
