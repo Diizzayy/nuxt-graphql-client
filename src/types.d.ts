@@ -48,6 +48,11 @@ export interface GqlClient<T = string> {
      * */
     serverOnly: Record<string, string>
   }
+
+  /**
+   * Declare headers that should only be applied to the GraphQL Code Generator.
+   * */
+  codegenHeaders?: Record<string, string>
 }
 
 export interface GqlConfig<T = GqlClient> {

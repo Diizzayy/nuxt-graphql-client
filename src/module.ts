@@ -85,7 +85,6 @@ export default defineNuxtModule<GqlConfig>({
       }
 
       const conf: GqlClient<TokenOpts> = {
-        ...(typeof v !== 'string' && { ...v }),
         host,
         ...(clientHost && { clientHost }),
         ...(schema && existsSync(schema) && { schema }),
@@ -94,11 +93,15 @@ export default defineNuxtModule<GqlConfig>({
           ...(tokenName && { name: tokenName }),
           type: typeof tokenType !== 'string' ? '' : tokenType
         },
-        proxyCookies: (typeof v !== 'string' && v?.proxyCookies !== undefined) ? v.proxyCookies : true
+        ...(typeof v !== 'string' && {
+          headers: v.headers,
+          retainToken: v.retainToken,
+          proxyCookies: v?.proxyCookies !== undefined ? v.proxyCookies : true
+        })
       }
 
       ctx.clientOps[k] = []
-      config.clients[k] = deepmerge({}, conf)
+      config.clients[k] = deepmerge({}, { ...conf, codegenHeaders: typeof v !== 'string' && v?.codegenHeaders })
       nuxt.options.runtimeConfig.public['graphql-client'].clients[k] = deepmerge({}, conf)
 
       if (conf.token?.value) {
