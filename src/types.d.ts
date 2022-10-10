@@ -48,6 +48,14 @@ export interface GqlClient<T = string> {
      * */
     serverOnly: Record<string, string>
   }
+
+  /**
+   * When enabled, queries will be sent as GET requests instead of POST requests.
+   *
+   * @type boolean
+   * @default false
+   * */
+  preferGETQueries?: boolean
 }
 
 export interface GqlConfig<T = GqlClient> {
@@ -116,6 +124,14 @@ export interface GqlConfig<T = GqlClient> {
    * @note this option overrides the `GQL_HOST` in `runtimeConfig`.
    * */
   clients?: Record<string, T extends GqlClient ? Partial<GqlClient<T>> : string | GqlClient<T>>
+
+  /**
+   * When enabled, queries will be sent as GET requests instead of POST requests.
+   *
+   * @type boolean
+   * @default false
+   * */
+  preferGETQueries?: boolean
 }
 
 export type GqlError = {
