@@ -50,12 +50,26 @@ export interface GqlClient<T = string> {
   }
 
   /**
+   * When enabled, queries will be sent as GET requests instead of POST requests.
+   *
+   * @type boolean
+   * @default false
+   * */
+  preferGETQueries?: boolean
+
+    /**
    * Declare headers that should only be applied to the GraphQL Code Generator.
    * */
-  codegenHeaders?: Record<string, string>
+     codegenHeaders?: Record<string, string>
 }
 
-export interface GqlConfig<T = GqlClient> {
+export interface StitchOptions {
+  mergeTypes?: boolean
+  prefixTypes?: boolean
+  prefixFields?: boolean
+}
+
+export interface GqlCodegen {
   /**
    * Prevent codegen from printing to console in dev mode
    *
@@ -63,6 +77,57 @@ export interface GqlConfig<T = GqlClient> {
    * @default true
    */
   silent?: boolean
+
+  /**
+   * Prevent adding `__typename` to generated types.
+   *
+   * @type boolean
+   * @default true
+   */
+  skipTypename?: boolean
+
+  /**
+   * Combine multiple GraphQL APIs into one unified gateway proxy schema that
+   * knows how to delegate parts of a request to the relevant underlying subschemas.
+   *
+   * @type boolean
+   * @default true
+   * */
+  stitchSchemas?: boolean | StitchOptions
+
+  /**
+   * Use `import type {}` rather than `import {}` when importing only types.
+   *
+   * @type boolean
+   * @default true
+   * */
+  useTypeImports?: boolean
+
+  /**
+   * Removes fragment duplicates. It is done by removing sub-fragments
+   * imports from fragment definition Instead - all of them are imported to the Operation node.
+   *
+   * @type boolean
+   * @default true
+   */
+  dedupeFragments?: boolean
+
+  /**
+   * Only generate the types for the operations in your GraphQL documents.
+   * When set to true, only the types needed for your operations will be generated.
+   * When set to false, all types from the GraphQL schema will be generated.
+   *
+   * @type boolean
+   * @default true
+   * */
+   onlyOperationTypes?: boolean
+}
+
+export interface GqlConfig<T = GqlClient> {
+  /**
+   * Configuration for the GraphQL Code Generator, setting this option to `false` results in limited TypeScript support.
+   */
+  codegen?: GqlCodegen
 
   /**
    * Enable hot reloading for GraphQL documents
@@ -106,21 +171,19 @@ export interface GqlConfig<T = GqlClient> {
   documentPaths?: string[]
 
   /**
-   * Only generate the types for the operations in your GraphQL documents.
-   * When set to true, only the types needed for your operations will be generated.
-   * When set to false, all types from the GraphQL schema will be generated.
-   *
-   * @type boolean
-   * @default true
-   * */
-  onlyOperationTypes?: boolean
-
-  /**
    * Allows generating multiple clients with different GraphQL hosts.
    *
    * @note this option overrides the `GQL_HOST` in `runtimeConfig`.
    * */
   clients?: Record<string, T extends GqlClient ? Partial<GqlClient<T>> : string | GqlClient<T>>
+
+  /**
+   * When enabled, queries will be sent as GET requests instead of POST requests.
+   *
+   * @type boolean
+   * @default false
+   * */
+  preferGETQueries?: boolean
 }
 
 export type GqlError = {

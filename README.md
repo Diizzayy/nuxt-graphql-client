@@ -20,6 +20,10 @@
   <a href="https://opensource.org/licenses/MIT">
       <img alt="MIT" src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square"/>
   </a>
+
+  <a href="https://codecov.io/gh/diizzayy/nuxt-graphql-client">
+      <img alt="PRs Welcome" src="https://img.shields.io/codecov/c/gh/diizzayy/nuxt-graphql-client/main?style=flat-square"/>
+  </a>
 </p>
 
 > ⚡️ Minimal GraphQL Client + Code Generation for Nuxt
