@@ -4,7 +4,7 @@ import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createR
 import { name, version } from '../package.json'
 import generate from './generate'
 import { deepmerge } from './runtime/utils'
-import type { GqlConfig, GqlClient, TokenOpts } from './types'
+import type { GqlConfig, GqlClient, TokenOpts, GqlCodegen } from './types'
 import { prepareContext, GqlContext, prepareOperations, prepareTemplate } from './context'
 
 const logger = useLogger('nuxt-graphql-client')
@@ -21,10 +21,8 @@ export default defineNuxtModule<GqlConfig>({
   defaults: {
     clients: {},
     watch: true,
-    silent: true,
     autoImport: true,
-    functionPrefix: 'Gql',
-    onlyOperationTypes: true
+    functionPrefix: 'Gql'
   },
   async setup (opts, nuxt) {
     const resolver = createResolver(import.meta.url)
@@ -32,15 +30,28 @@ export default defineNuxtModule<GqlConfig>({
 
     nuxt.options.build.transpile.push(resolver.resolve('runtime'))
 
-    const ctx: GqlContext = { clients: [], clientOps: {}, fnImports: [] }
-
     const config: GqlConfig<string | GqlClient> = defu(
       {},
       nuxt.options.runtimeConfig.public['graphql-client'],
       nuxt.options.runtimeConfig.public.gql,
       opts)
 
-    ctx.clients = Object.keys(config.clients)
+    const codegenDefaults: GqlCodegen = {
+      silent: true,
+      skipTypename: true,
+      stitchSchemas: true,
+      useTypeImports: true,
+      dedupeFragments: true,
+      onlyOperationTypes: true
+    }
+
+    config.codegen = defu<GqlCodegen, [GqlCodegen]>(config.codegen, codegenDefaults)
+
+    const ctx: GqlContext = {
+      clientOps: {},
+      fnImports: [],
+      clients: Object.keys(config.clients)
+    }
 
     if (!ctx?.clients?.length) {
       const host =
@@ -59,53 +70,46 @@ export default defineNuxtModule<GqlConfig>({
     nuxt.options.runtimeConfig['graphql-client'] = { clients: {} }
     nuxt.options.runtimeConfig.public['graphql-client'] = defu(nuxt.options.runtimeConfig.public['graphql-client'], { clients: {} })
 
+    const clientDefaults: Partial<GqlClient<TokenOpts> > = {
+      token: { type: 'Bearer', name: 'Authorization' },
+      proxyCookies: true,
+      preferGETQueries: config?.preferGETQueries ?? false
+    }
+
     for (const [k, v] of Object.entries(config.clients)) {
+      const conf = defu<GqlClient<TokenOpts>, [Partial<GqlClient<object>>]>(typeof v !== 'object'
+        ? { host: v }
+        : { ...v, token: typeof v.token === 'string' ? { value: v.token } : v.token }, clientDefaults)
+
       const runtimeHost = k === 'default' ? process.env.GQL_HOST : process.env?.[`GQL_${k.toUpperCase()}_HOST`]
+      if (runtimeHost) { conf.host = runtimeHost }
+
       const runtimeClientHost = k === 'default' ? process.env.GQL_CLIENT_HOST : process.env?.[`GQL_${k.toUpperCase()}_CLIENT_HOST`]
+      if (runtimeClientHost) { conf.clientHost = runtimeClientHost }
 
-      const host = runtimeHost || (typeof v === 'string' ? v : v?.host)
-      const clientHost = runtimeClientHost || (typeof v !== 'string' && v.clientHost)
-
-      if (!host) { throw new Error(`GraphQL client (${k}) is missing it's host.`) }
+      if (!conf?.host) { throw new Error(`GraphQL client (${k}) is missing it's host.`) }
 
       const runtimeToken = k === 'default' ? process.env.GQL_TOKEN : process.env?.[`GQL_${k.toUpperCase()}_TOKEN`]
-
-      const token = runtimeToken || (
-        typeof v !== 'string' && ((typeof v?.token === 'object' && v.token?.value) || (typeof v?.token === 'string' && v.token))
-      )
+      if (runtimeToken) { conf.token.value = runtimeToken }
 
       const runtimeTokenName = k === 'default' ? process.env.GQL_TOKEN_NAME : process.env?.[`GQL_${k.toUpperCase()}_TOKEN_NAME`]
-      const tokenName = runtimeTokenName || (typeof v !== 'string' && typeof v?.token === 'object' && v.token.name) || 'Authorization'
-      const tokenType = (typeof v !== 'string' && typeof v?.token === 'object' && v?.token?.type !== undefined) ? v?.token?.type : 'Bearer'
+      if (runtimeTokenName) { conf.token.name = runtimeTokenName }
 
-      const schema = (typeof v !== 'string' && v?.schema) && srcResolver.resolve(v.schema)
+      const schema = conf?.schema && srcResolver.resolve(conf.schema)
 
       if (schema && !existsSync(schema)) {
+        delete conf.schema
         logger.warn(`[nuxt-graphql-client] The Schema provided for the (${k}) GraphQL Client does not exist. \`host\` will be used as fallback.`)
-      }
-
-      const conf: GqlClient<TokenOpts> = {
-        ...(typeof v !== 'string' && { ...v }),
-        host,
-        ...(clientHost && { clientHost }),
-        ...(schema && existsSync(schema) && { schema }),
-        token: {
-          ...(token && { value: token }),
-          ...(tokenName && { name: tokenName }),
-          type: typeof tokenType !== 'string' ? '' : tokenType
-        },
-        proxyCookies: (typeof v !== 'string' && v?.proxyCookies !== undefined) ? v.proxyCookies : true,
-        preferGETQueries: ((typeof v !== 'string' && v?.preferGETQueries !== undefined) ? v?.preferGETQueries : config.preferGETQueries) || false
       }
 
       ctx.clientOps[k] = []
       config.clients[k] = deepmerge({}, conf)
       nuxt.options.runtimeConfig.public['graphql-client'].clients[k] = deepmerge({}, conf)
 
-      if (conf.token?.value) {
+      if (conf?.token?.value) {
         nuxt.options.runtimeConfig['graphql-client'].clients[k] = { token: conf.token }
 
-        if (!(typeof v !== 'string' && v?.retainToken)) {
+        if (!conf?.retainToken) {
           (nuxt.options.runtimeConfig.public['graphql-client'] as GqlConfig).clients[k].token.value = undefined
         }
       }
@@ -143,11 +147,10 @@ export default defineNuxtModule<GqlConfig>({
       ctx.template = await generate({
         clients: config.clients as GqlConfig['clients'],
         file: 'gql-sdk.ts',
-        silent: config.silent,
         plugins,
         documents,
-        onlyOperationTypes: config.onlyOperationTypes,
-        resolver: srcResolver
+        resolver: srcResolver,
+        ...(typeof config.codegen !== 'boolean' && config.codegen)
       })
 
       await prepareOperations(ctx, documents)

@@ -1,0 +1,5 @@
+query spacex_mission {
+  mission(id: "F3364BF") {
+    name
+  }
+}

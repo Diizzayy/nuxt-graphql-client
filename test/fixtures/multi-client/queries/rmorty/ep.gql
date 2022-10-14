@@ -1,0 +1,5 @@
+query rmorty_first_episode {
+    episode(id: "1") {
+        name
+    }
+}
