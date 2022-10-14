@@ -95,6 +95,8 @@ jobs:
 
       - name: Run Tests
         run: pnpm test
+
+      - uses: codecov/codecov-action@v3
   
   release-build:
     if: |
