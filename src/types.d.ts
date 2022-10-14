@@ -58,7 +58,13 @@ export interface GqlClient<T = string> {
   preferGETQueries?: boolean
 }
 
-export interface GqlConfig<T = GqlClient> {
+export interface StitchOptions {
+  mergeTypes?: boolean
+  prefixTypes?: boolean
+  prefixFields?: boolean
+}
+
+export interface GqlCodegen {
   /**
    * Prevent codegen from printing to console in dev mode
    *
@@ -66,6 +72,57 @@ export interface GqlConfig<T = GqlClient> {
    * @default true
    */
   silent?: boolean
+
+  /**
+   * Prevent adding `__typename` to generated types.
+   *
+   * @type boolean
+   * @default true
+   */
+  skipTypename?: boolean
+
+  /**
+   * Combine multiple GraphQL APIs into one unified gateway proxy schema that
+   * knows how to delegate parts of a request to the relevant underlying subschemas.
+   *
+   * @type boolean
+   * @default true
+   * */
+  stitchSchemas?: boolean | StitchOptions
+
+  /**
+   * Use `import type {}` rather than `import {}` when importing only types.
+   *
+   * @type boolean
+   * @default true
+   * */
+  useTypeImports?: boolean
+
+  /**
+   * Removes fragment duplicates. It is done by removing sub-fragments
+   * imports from fragment definition Instead - all of them are imported to the Operation node.
+   *
+   * @type boolean
+   * @default true
+   */
+  dedupeFragments?: boolean
+
+  /**
+   * Only generate the types for the operations in your GraphQL documents.
+   * When set to true, only the types needed for your operations will be generated.
+   * When set to false, all types from the GraphQL schema will be generated.
+   *
+   * @type boolean
+   * @default true
+   * */
+   onlyOperationTypes?: boolean
+}
+
+export interface GqlConfig<T = GqlClient> {
+  /**
+   * Configuration for the GraphQL Code Generator, setting this option to `false` results in limited TypeScript support.
+   */
+  codegen?: GqlCodegen
 
   /**
    * Enable hot reloading for GraphQL documents
@@ -107,16 +164,6 @@ export interface GqlConfig<T = GqlClient> {
    * @example ['../shared/queries']
    * */
   documentPaths?: string[]
-
-  /**
-   * Only generate the types for the operations in your GraphQL documents.
-   * When set to true, only the types needed for your operations will be generated.
-   * When set to false, all types from the GraphQL schema will be generated.
-   *
-   * @type boolean
-   * @default true
-   * */
-  onlyOperationTypes?: boolean
 
   /**
    * Allows generating multiple clients with different GraphQL hosts.

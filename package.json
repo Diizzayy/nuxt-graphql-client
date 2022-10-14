@@ -47,11 +47,16 @@
     "@graphql-codegen/typescript": "^2.7.3",
     "@graphql-codegen/typescript-graphql-request": "^4.5.5",
     "@graphql-codegen/typescript-operations": "^2.5.3",
+    "@graphql-tools/graphql-file-loader": "^7.5.5",
+    "@graphql-tools/load": "^7.7.7",
+    "@graphql-tools/stitch": "^8.7.13",
+    "@graphql-tools/wrap": "^9.2.3",
     "@nuxt/kit": "3.0.0-rc.11",
     "defu": "^6.1.0",
     "graphql": "^16.6.0",
     "graphql-request": "^5.0.0",
     "ohash": "^0.1.5",
+    "ohmyfetch": "^0.4.19",
     "scule": "^0.3.2"
   },
   "devDependencies": {
