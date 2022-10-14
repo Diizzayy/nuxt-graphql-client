@@ -103,7 +103,7 @@ export default defineNuxtModule<GqlConfig>({
       }
 
       ctx.clientOps[k] = []
-      config.clients[k] = deepmerge({}, { ...conf, codegenHeaders: typeof v !== 'string' && v?.codegenHeaders })
+      config.clients[k] = deepmerge({}, conf)
       nuxt.options.runtimeConfig.public['graphql-client'].clients[k] = deepmerge({}, conf)
 
       if (conf?.token?.value) {

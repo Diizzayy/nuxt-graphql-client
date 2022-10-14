@@ -57,10 +57,10 @@ export interface GqlClient<T = string> {
    * */
   preferGETQueries?: boolean
 
-    /**
+  /**
    * Declare headers that should only be applied to the GraphQL Code Generator.
    * */
-     codegenHeaders?: Record<string, string>
+  codegenHeaders?: Record<string, string>
 }
 
 export interface StitchOptions {
