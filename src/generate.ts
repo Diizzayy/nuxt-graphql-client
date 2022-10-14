@@ -78,7 +78,7 @@ async function prepareConfig (options: GenerateOptions & GqlCodegen): Promise<Co
       return !options.stitchSchemas && Array.isArray(acc) ? [...acc, v.schema] : { ...acc, [k]: v.schema }
     }
 
-    if (!v?.token?.value && !v?.headers) {
+    if (!v?.token?.value && !v?.headers && !v?.codegenHeaders) {
       return !options.stitchSchemas && Array.isArray(acc) ? [...acc, v.host] : { ...acc, [k]: v.host }
     }
 
@@ -89,7 +89,8 @@ async function prepareConfig (options: GenerateOptions & GqlCodegen): Promise<Co
 
     const headers = {
       ...(v?.headers && { ...(v.headers as Record<string, string>), ...serverHeaders }),
-      ...(token && { [v.token.name]: token })
+      ...(token && { [v.token.name]: token }),
+      ...v?.codegenHeaders
     }
 
     return !options.stitchSchemas && Array.isArray(acc)
