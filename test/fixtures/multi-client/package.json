@@ -1,0 +1,9 @@
+{
+    "private": true,
+    "version": "0.0.0",
+    "name": "fixture-multi-client",
+    "devDependencies": {
+      "nuxt-graphql-client": "workspace:*"
+    }
+  }
+  
