@@ -1,0 +1,5 @@
+query character {
+    character(id: "2") {
+        name
+    }
+}

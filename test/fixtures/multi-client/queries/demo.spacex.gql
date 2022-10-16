@@ -1,0 +1,5 @@
+query launches {
+    launches(limit: 10) {
+        id
+    }
+}

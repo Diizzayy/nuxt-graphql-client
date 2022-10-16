@@ -2,19 +2,25 @@ import { promises as fsp } from 'fs'
 import { parse } from 'graphql'
 import { upperFirst } from 'scule'
 import type { Import } from 'unimport'
+import { genExport } from 'knitwork'
 
 export interface GqlContext {
-  template?: string
+  template?: Record<string, string>
   fns?: string[]
   clients?: string[]
   fnImports?: Import[]
   generateImports?: () => string
   generateDeclarations?: () => string
   clientOps?: Record<string, string[]> | null
+  clientTypes?: Record<string, string[]>
 }
 
 export function prepareContext (ctx: GqlContext, prefix: string) {
-  ctx.fns = ctx.template?.match(/\w+\s*(?=\(variables)/g)?.sort() || []
+  ctx.fns = Object.values(ctx.template).reduce((acc, template) => {
+    const fns = template.match(/\w+\s*(?=\(variables)/g)?.sort() || []
+
+    return [...acc, ...fns]
+  }, [] as string[])
 
   const fnName = (fn: string) => prefix + upperFirst(fn)
 
@@ -27,11 +33,16 @@ export function prepareContext (ctx: GqlContext, prefix: string) {
       return `export const ${name} = (...params) => GqlInstance().handle(${client ? `'${client}'` : ''})['${fn}'](...params)`
     }
 
-    return `  export const ${name}: (...params: Parameters<GqlFunc['${fn}']>) => ReturnType<GqlFunc['${fn}']>`
+    return `  export const ${name}: (...params: Parameters<GqlSdkFuncs['${fn}']>) => ReturnType<GqlSdkFuncs['${fn}']>`
   }
 
   ctx.generateImports = () => [
     'import { useGql } from \'#imports\'',
+    ...ctx.clients.map(client => `import { getSdk as ${client}GqlSdk } from '#gql/${client}'`),
+    'export const GqlSdks = {',
+    `    default: ${ctx.clients.find(c => c === 'default') || ctx.clients[0]}GqlSdk,`,
+    ...ctx.clients.map(client => `  ${client}: ${client}GqlSdk,`),
+    '}',
     'const ctx = { instance: null }',
     'export const GqlInstance = () => {',
     ' if (!ctx?.instance) {ctx.instance = useGql()}',
@@ -42,17 +53,18 @@ export function prepareContext (ctx: GqlContext, prefix: string) {
   ].join('\n')
 
   ctx.generateDeclarations = () => [
-    'declare module \'#build/gql\' {',
+    ...ctx.clients.map(client => `import { getSdk as ${client}GqlSdk } from '#gql/${client}'`),
+    ...Object.entries(ctx.clientTypes || {}).map(([k, v]) => genExport(`#gql/${k}`, v)),
+    'declare module \'#gql\' {',
       `  type GqlClients = '${ctx.clients.join("' | '") || 'default'}'`,
-      '  type GqlFunc = ReturnType<ReturnType<typeof import(\'#imports\')[\'useGql\']>[\'handle\']>',
+      '  const GqlOperations = {}',
+      '  type GqlSdkValues<T extends GqlClients> = ReturnType<typeof GqlSdks[T]>',
       ...ctx.fns.map(f => fnExp(f, true)),
+      `  type GqlSdkFuncs = ${ctx.clients.map(c => `ReturnType<typeof ${c}GqlSdk>`).join(' & ')}`,
       '}'
   ].join('\n')
 
-  ctx.fnImports = ctx.fns.map((fn): Import => ({
-    name: fnName(fn),
-    from: '#build/gql'
-  }))
+  ctx.fnImports = ctx.fns.map((fn): Import => ({ from: '#gql', name: fnName(fn) }))
 }
 
 export async function prepareOperations (ctx: GqlContext, path: string[]) {
@@ -83,10 +95,8 @@ export async function prepareOperations (ctx: GqlContext, path: string[]) {
         clientToUse = clientToUse || ctx.clients.find(c => c === 'default') || ctx.clients[0]
       }
 
-      const operationName = op.replace(`${clientToUse}_`, '').replace(op.split('_')[0] + '_', '')
-
-      if (!ctx.clientOps?.[clientToUse]?.includes(operationName)) {
-        ctx.clientOps[clientToUse].push(operationName)
+      if (!ctx.clientOps?.[clientToUse]?.includes(op)) {
+        ctx.clientOps[clientToUse].push(op)
       }
     }
   }
@@ -95,40 +105,13 @@ export async function prepareOperations (ctx: GqlContext, path: string[]) {
 }
 
 export function prepareTemplate (ctx: GqlContext) {
-  const toPSCase = (s: string) => s.split('_').map(upperFirst).join('_')
+  ctx.clientTypes = ctx.clientTypes || {}
 
-  const oust = (from: string, to: string) => ctx.template
-    .replace(new RegExp(from, 'g'), to)
-    .replace(new RegExp(toPSCase(from), 'g'), toPSCase(to))
+  ctx.clientTypes = Object.entries(ctx.template).reduce((acc, [key, template]) => {
+    acc[key] = template.match(/^export\stype\s\w+(?=\s=\s)/gm)
+      .filter(e => !['Scalars', 'SdkFunctionWrapper', 'Sdk'].some(f => e.includes(f)))
+      .map(e => e.replace('export type ', ''))
 
-  for (const [client, ops] of Object.entries(ctx.clientOps)) {
-    if (!ops?.length) { continue }
-
-    for (const op of ops) {
-      const originalName = `${client}_${op}`
-
-      const [basic, special] = [op, originalName].map(n =>
-        new RegExp(`\\s${n}\\s*(?=\\(variables)`, 'g').test(ctx.template))
-
-      if (basic) { continue }
-
-      if (special) {
-        ctx.template = oust(originalName, op)
-
-        continue
-      }
-
-      if (!basic && !special) {
-        const reInvalid = new RegExp(`\\w+_(${op})\\s*(?=\\(variables)`)
-
-        if (!reInvalid.test(ctx.template)) { continue }
-
-        const [invalidName, opName] = reInvalid.exec(ctx.template)
-
-        ctx.template = oust(invalidName, opName)
-
-        continue
-      }
-    }
-  }
+    return acc
+  }, {} as Record<string, string[]>)
 }

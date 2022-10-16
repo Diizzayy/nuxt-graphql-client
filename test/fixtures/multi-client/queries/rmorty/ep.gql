@@ -1,4 +1,4 @@
-query rmorty_first_episode {
+query first_episode {
     episode(id: "1") {
         name
     }

@@ -39,7 +39,6 @@ export default defineNuxtModule<GqlConfig>({
     const codegenDefaults: GqlCodegen = {
       silent: true,
       skipTypename: true,
-      stitchSchemas: true,
       useTypeImports: true,
       dedupeFragments: true,
       onlyOperationTypes: true
@@ -146,40 +145,41 @@ export default defineNuxtModule<GqlConfig>({
 
       ctx.template = await generate({
         clients: config.clients as GqlConfig['clients'],
-        file: 'gql-sdk.ts',
         plugins,
         documents,
         resolver: srcResolver,
         ...(typeof config.codegen !== 'boolean' && config.codegen)
-      })
+      }).then(output => output.reduce((acc, c) => ({ ...acc, [c.filename.split('.ts')[0]]: c.content }), {}))
 
       await prepareOperations(ctx, documents)
 
-      if (Object.keys(config.clients).length > 1 || !config.clients?.default) {
-        prepareTemplate(ctx)
-      }
+      prepareTemplate(ctx)
 
       prepareContext(ctx, config.functionPrefix)
     }
 
-    addTemplate({
-      write: true,
-      filename: 'gql-sdk.ts',
-      getContents: () => ctx.template
-    })
-
     addPlugin(resolver.resolve('runtime/plugin'))
 
     if (config.autoImport) {
+      nuxt.options.alias['#gql'] = resolver.resolve(nuxt.options.buildDir, 'gql')
+
       addTemplate({
         filename: 'gql.mjs',
         getContents: () => ctx.generateImports()
       })
 
       addTemplate({
-        filename: 'gql.d.ts',
+        filename: 'gql/index.d.ts',
         getContents: () => ctx.generateDeclarations()
       })
+
+      for (const client of ctx.clients) {
+        addTemplate({
+          write: true,
+          filename: `gql/${client}.ts`,
+          getContents: () => ctx.template[client]
+        })
+      }
 
       nuxt.hook('imports:extend', (autoimports) => {
         autoimports.push(...ctx.fnImports)

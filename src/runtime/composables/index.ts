@@ -4,9 +4,9 @@ import type { AsyncData } from 'nuxt/dist/app/composables'
 import type { GqlState, GqlConfig, GqlError, OnGqlError } from '../../types'
 import { deepmerge } from '../utils'
 // @ts-ignore
-import { GqlOperations, GqlInstance } from '#build/gql'
-import type { GqlClients, GqlFunc } from '#build/gql'
-import { getSdk as gqlSdk } from '#build/gql-sdk'
+// eslint-disable-next-line import/named
+import { GqlSdks, GqlInstance, GqlOperations } from '#gql'
+import type { GqlClients, GqlSdkValues, GqlSdkFuncs } from '#gql'
 import { useState, useNuxtApp, useAsyncData, useRuntimeConfig } from '#imports'
 
 const useGqlState = (): Ref<GqlState> => {
@@ -99,7 +99,13 @@ export function useGqlHeaders (...args: any[]) {
 
   if (respectDefaults && !Object.keys(headers).length) {
     const defaultHeaders = (useRuntimeConfig()?.public?.['graphql-client'] as GqlConfig)?.clients?.[client || 'default']?.headers
-    setGqlState({ client, patch: { headers: defaultHeaders } })
+
+    const serverHeaders = (process.server && (typeof defaultHeaders?.serverOnly === 'object' && defaultHeaders?.serverOnly)) || undefined
+    if (defaultHeaders?.serverOnly) { delete defaultHeaders.serverOnly }
+
+    headers = { ...(defaultHeaders as Record<string, string>), ...serverHeaders }
+
+    setGqlState({ client, patch: { headers } })
   }
 }
 
@@ -202,11 +208,11 @@ export const useGql = () => {
   const state = useGqlState()
   const errState = useGqlErrorState()
 
-  const handle = (client?: GqlClients): ReturnType<typeof gqlSdk> => {
-    client = client || 'default'
+  const handle = <T extends GqlClients> (client?: T) => {
+    client = client || 'default' as T
     const { instance } = state.value?.[client]
 
-    const $gql: ReturnType<typeof gqlSdk> = gqlSdk(instance, async (action, operationName, operationType): Promise<any> => {
+    return GqlSdks[client](instance, async (action, operationName, operationType): Promise<any> => {
       try {
         return await action()
       } catch (err) {
@@ -224,9 +230,7 @@ export const useGql = () => {
 
         throw errState.value
       }
-    })
-
-    return { ...$gql }
+    }) as GqlSdkValues<T>
   }
 
   return { handle }
@@ -268,9 +272,9 @@ const useGqlErrorState = () => useState<GqlError>('_gqlErrors', () => null)
  * @param {Object} options.options AsyncData options.
  */
 export function useAsyncGql<
-T extends keyof GqlFunc,
-P extends Parameters<GqlFunc[T]>['0'],
-R extends AsyncData<Awaited<ReturnType<GqlFunc[T]>>, GqlError>,
+T extends keyof GqlSdkFuncs,
+P extends Parameters<GqlSdkFuncs[T]>['0'],
+R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
 O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variables?: P, options?: O }): Promise<R>
 
 /**
@@ -281,9 +285,9 @@ O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variab
  * @param {Object} options AsyncData options.
  */
 export function useAsyncGql<
-T extends keyof GqlFunc,
-P extends Parameters<GqlFunc[T]>['0'],
-R extends AsyncData<Awaited<ReturnType<GqlFunc[T]>>, GqlError>,
+T extends keyof GqlSdkFuncs,
+P extends Parameters<GqlSdkFuncs[T]>['0'],
+R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
 O extends Parameters<typeof useAsyncData>['2']> (operation: T, variables?: P, options?: O): Promise<R>
 
 export function useAsyncGql (...args: any[]) {

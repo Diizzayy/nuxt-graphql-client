@@ -87,15 +87,6 @@ export interface GqlCodegen {
   skipTypename?: boolean
 
   /**
-   * Combine multiple GraphQL APIs into one unified gateway proxy schema that
-   * knows how to delegate parts of a request to the relevant underlying subschemas.
-   *
-   * @type boolean
-   * @default true
-   * */
-  stitchSchemas?: boolean | StitchOptions
-
-  /**
    * Use `import type {}` rather than `import {}` when importing only types.
    *
    * @type boolean

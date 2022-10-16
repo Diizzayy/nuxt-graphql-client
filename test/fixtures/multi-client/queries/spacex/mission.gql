@@ -1,4 +1,4 @@
-query spacex_mission {
+query mission {
   mission(id: "F3364BF") {
     name
   }

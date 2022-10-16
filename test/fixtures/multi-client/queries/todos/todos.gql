@@ -1,0 +1,6 @@
+query todos {
+    todos {
+        id
+        text
+    }
+}
