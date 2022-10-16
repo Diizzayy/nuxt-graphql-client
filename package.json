@@ -68,8 +68,5 @@
     "nuxt": "^3.0.0-rc.11",
     "vitest": "^0.24.3"
   },
-  "resolutions": {
-    "nuxt-graphql-client": "link:."
-  },
   "packageManager": "pnpm@7.13.3"
 }
