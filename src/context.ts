@@ -5,6 +5,7 @@ import type { Import } from 'unimport'
 import { genExport } from 'knitwork'
 
 export interface GqlContext {
+  codegen?: boolean
   template?: Record<string, string>
   fns?: string[]
   clients?: string[]
@@ -17,7 +18,7 @@ export interface GqlContext {
 
 export function prepareContext (ctx: GqlContext, prefix: string) {
   ctx.fns = Object.values(ctx.template).reduce((acc, template) => {
-    const fns = template.match(/\w+\s*(?=\(variables)/g)?.sort() || []
+    const fns = template.match(ctx?.codegen ? /\w+\s*(?=\(variables)/g : /\w+(?=:\s\(variables)/g)?.sort() || []
 
     return [...acc, ...fns]
   }, [] as string[])
@@ -38,21 +39,28 @@ export function prepareContext (ctx: GqlContext, prefix: string) {
     'export const GqlSdks = {',
     ...ctx.clients.map(client => `  ${client}: ${client}GqlSdk,`),
     '}',
-    `export const GqlOperations = ${JSON.stringify(ctx.clientOps)}`,
+    `export const GqClientOps = ${JSON.stringify(ctx.clientOps)}`,
     ...ctx.fns.map(f => fnExp(f))
   ].join('\n')
 
   ctx.generateDeclarations = () => [
-    ...ctx.clients.map(client => `import { getSdk as ${client}GqlSdk } from '#gql/${client}'`),
+    ...(!ctx.codegen
+      ? []
+      : ctx.clients.map(client => `import { getSdk as ${client}GqlSdk } from '#gql/${client}'`)),
     ...Object.entries(ctx.clientTypes || {}).map(([k, v]) => genExport(`#gql/${k}`, v)),
     'declare module \'#gql\' {',
       `  type GqlClients = '${ctx.clients.join("' | '") || 'default'}'`,
-      '  const GqlOperations = {}',
-      '  const GqlSdks = {',
-      ...ctx.clients.map(client => `    ${client}: ${client}GqlSdk,`),
-      '  }',
-      ...ctx.fns.map(f => fnExp(f, true)),
-      `  type GqlSdkFuncs = ${ctx.clients.map(c => `ReturnType<typeof ${c}GqlSdk>`).join(' & ')}`,
+      `  type GqlOps = '${Object.values(ctx.clientOps).flat().join("' | '")}'`,
+      '  const GqClientOps = {}',
+      ...(!ctx.codegen
+        ? []
+        : [
+            '  const GqlSdks = {',
+            ...ctx.clients.map(client => `    ${client}: ${client}GqlSdk,`),
+            '  }',
+            ...ctx.fns.map(f => fnExp(f, true)),
+            `  type GqlSdkFuncs = ${ctx.clients.map(c => `ReturnType<typeof ${c}GqlSdk>`).join(' & ')}`
+          ]),
       '}'
   ].join('\n')
 
@@ -97,6 +105,8 @@ export async function prepareOperations (ctx: GqlContext, path: string[]) {
 }
 
 export function prepareTemplate (ctx: GqlContext) {
+  if (!ctx.codegen) { return }
+
   ctx.clientTypes = ctx.clientTypes || {}
 
   ctx.clientTypes = Object.entries(ctx.template).reduce((acc, [key, template]) => {
@@ -106,4 +116,20 @@ export function prepareTemplate (ctx: GqlContext) {
 
     return acc
   }, {} as Record<string, string[]>)
+}
+
+export const mockTemplate = (operations: Record<string, string>) => {
+  const GqlFunctions: string[] = []
+
+  for (const [k, v] of Object.entries(operations)) {
+    GqlFunctions.push(`    ${k}: (variables = undefined, requestHeaders = undefined) => withWrapper((wrappedRequestHeaders) => client.request(\`${v}\`, variables, {...requestHeaders, ...wrappedRequestHeaders}), '${k}', 'query')`)
+  }
+
+  return [
+    'export function getSdk(client, withWrapper = (action, _operationName, _operationType) => action()) {',
+    '  return {',
+    GqlFunctions.join(',\n'),
+    '  }',
+    '}'
+  ].join('\n')
 }

@@ -125,7 +125,7 @@ export interface GqlConfig<T = GqlClient> {
   /**
    * Configuration for the GraphQL Code Generator, setting this option to `false` results in limited TypeScript support.
    */
-  codegen?: GqlCodegen
+  codegen?: boolean | GqlCodegen
 
   /**
    * Enable hot reloading for GraphQL documents

@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       'graphql-client': {
+        codegen: false,
         clients: {
           spacex: 'https://api.spacex.land/graphql',
           rmorty: 'https://rickandmortyapi.com/graphql',

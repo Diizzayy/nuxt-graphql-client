@@ -2,6 +2,7 @@ import { generate } from '@graphql-codegen/cli'
 import type { CodegenConfig } from '@graphql-codegen/cli'
 
 import type { Resolver } from '@nuxt/kit'
+import { mapDocsToClients } from './utils'
 import type { GqlConfig, GqlCodegen } from './types'
 
 interface GenerateOptions {
@@ -49,32 +50,17 @@ function prepareConfig (options: GenerateOptions & GqlCodegen): CodegenConfig {
     }
   }
 
-  const generates: CodegenConfig['generates'] = Object.entries(options.clients).reduce((acc, [k, v]) => {
-    const clientDocuments = options.documents.filter((file: string) => {
-      const clientInExt = new RegExp(`\\.${k}\\.(gql|graphql)$`)
-      const clientInPath = new RegExp(`\\/${k}\\/(?=${file.split('/').pop().replace(/\./g, '\\.')})`)
+  const clientDocuments = mapDocsToClients(options.documents, Object.keys(options.clients))
 
-      return clientInExt.test(file) || clientInPath.test(file)
-    })
-
-    const noClientSpecified = options.documents.filter((file: string) => {
-      const clientInExt = /\.\w+\.(gql|graphql)$/.test(file)
-
-      const clientInPath = new RegExp(`\\/(${Object.keys(options.clients).join('|')})\\/(?=${file.split('/').pop().replace(/\./g, '\\.')})`).test(file)
-
-      return !clientInExt && !clientInPath
-    })
-
-    return {
-      ...acc,
-      [`${k}.ts`]: {
-        config: codegenConfig,
-        schema: prepareSchema(v),
-        plugins: options.plugins,
-        documents: k !== 'default' ? clientDocuments : noClientSpecified
-      }
+  const generates: CodegenConfig['generates'] = Object.entries(options.clients).reduce((acc, [k, v]) => ({
+    ...acc,
+    [`${k}.ts`]: {
+      config: codegenConfig,
+      schema: prepareSchema(v),
+      plugins: options.plugins,
+      documents: clientDocuments?.[k] || []
     }
-  }, {})
+  }), {})
 
   return { silent: options.silent, generates }
 }

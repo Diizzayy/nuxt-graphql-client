@@ -1,11 +1,14 @@
-import { existsSync, statSync } from 'fs'
+import { existsSync, statSync, readFileSync } from 'fs'
 import { defu } from 'defu'
+import { parse } from 'graphql'
 import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createResolver, defineNuxtModule, extendViteConfig } from '@nuxt/kit'
+import type { NameNode, DefinitionNode } from 'graphql'
 import { name, version } from '../package.json'
 import generate from './generate'
 import { deepmerge } from './runtime/utils'
+import { mapDocsToClients } from './utils'
 import type { GqlConfig, GqlClient, TokenOpts, GqlCodegen } from './types'
-import { prepareContext, GqlContext, prepareOperations, prepareTemplate } from './context'
+import { prepareContext, GqlContext, prepareOperations, prepareTemplate, mockTemplate } from './context'
 
 const logger = useLogger('nuxt-graphql-client')
 
@@ -21,6 +24,7 @@ export default defineNuxtModule<GqlConfig>({
   defaults: {
     clients: {},
     watch: true,
+    codegen: true,
     autoImport: true,
     functionPrefix: 'Gql'
   },
@@ -44,11 +48,12 @@ export default defineNuxtModule<GqlConfig>({
       onlyOperationTypes: true
     }
 
-    config.codegen = defu<GqlCodegen, [GqlCodegen]>(config.codegen, codegenDefaults)
+    config.codegen = !!config.codegen && defu<GqlCodegen, [GqlCodegen]>(config.codegen, codegenDefaults)
 
     const ctx: GqlContext = {
       clientOps: {},
       fnImports: [],
+      codegen: !!config?.codegen,
       clients: Object.keys(config.clients)
     }
 
@@ -146,13 +151,34 @@ export default defineNuxtModule<GqlConfig>({
         plugins.push('typescript-operations', 'typescript-graphql-request')
       }
 
-      ctx.template = await generate({
-        clients: config.clients as GqlConfig['clients'],
-        plugins,
-        documents,
-        resolver: srcResolver,
-        ...(typeof config.codegen !== 'boolean' && config.codegen)
-      }).then(output => output.reduce((acc, c) => ({ ...acc, [c.filename.split('.ts')[0]]: c.content }), {}))
+      if (ctx.codegen) {
+        ctx.template = await generate({
+          clients: config.clients as GqlConfig['clients'],
+          plugins,
+          documents,
+          resolver: srcResolver,
+          ...(typeof config.codegen !== 'boolean' && config.codegen)
+        }).then(output => output.reduce((acc, c) => ({ ...acc, [c.filename.split('.ts')[0]]: c.content }), {}))
+      } else {
+        const clientDocs = mapDocsToClients(documents, ctx.clients)
+
+        ctx.template = ctx.clients.reduce<Record<string, string>>((acc, k) => {
+          const entries: Record<string, string> = {}
+
+          for (const doc of clientDocs?.[k] || []) {
+            const definitions = parse(readFileSync(doc, 'utf-8'))?.definitions as (DefinitionNode & { name: NameNode })[]
+
+            for (const op of definitions) {
+              const name: string = op?.name?.value
+              const operation = op.loc?.source.body.slice(op.loc.start, op.loc.end) || undefined
+
+              if (name && operation) { entries[name] = operation }
+            }
+          }
+
+          return { ...acc, [k]: mockTemplate(entries) }
+        }, {})
+      }
 
       await prepareOperations(ctx, documents)
 
@@ -178,8 +204,8 @@ export default defineNuxtModule<GqlConfig>({
 
       for (const client of ctx.clients) {
         addTemplate({
-          write: true,
-          filename: `gql/${client}.ts`,
+          write: ctx.codegen,
+          filename: `gql/${client}.${ctx.codegen ? 'ts' : 'mjs'}`,
           getContents: () => ctx.template[client]
         })
       }

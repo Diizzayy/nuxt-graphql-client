@@ -94,7 +94,7 @@ jobs:
         run: pnpm install
 
       - name: Run Tests
-        run: pnpm test
+        run: pnpm test -- --coverage
 
       - uses: codecov/codecov-action@v3
   

@@ -5,8 +5,8 @@ import type { GqlState, GqlConfig, GqlError, OnGqlError } from '../../types'
 import { deepmerge } from '../utils'
 // @ts-ignore
 // eslint-disable-next-line import/named
-import { GqlSdks, GqlOperations } from '#gql'
-import type { GqlClients, GqlSdkFuncs } from '#gql'
+import { GqlSdks, GqClientOps } from '#gql'
+import type { GqlOps, GqlClients, GqlSdkFuncs } from '#gql'
 import { useState, useNuxtApp, useAsyncData, useRuntimeConfig } from '#imports'
 
 const useGqlState = (): Ref<GqlState> => {
@@ -205,12 +205,12 @@ export const useGqlCors = (cors: GqlCors) => {
 }
 
 export const useGql = (): (<
-  T extends keyof GqlSdkFuncs,
+  T extends GqlOps,
   R extends ReturnType<GqlSdkFuncs[T]>,
   P extends Parameters<GqlSdkFuncs[T]>['0'],
   > (args: { operation: T, variables?: P }) => R) &
   (<
-    T extends keyof GqlSdkFuncs,
+    T extends GqlOps,
     R extends ReturnType<GqlSdkFuncs[T]>,
     P extends Parameters<GqlSdkFuncs[T]>['0'],
     > (operation: T, variables?: P) => R) => {
@@ -221,7 +221,7 @@ export const useGql = (): (<
     const operation = (typeof args?.[0] !== 'string' && 'operation' in args?.[0] ? args[0].operation : args[0]) ?? undefined
     const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? args[0].variables : args[1]) ?? undefined
 
-    const client = Object.keys(GqlOperations).find(k => GqlOperations[k].includes(operation)) ?? 'default'
+    const client = Object.keys(GqClientOps).find(k => GqClientOps[k].includes(operation)) ?? 'default'
 
     const { instance } = state.value?.[client]
 
@@ -283,7 +283,7 @@ const useGqlErrorState = () => useState<GqlError>('_gqlErrors', () => null)
  * @param {Object} options.options AsyncData options.
  */
 export function useAsyncGql<
-T extends keyof GqlSdkFuncs,
+T extends GqlOps,
 P extends Parameters<GqlSdkFuncs[T]>['0'],
 R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
 O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variables?: P, options?: O }): Promise<R>
@@ -296,7 +296,7 @@ O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variab
  * @param {Object} options AsyncData options.
  */
 export function useAsyncGql<
-T extends keyof GqlSdkFuncs,
+T extends GqlOps,
 P extends Parameters<GqlSdkFuncs[T]>['0'],
 R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
 O extends Parameters<typeof useAsyncData>['2']> (operation: T, variables?: P, options?: O): Promise<R>
@@ -306,5 +306,6 @@ export function useAsyncGql (...args: any[]) {
   const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? args[0].variables : args[1]) ?? undefined
   const options = (typeof args?.[0] !== 'string' && 'options' in args?.[0] ? args[0].options : args[2]) ?? undefined
   const key = hash({ operation, variables })
+  // @ts-ignore
   return useAsyncData(key, () => useGql()(operation, variables), options)
 }
