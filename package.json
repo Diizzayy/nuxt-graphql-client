@@ -37,7 +37,7 @@
     "build": "nuxt-module-build",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
-    "test": "vitest run --coverage",
+    "test": "vitest run --coverage --watch false",
     "lint": "eslint --ext .js,.ts,.vue .",
     "lint:fix": "eslint --fix --ext .js,.ts,.vue .",
     "prepare": "nuxt-module-build --stub && nuxi prepare playground"

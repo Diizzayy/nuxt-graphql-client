@@ -3,5 +3,5 @@
 </template>
 
 <script lang="ts" setup>
-const { data } = await useAsyncGql('launches')
+const { data } = await useAsyncData(() => GqlLaunches())
 </script>

@@ -3,5 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-const { data } = await useAsyncGql('mission')
+const GqlInstance = useGql()
+
+const { data } = await useAsyncData(() => GqlInstance('mission'))
 </script>

@@ -5,8 +5,8 @@ import type { GqlState, GqlConfig, GqlError, OnGqlError } from '../../types'
 import { deepmerge } from '../utils'
 // @ts-ignore
 // eslint-disable-next-line import/named
-import { GqlSdks, GqlInstance, GqlOperations } from '#gql'
-import type { GqlClients, GqlSdkValues, GqlSdkFuncs } from '#gql'
+import { GqlSdks, GqlOperations } from '#gql'
+import type { GqlClients, GqlSdkFuncs } from '#gql'
 import { useState, useNuxtApp, useAsyncData, useRuntimeConfig } from '#imports'
 
 const useGqlState = (): Ref<GqlState> => {
@@ -204,12 +204,25 @@ export const useGqlCors = (cors: GqlCors) => {
   setGqlState({ client, patch: { mode, credentials } })
 }
 
-export const useGql = () => {
+export const useGql = (): (<
+  T extends keyof GqlSdkFuncs,
+  R extends ReturnType<GqlSdkFuncs[T]>,
+  P extends Parameters<GqlSdkFuncs[T]>['0'],
+  > (args: { operation: T, variables?: P }) => R) &
+  (<
+    T extends keyof GqlSdkFuncs,
+    R extends ReturnType<GqlSdkFuncs[T]>,
+    P extends Parameters<GqlSdkFuncs[T]>['0'],
+    > (operation: T, variables?: P) => R) => {
   const state = useGqlState()
   const errState = useGqlErrorState()
 
-  const handle = <T extends GqlClients> (client?: T) => {
-    client = client || 'default' as T
+  return (...args: any[]) => {
+    const operation = (typeof args?.[0] !== 'string' && 'operation' in args?.[0] ? args[0].operation : args[0]) ?? undefined
+    const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? args[0].variables : args[1]) ?? undefined
+
+    const client = Object.keys(GqlOperations).find(k => GqlOperations[k].includes(operation)) ?? 'default'
+
     const { instance } = state.value?.[client]
 
     return GqlSdks[client](instance, async (action, operationName, operationType): Promise<any> => {
@@ -230,10 +243,8 @@ export const useGql = () => {
 
         throw errState.value
       }
-    }) as GqlSdkValues<T>
+    })[operation](variables)
   }
-
-  return { handle }
 }
 
 /**
@@ -294,7 +305,6 @@ export function useAsyncGql (...args: any[]) {
   const operation = (typeof args?.[0] !== 'string' && 'operation' in args?.[0] ? args[0].operation : args[0]) ?? undefined
   const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? args[0].variables : args[1]) ?? undefined
   const options = (typeof args?.[0] !== 'string' && 'options' in args?.[0] ? args[0].options : args[2]) ?? undefined
-  const client = Object.keys(GqlOperations).find(k => GqlOperations[k].includes(operation)) ?? 'default'
-  const key = hash({ operation, client, variables })
-  return useAsyncData(key, () => GqlInstance().handle(client as GqlClients)[operation](variables), options)
+  const key = hash({ operation, variables })
+  return useAsyncData(key, () => useGql()(operation, variables), options)
 }

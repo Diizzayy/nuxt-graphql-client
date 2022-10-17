@@ -27,11 +27,7 @@ export function prepareContext (ctx: GqlContext, prefix: string) {
   const fnExp = (fn: string, typed = false) => {
     const name = fnName(fn)
 
-    if (!typed) {
-      const client = ctx?.clients.find(c => ctx?.clientOps?.[c]?.includes(fn))
-
-      return `export const ${name} = (...params) => GqlInstance().handle(${client ? `'${client}'` : ''})['${fn}'](...params)`
-    }
+    if (!typed) { return `export const ${name} = (...params) => useGql()('${fn}', ...params)` }
 
     return `  export const ${name}: (...params: Parameters<GqlSdkFuncs['${fn}']>) => ReturnType<GqlSdkFuncs['${fn}']>`
   }
@@ -40,13 +36,7 @@ export function prepareContext (ctx: GqlContext, prefix: string) {
     'import { useGql } from \'#imports\'',
     ...ctx.clients.map(client => `import { getSdk as ${client}GqlSdk } from '#gql/${client}'`),
     'export const GqlSdks = {',
-    `    default: ${ctx.clients.find(c => c === 'default') || ctx.clients[0]}GqlSdk,`,
     ...ctx.clients.map(client => `  ${client}: ${client}GqlSdk,`),
-    '}',
-    'const ctx = { instance: null }',
-    'export const GqlInstance = () => {',
-    ' if (!ctx?.instance) {ctx.instance = useGql()}',
-    ' return ctx.instance',
     '}',
     `export const GqlOperations = ${JSON.stringify(ctx.clientOps)}`,
     ...ctx.fns.map(f => fnExp(f))
@@ -58,7 +48,9 @@ export function prepareContext (ctx: GqlContext, prefix: string) {
     'declare module \'#gql\' {',
       `  type GqlClients = '${ctx.clients.join("' | '") || 'default'}'`,
       '  const GqlOperations = {}',
-      '  type GqlSdkValues<T extends GqlClients> = ReturnType<typeof GqlSdks[T]>',
+      '  const GqlSdks = {',
+      ...ctx.clients.map(client => `    ${client}: ${client}GqlSdk,`),
+      '  }',
       ...ctx.fns.map(f => fnExp(f, true)),
       `  type GqlSdkFuncs = ${ctx.clients.map(c => `ReturnType<typeof ${c}GqlSdk>`).join(' & ')}`,
       '}'

@@ -21,10 +21,16 @@ describe('test multiple clients', () => {
   it('renders the character morty', async () => {
     const result = await $fetch('/rmorty')
     expect(result).toContain('<p>Name: Morty Smith</p>')
-  }, 15000)
+  })
 
   it('fetches the name of the first rick and morty episode', async () => {
     const result = await $fetch('/rmorty/first-ep')
     expect(result).toContain('<p>First Episode: Pilot</p>')
-  }, 15000)
+  })
+
+  it('fetches the name of the first rick and morty episode', async () => {
+    const result = await $fetch('/rmorty/chain')
+    expect(result).toContain('<p>First Episode: Pilot</p>')
+    expect(result).toContain('<p>Name: Morty Smith</p>')
+  })
 })
