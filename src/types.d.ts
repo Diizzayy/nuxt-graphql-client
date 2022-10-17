@@ -14,6 +14,13 @@ export interface GqlClient<T = string> {
   clientHost?: string
 
   /**
+   * Specify a host to be used for introspection.
+   *
+   * @type string
+   */
+  introspectionHost?: string
+
+  /**
    * Specify the path to a GraphQL Schema file to be used for code generation. When omitted, the `host` will be used.
    *
    * @type string

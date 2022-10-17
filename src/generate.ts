@@ -20,9 +20,9 @@ function prepareConfig (options: GenerateOptions & GqlCodegen): CodegenConfig {
       return [v.schema]
     }
 
-    if (!v?.token?.value && !v?.headers && !v?.codegenHeaders) {
-      return [v.host]
-    }
+    const host = v?.introspectionHost || v.host
+
+    if (!v?.token?.value && !v?.headers && !v?.codegenHeaders) { return [host] }
 
     const token = v?.token?.value && `${v?.token?.type} ${v?.token?.value}`.trim()
 
@@ -35,7 +35,7 @@ function prepareConfig (options: GenerateOptions & GqlCodegen): CodegenConfig {
       ...v?.codegenHeaders
     }
 
-    return [{ [v.host]: { headers } }]
+    return [{ [host]: { headers } }]
   }
 
   const codegenConfig = {
