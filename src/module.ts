@@ -80,7 +80,7 @@ export default defineNuxtModule<GqlConfig>({
         ? { host: v }
         : { ...v, token: typeof v.token === 'string' ? { value: v.token } : v.token }, {
         ...clientDefaults,
-        ...(typeof v === 'object' && typeof v.token !== 'string' && v.token.type === null && { token: { type: null } })
+        ...(typeof v === 'object' && typeof v.token !== 'string' && v?.token?.type === null && { token: { type: null } })
       })
 
       const runtimeHost = k === 'default' ? process.env.GQL_HOST : process.env?.[`GQL_${k.toUpperCase()}_HOST`]
