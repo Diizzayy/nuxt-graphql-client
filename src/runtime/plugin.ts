@@ -29,7 +29,7 @@ export default defineNuxtPlugin(() => {
           headers: {
             ...(v?.headers && { ...(v.headers as Record<string, string>), ...serverHeaders }),
             ...(proxyCookie && { cookie }),
-            ...(v?.token?.value && { [v.token.name]: `${v.token.type} ${v.token.value}` })
+            ...(v?.token?.value && { [v.token.name]: !v.token.type ? v.token.value : `${v.token.type} ${v.token.value}` })
           }
         })
       }

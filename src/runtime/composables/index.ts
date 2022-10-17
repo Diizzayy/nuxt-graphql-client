@@ -178,7 +178,7 @@ export function useGqlToken (...args: any[]) {
 
   setGqlState({
     client,
-    patch: { headers: { [config.name]: !token ? undefined : `${config.type} ${token}`.trim() } }
+    patch: { headers: { [config.name]: !token ? undefined : !config.type ? token : `${config.type} ${token}`.trim() } }
   })
 }
 

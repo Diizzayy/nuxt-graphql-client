@@ -24,7 +24,7 @@ function prepareConfig (options: GenerateOptions & GqlCodegen): CodegenConfig {
 
     if (!v?.token?.value && !v?.headers && !v?.codegenHeaders) { return [host] }
 
-    const token = v?.token?.value && `${v?.token?.type} ${v?.token?.value}`.trim()
+    const token = v?.token?.value && !v?.token?.type ? v?.token?.value : `${v?.token?.type} ${v?.token?.value}`.trim()
 
     const serverHeaders = typeof v?.headers?.serverOnly === 'object' && v?.headers?.serverOnly
     if (v?.headers?.serverOnly) { delete v.headers.serverOnly }
