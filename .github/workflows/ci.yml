@@ -76,7 +76,9 @@ jobs:
       matrix:
         node: [16]
         os: [ubuntu-latest]
-      fail-fast: false
+      fail-fast: true
+
+    timeout-minutes: 6
 
     steps:
       - name: Checkout
@@ -94,7 +96,7 @@ jobs:
         run: pnpm install
 
       - name: Run Tests
-        run: pnpm test -- --coverage
+        run: pnpm test -- --coverage --no-threads
 
       - uses: codecov/codecov-action@v3
   
