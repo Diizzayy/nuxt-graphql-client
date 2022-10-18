@@ -1,24 +1,13 @@
-import { defineNuxtConfig } from 'nuxt'
-
 export default defineNuxtConfig({
-  extends: ['./node_modules/@docus/docs-theme'],
+  extends: ['@nuxt-themes/docus'],
 
-  theme: {},
-
-  github: {
-    repo: 'nuxt-graphql-client',
-    owner: 'diizzayy',
-    branch: 'main',
-    releases: false
+  colorMode: {
+    preference: 'dark'
   },
 
   content: {
     highlight: {
       preload: ['graphql']
     }
-  },
-
-  colorMode: {
-    preference: 'dark'
   }
 })

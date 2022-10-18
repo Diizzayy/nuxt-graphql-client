@@ -5,12 +5,13 @@
   "private": true,
   "scripts": {
     "dev": "nuxi dev",
-    "generate": "nuxi generate",
-    "preview": "nuxi preview"
+    "prepare": "nuxi prepare",
+    "preview": "nuxi preview",
+    "generate": "nuxi generate"
   },
   "devDependencies": {
-    "@docus/docs-theme": "npm:@docus/docs-theme-edge@latest",
-    "nuxt": "^3.0.0-rc.4"
+    "@nuxt-themes/docus": "npm:@nuxt-themes/docus-edge@latest",
+    "nuxt": "npm:nuxt3@latest"
   },
-  "packageManager": "yarn@1.22.15"
+  "packageManager": "yarn@1.22.19"
 }
