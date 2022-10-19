@@ -204,6 +204,22 @@ export const useGqlCors = (cors: GqlCors) => {
   setGqlState({ client, patch: { mode, credentials } })
 }
 
+/**
+ * `useGqlHost` allows you to change a client's host at runtime.
+ *
+ * @param {string} host The host to be used for subsequent requests
+ * @param {string} client The name of your GraphQL client. Defaults to either the client named `default` or the first configured client.
+ */
+export const useGqlHost = (host?: string, client?: GqlClients) => {
+  const state = useGqlState()
+
+  if (!client) {
+    client = state.value?.default ? 'default' : Object.keys(state.value)[0] as GqlClients
+  }
+
+  return state.value?.[client].instance.setEndpoint(host)
+}
+
 export const useGql = (): (<
   T extends GqlOps,
   R extends ReturnType<GqlSdkFuncs[T]>,
