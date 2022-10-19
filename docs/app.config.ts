@@ -18,7 +18,7 @@ export default defineAppConfig({
     },
     github: {
       branch: 'main',
-      repo: 'diizzayy/nuxt-graphql-client',
+      repo: 'diizzayy/nuxt-graphql-client'
     }
   }
 })
