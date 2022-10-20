@@ -37,11 +37,15 @@ export default defineNuxtPlugin(() => {
       nuxtApp._gqlState.value[name] = {
         options: opts,
         instance: new GraphQLClient(host, {
-          ...opts,
           ...(v?.preferGETQueries && {
             method: 'GET',
             jsonSerializer: { parse: JSON.parse, stringify: JSON.stringify }
-          })
+          }),
+          requestMiddleware: (req) => {
+            const reqOpts = nuxtApp._gqlState.value?.[name]?.options || {}
+
+            return defu<RequestInit, [RequestInit]>(req, reqOpts)
+          }
         })
       }
     }

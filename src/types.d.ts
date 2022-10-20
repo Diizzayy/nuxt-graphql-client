@@ -1,5 +1,5 @@
 import type { GraphQLClient } from 'graphql-request'
-import type { GraphQLError, PatchedRequestInit } from 'graphql-request/dist/types'
+import type { GraphQLError } from 'graphql-request/dist/types'
 
 type TokenOpts = { name?: string, value?: string, type?: string}
 
@@ -194,5 +194,5 @@ export type GqlError = {
 
 export type OnGqlError = <T>(error: GqlError) => Promise<T> | any
 
-type GqlStateOpts = {instance?: GraphQLClient, options?: PatchedRequestInit}
+type GqlStateOpts = {instance?: GraphQLClient, options?: RequestInit}
 export type GqlState = Record<string, GqlStateOpts> & { onError?: OnGqlError }

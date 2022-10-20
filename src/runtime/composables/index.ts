@@ -9,6 +9,12 @@ import { GqlSdks, GqClientOps } from '#gql'
 import type { GqlOps, GqlClients, GqlSdkFuncs } from '#gql'
 import { useState, useNuxtApp, useAsyncData, useRuntimeConfig } from '#imports'
 
+const getGqlClient = (client?: GqlClients, state?: Ref<GqlState>): GqlClients => {
+  if (!state) { state = useGqlState() }
+
+  return client || (state.value?.default ? 'default' : Object.keys(state.value)[0]) as GqlClients
+}
+
 const useGqlState = (): Ref<GqlState> => {
   const nuxtApp = useNuxtApp() as Partial<{ _gqlState: Ref<GqlState> }>
 
@@ -21,8 +27,10 @@ const useGqlState = (): Ref<GqlState> => {
  *
  * */
 // The decision was made to avert using `GraphQLClient's` `setHeader(s)` helper in favor of reactivity and more granular control.
-const setGqlState = ({ client = 'default', patch }: {client: GqlClients, patch: RequestInit}) => {
+const setGqlState = ({ client, patch }: {client: GqlClients, patch: RequestInit}) => {
   const state = useGqlState()
+
+  client = getGqlClient(client, state)
 
   const reset = !Object.keys(patch).length
   const partial = !reset && Object.keys(patch).some(key => typeof patch[key] !== 'object'
@@ -59,9 +67,6 @@ const setGqlState = ({ client = 'default', patch }: {client: GqlClients, patch: 
   } else {
     state.value[client].options = deepmerge(state.value[client].options, patch)
   }
-
-  // @ts-ignore
-  state.value[client].instance.options = state.value[client].options
 }
 
 /**
@@ -164,10 +169,12 @@ export function useGqlToken (...args: any[]) {
   args = args || []
 
   const token = typeof args[0] === 'string' ? args[0] : args?.[0]?.token
-  const client = args[0]?.client || args?.[1]?.client
+  let client = args[0]?.client || args?.[1]?.client
   let config = args[0]?.config || args?.[1]?.config
 
-  const clientConfig = (useRuntimeConfig()?.public?.['graphql-client'] as GqlConfig)?.clients?.[client || 'default']
+  client = getGqlClient(client)
+
+  const clientConfig = (useRuntimeConfig()?.public?.['graphql-client'] as GqlConfig)?.clients?.[client]
 
   config = {
     ...DEFAULT_AUTH,
@@ -213,9 +220,7 @@ export const useGqlCors = (cors: GqlCors) => {
 export const useGqlHost = (host?: string, client?: GqlClients) => {
   const state = useGqlState()
 
-  if (!client) {
-    client = state.value?.default ? 'default' : Object.keys(state.value)[0] as GqlClients
-  }
+  client = getGqlClient(client, state)
 
   return state.value?.[client].instance.setEndpoint(host)
 }
