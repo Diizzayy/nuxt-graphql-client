@@ -12,12 +12,17 @@ export interface GqlContext {
   fnImports?: Import[]
   generateImports?: () => string
   generateDeclarations?: () => string
-  clientOps?: Record<string, string[]> | null
+  clientOps?: Record<string, string[]>
+  clientDocs?: Record<string, string[]>
   clientTypes?: Record<string, string[]>
 }
 
-export function prepareContext (ctx: GqlContext, prefix: string) {
-  ctx.fns = Object.values(ctx.template).reduce((acc, template) => {
+export async function prepareContext (ctx: GqlContext, prefix: string) {
+  if (ctx.clientDocs) { await prepareOperations(ctx) }
+
+  if (ctx.template) { prepareTemplate(ctx) }
+
+  ctx.fns = Object.values(ctx.template || {}).reduce((acc, template) => {
     const fns = template.match(ctx?.codegen ? /\w+\s*(?=\(variables)/g : /\w+(?=:\s\(variables)/g)?.sort() || []
 
     return [...acc, ...fns]
@@ -32,6 +37,8 @@ export function prepareContext (ctx: GqlContext, prefix: string) {
 
     return `  export const ${name}: (...params: Parameters<GqlSdkFuncs['${fn}']>) => ReturnType<GqlSdkFuncs['${fn}']>`
   }
+
+  ctx.clients = ctx.clients.filter(c => ctx.clientDocs?.[c])
 
   ctx.generateImports = () => [
     'import { useGql } from \'#imports\'',
@@ -59,7 +66,7 @@ export function prepareContext (ctx: GqlContext, prefix: string) {
             ...ctx.clients.map(client => `    ${client}: ${client}GqlSdk,`),
             '  }',
             ...ctx.fns.map(f => fnExp(f, true)),
-            `  type GqlSdkFuncs = ${ctx.clients.map(c => `ReturnType<typeof ${c}GqlSdk>`).join(' & ')}`
+            `  type GqlSdkFuncs = ${ctx.clients.map(c => `ReturnType<typeof ${c}GqlSdk>`).join(' & ') || 'any'}`
           ]),
       '}'
   ].join('\n')
@@ -67,51 +74,39 @@ export function prepareContext (ctx: GqlContext, prefix: string) {
   ctx.fnImports = ctx.fns.map((fn): Import => ({ from: '#gql', name: fnName(fn) }))
 }
 
-export async function prepareOperations (ctx: GqlContext, path: string[]) {
-  const scanFile = async (file: string) => {
-    let clientToUse: string | undefined
-
-    const reExt = new RegExp(`\\.(${ctx.clients.join('|')})\\.(gql|graphql)$`)
-    if (reExt.test(file)) { clientToUse = reExt.exec(file)?.[1] }
-
-    const fileName = file.split('/').pop().replace(/\./g, '\\.')
-    const reDir = new RegExp(`\\/(${ctx.clients.join('|')})\\/(?=${fileName})`)
-
-    if (!clientToUse && reDir.test(file)) { clientToUse = reDir.exec(file)?.[1] }
-
-    const { definitions } = parse(await fsp.readFile(file, 'utf8'))
+async function prepareOperations (ctx: GqlContext) {
+  const scanDoc = async (doc: string, client: string) => {
+    const { definitions } = parse(await fsp.readFile(doc, 'utf8'))
 
     // @ts-ignore
     const operations: string[] = definitions.map(({ name }) => {
-      if (!name?.value) { throw new Error(`Operation name missing in: ${file}`) }
+      if (!name?.value) { throw new Error(`Operation name missing in: ${doc}`) }
 
       return name.value
     })
 
     for (const op of operations) {
-      clientToUse = new RegExp(`^(${ctx.clients.join('|')})(?=\\_)`).exec(op)?.[0] || clientToUse
+      if (ctx.clientOps?.[client]?.includes(op)) { continue }
 
-      if (!clientToUse || !ctx.clientOps?.[clientToUse]) {
-        clientToUse = clientToUse || ctx.clients.find(c => c === 'default') || ctx.clients[0]
-      }
-
-      if (!ctx.clientOps?.[clientToUse]?.includes(op)) {
-        ctx.clientOps[clientToUse].push(op)
-      }
+      ctx.clientOps[client].push(op)
     }
   }
 
-  for (const file of path) { await scanFile(file) }
+  for await (const [client, docs] of Object.entries(ctx?.clientDocs || {})) {
+    for await (const doc of docs) {
+      await scanDoc(doc, client)
+    }
+  }
 }
 
-export function prepareTemplate (ctx: GqlContext) {
+function prepareTemplate (ctx: GqlContext) {
   if (!ctx.codegen) { return }
 
-  ctx.clientTypes = ctx.clientTypes || {}
+  ctx.clientTypes ||= {}
 
-  ctx.clientTypes = Object.entries(ctx.template).reduce((acc, [key, template]) => {
+  ctx.clientTypes = Object.entries(ctx.template || {}).reduce((acc, [key, template]) => {
     acc[key] = template.match(/^export\stype\s\w+(?=\s=\s)/gm)
-      .filter(e => !['Scalars', 'SdkFunctionWrapper', 'Sdk'].some(f => e.includes(f)))
+      ?.filter(e => !['Scalars', 'SdkFunctionWrapper', 'Sdk'].some(f => e.includes(f)))
       .map(e => e.replace('export type ', ''))
 
     return acc

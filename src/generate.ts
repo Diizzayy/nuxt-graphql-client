@@ -1,17 +1,18 @@
 import { generate } from '@graphql-codegen/cli'
-import type { CodegenConfig } from '@graphql-codegen/cli'
 
 import type { Resolver } from '@nuxt/kit'
-import { mapDocsToClients } from './utils'
+import type { CodegenConfig } from '@graphql-codegen/cli'
+
 import type { GqlConfig, GqlCodegen } from './types'
 
 interface GenerateOptions {
-  clients?: GqlConfig['clients']
   silent?: boolean
   plugins?: string[]
+  resolver? : Resolver
   documents?: string[]
   onlyOperationTypes?: boolean
-  resolver? : Resolver
+  clients?: GqlConfig['clients']
+  clientDocs?: Record<string, string[]>
 }
 
 function prepareConfig (options: GenerateOptions & GqlCodegen): CodegenConfig {
@@ -50,17 +51,19 @@ function prepareConfig (options: GenerateOptions & GqlCodegen): CodegenConfig {
     }
   }
 
-  const clientDocuments = mapDocsToClients(options.documents, Object.keys(options.clients))
+  const generates: CodegenConfig['generates'] = Object.entries(options.clients).reduce((acc, [k, v]) => {
+    if (!options?.clientDocs?.[k]) { return acc }
 
-  const generates: CodegenConfig['generates'] = Object.entries(options.clients).reduce((acc, [k, v]) => ({
-    ...acc,
-    [`${k}.ts`]: {
-      config: codegenConfig,
-      schema: prepareSchema(v),
-      plugins: options.plugins,
-      documents: clientDocuments?.[k] || []
+    return {
+      ...acc,
+      [`${k}.ts`]: {
+        config: codegenConfig,
+        schema: prepareSchema(v),
+        plugins: options.plugins,
+        documents: options?.clientDocs?.[k] || []
+      }
     }
-  }), {})
+  }, {})
 
   return { silent: options.silent, generates }
 }
