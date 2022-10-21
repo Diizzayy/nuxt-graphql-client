@@ -9,7 +9,8 @@ import generate from './generate'
 import { deepmerge } from './runtime/utils'
 import { mapDocsToClients } from './utils'
 import type { GqlConfig, GqlClient, TokenOpts, GqlCodegen, TokenStorageOpts } from './types'
-import { prepareContext, GqlContext, prepareOperations, prepareTemplate, mockTemplate } from './context'
+import { prepareContext, mockTemplate } from './context'
+import type { GqlContext } from './context'
 
 const logger = useLogger('nuxt-graphql-client')
 
@@ -65,7 +66,7 @@ export default defineNuxtModule<GqlConfig>({
     const ctx: GqlContext = {
       clientOps: {},
       fnImports: [],
-      codegen: !!config?.codegen,
+      codegen: !config?.codegen ? false : nuxt.options._prepare || nuxt.options.dev,
       clients: Object.keys(config.clients)
     }
 
@@ -76,7 +77,10 @@ export default defineNuxtModule<GqlConfig>({
       const clientHost =
         process.env.GQL_CLIENT_HOST || nuxt.options.runtimeConfig.public.GQL_CLIENT_HOST
 
-      if (!host) { throw new Error('GQL_HOST is not set in public runtimeConfig') }
+      if (!host) {
+        logger.warn('No GraphQL clients configured. Skipping module setup.')
+        return
+      }
 
       ctx.clients = ['default']
       config.clients = !clientHost ? { default: host } : { default: { host, clientHost } }
@@ -163,43 +167,39 @@ export default defineNuxtModule<GqlConfig>({
       const plugins = ['typescript']
 
       if (documents?.length) {
+        ctx.clientDocs = mapDocsToClients(documents, ctx.clients)
         plugins.push('typescript-operations', 'typescript-graphql-request')
       }
 
-      if (ctx.codegen) {
-        ctx.template = await generate({
-          clients: config.clients as GqlConfig['clients'],
-          plugins,
-          documents,
-          resolver: srcResolver,
-          ...(typeof config.codegen !== 'boolean' && config.codegen)
-        }).then(output => output.reduce((acc, c) => ({ ...acc, [c.filename.split('.ts')[0]]: c.content }), {}))
-      } else {
-        const clientDocs = mapDocsToClients(documents, ctx.clients)
+      if (ctx.clientDocs) {
+        ctx.template = ctx?.codegen
+          ? await generate({
+            clients: config.clients as GqlConfig['clients'],
+            plugins,
+            documents,
+            resolver: srcResolver,
+            clientDocs: ctx.clientDocs,
+            ...(typeof config.codegen !== 'boolean' && config.codegen)
+          }).then(output => output.reduce((acc, c) => ({ ...acc, [c.filename.split('.ts')[0]]: c.content }), {}))
+          : ctx.template = ctx.clients.reduce<Record<string, string>>((acc, k) => {
+            const entries: Record<string, string> = {}
 
-        ctx.template = ctx.clients.reduce<Record<string, string>>((acc, k) => {
-          const entries: Record<string, string> = {}
+            for (const doc of ctx?.clientDocs?.[k] || []) {
+              const definitions = parse(readFileSync(doc, 'utf-8'))?.definitions as (DefinitionNode & { name: NameNode })[]
 
-          for (const doc of clientDocs?.[k] || []) {
-            const definitions = parse(readFileSync(doc, 'utf-8'))?.definitions as (DefinitionNode & { name: NameNode })[]
+              for (const op of definitions) {
+                const name: string = op?.name?.value
+                const operation = op.loc?.source.body.slice(op.loc.start, op.loc.end) || undefined
 
-            for (const op of definitions) {
-              const name: string = op?.name?.value
-              const operation = op.loc?.source.body.slice(op.loc.start, op.loc.end) || undefined
-
-              if (name && operation) { entries[name] = operation }
+                if (name && operation) { entries[name] = operation }
+              }
             }
-          }
 
-          return { ...acc, [k]: mockTemplate(entries) }
-        }, {})
+            return { ...acc, [k]: mockTemplate(entries) }
+          }, {})
       }
 
-      await prepareOperations(ctx, documents)
-
-      prepareTemplate(ctx)
-
-      prepareContext(ctx, config.functionPrefix)
+      await prepareContext(ctx, config.functionPrefix)
     }
 
     addPlugin(resolver.resolve('runtime/plugin'))
@@ -221,7 +221,7 @@ export default defineNuxtModule<GqlConfig>({
         addTemplate({
           write: ctx.codegen,
           filename: `gql/${client}.${ctx.codegen ? 'ts' : 'mjs'}`,
-          getContents: () => ctx.template[client]
+          getContents: () => ctx.template?.[client] || ''
         })
       }
 

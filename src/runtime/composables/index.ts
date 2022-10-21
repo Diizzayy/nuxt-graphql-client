@@ -204,7 +204,7 @@ export const useGql = (): (<
 
     const { instance } = state.value?.[client]
 
-    return GqlSdks[client](instance, async (action, operationName, operationType): Promise<any> => {
+    return GqlSdks[client]?.(instance, async (action, operationName, operationType): Promise<any> => {
       try {
         return await action()
       } catch (err) {

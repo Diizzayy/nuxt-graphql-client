@@ -1,10 +1,5 @@
 <template>
   <div>
-    <Script
-      :async="true"
-      src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"
-    ></Script>
-
     <div class="launches">
       <div v-for="entry in data?.launches" :key="entry.id">
         <div v-if="entry?.links.flickr_images[0]" class="thumbnail">
@@ -38,6 +33,8 @@
 </template>
 
 <script lang="ts" setup>
+useHead({ script: [{ async: true, src: 'https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js' }] })
+
 const { data, error } = await useAsyncGql({
   operation: 'launches',
   variables: { limit: 8 }
