@@ -1,5 +1,6 @@
 import { existsSync, statSync, readFileSync } from 'fs'
 import { defu } from 'defu'
+import type { Ref } from 'vue'
 import { parse } from 'graphql'
 import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createResolver, defineNuxtModule, extendViteConfig } from '@nuxt/kit'
 import type { NameNode, DefinitionNode } from 'graphql'
@@ -7,7 +8,7 @@ import { name, version } from '../package.json'
 import generate from './generate'
 import { deepmerge } from './runtime/utils'
 import { mapDocsToClients } from './utils'
-import type { GqlConfig, GqlClient, TokenOpts, GqlCodegen } from './types'
+import type { GqlConfig, GqlClient, TokenOpts, GqlCodegen, TokenStorageOpts } from './types'
 import { prepareContext, GqlContext, prepareOperations, prepareTemplate, mockTemplate } from './context'
 
 const logger = useLogger('nuxt-graphql-client')
@@ -26,6 +27,7 @@ export default defineNuxtModule<GqlConfig>({
     watch: true,
     codegen: true,
     autoImport: true,
+    tokenStorage: true,
     functionPrefix: 'Gql'
   },
   async setup (opts, nuxt) {
@@ -49,6 +51,14 @@ export default defineNuxtModule<GqlConfig>({
     }
 
     config.codegen = !!config.codegen && defu<GqlCodegen, [GqlCodegen]>(config.codegen, codegenDefaults)
+
+    config.tokenStorage = !!config.tokenStorage && defu<TokenStorageOpts, [TokenStorageOpts]>(config.tokenStorage, {
+      mode: 'cookie',
+      cookieOptions: {
+        maxAge: 60 * 60 * 24 * 7,
+        secure: process.env.NODE_ENV === 'production'
+      }
+    })
 
     const ctx: GqlContext = {
       clientOps: {},
@@ -77,6 +87,7 @@ export default defineNuxtModule<GqlConfig>({
     const clientDefaults: Partial<GqlClient<TokenOpts> > = {
       token: { type: 'Bearer', name: 'Authorization' },
       proxyCookies: true,
+      tokenStorage: config.tokenStorage,
       preferGETQueries: config?.preferGETQueries ?? false
     }
 
@@ -101,6 +112,8 @@ export default defineNuxtModule<GqlConfig>({
 
       const runtimeTokenName = k === 'default' ? process.env.GQL_TOKEN_NAME : process.env?.[`GQL_${k.toUpperCase()}_TOKEN_NAME`]
       if (runtimeTokenName) { conf.token.name = runtimeTokenName }
+
+      if (conf.tokenStorage) { conf.tokenStorage.name = conf.tokenStorage?.name || `gql:${k}` }
 
       const schema = conf?.schema && srcResolver.resolve(conf.schema)
 
@@ -268,5 +281,14 @@ declare module '@nuxt/schema' {
 
     // @ts-ignore
     'graphql-client'?: GqlConfig<any>
+  }
+}
+
+declare module '#app' {
+  interface RuntimeNuxtHooks {
+    /**
+     * `gql:auth` hook specifies how the authentication token is retrieved.
+     */
+    'gql:auth': (params: { client: string, token: Ref<string> }) => void
   }
 }

@@ -1,7 +1,44 @@
 import type { GraphQLClient } from 'graphql-request'
 import type { GraphQLError } from 'graphql-request/dist/types'
+import type { CookieOptions } from 'nuxt/dist/app/composables'
 
-type TokenOpts = { name?: string, value?: string, type?: string}
+type TokenOpts = {
+  /**
+   * The name of the Authentication token header.
+   *
+   * @default 'Authorization'
+   * */
+  name?: string;
+
+  /**
+   * The HTTP Authentication scheme.
+   *
+   * @default "Bearer"
+   * */
+  type?: string;
+
+  value?: string;
+}
+
+type TokenStorageOpts = {
+  /**
+   * Specify the name under which the token will be stored.
+   * as in either a cookie or localStorage.
+   * @type {string}
+   * @default "gql:<client-name>"
+   */
+  name?: string;
+
+  /**
+   * Specify if the auth token should be stored in `cookie` or `localStorage`.
+   * `Cookie` storage is required for SSR.
+   * @type {string}
+   * @default "cookie"
+   **/
+  mode?: 'cookie' | 'localStorage';
+
+  cookieOptions?: Omit< CookieOptions, 'encode' | 'decode' | 'expires' | 'default'>;
+}
 
 export interface GqlClient<T = string> {
   host: string
@@ -28,6 +65,11 @@ export interface GqlClient<T = string> {
   schema?: string
 
   token?: T extends object ? TokenOpts : string | TokenOpts
+
+  /**
+   * Configuration for the token storage
+   * */
+  tokenStorage?: T extends object ? TokenStorageOpts : boolean | TokenStorageOpts
 
   /**
    * When enabled, this flag will force tokens set at config-level to be retained client-side.
@@ -118,7 +160,7 @@ export interface GqlCodegen {
    * @type boolean
    * @default true
    * */
-   onlyOperationTypes?: boolean
+  onlyOperationTypes?: boolean
 }
 
 export interface GqlConfig<T = GqlClient> {
@@ -182,6 +224,11 @@ export interface GqlConfig<T = GqlClient> {
    * @default false
    * */
   preferGETQueries?: boolean
+
+  /**
+   * Configuration for the token storage
+   * */
+  tokenStorage?: boolean | TokenStorageOpts
 }
 
 export type GqlError = {
@@ -194,5 +241,5 @@ export type GqlError = {
 
 export type OnGqlError = <T>(error: GqlError) => Promise<T> | any
 
-type GqlStateOpts = {instance?: GraphQLClient, options?: RequestInit}
+type GqlStateOpts = {instance?: GraphQLClient, options?: { token?: TokenOpts } & Pick<RequestInit, 'headers' | 'mode' | 'credentials'> }
 export type GqlState = Record<string, GqlStateOpts> & { onError?: OnGqlError }
