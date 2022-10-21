@@ -2,7 +2,7 @@ import { defu } from 'defu'
 import type { Ref } from 'vue'
 import { GraphQLClient } from 'graphql-request'
 import type { GqlState, GqlConfig } from '../types'
-import { ref, useNuxtApp, defineNuxtPlugin, useRuntimeConfig, useRequestHeaders } from '#imports'
+import { ref, useCookie, useNuxtApp, defineNuxtPlugin, useRuntimeConfig, useRequestHeaders } from '#imports'
 import type { GqlClients } from '#gql'
 
 export default defineNuxtPlugin((nuxtApp) => {
