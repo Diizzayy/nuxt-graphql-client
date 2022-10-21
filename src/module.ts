@@ -13,6 +13,8 @@ import { prepareContext, GqlContext, prepareOperations, prepareTemplate, mockTem
 
 const logger = useLogger('nuxt-graphql-client')
 
+export type ModuleOptions = Partial<GqlConfig>
+
 export default defineNuxtModule<GqlConfig>({
   meta: {
     name,
