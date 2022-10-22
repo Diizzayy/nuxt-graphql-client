@@ -52,7 +52,7 @@ function prepareConfig (options: GenerateOptions & GqlCodegen): CodegenConfig {
   }
 
   const generates: CodegenConfig['generates'] = Object.entries(options.clients).reduce((acc, [k, v]) => {
-    if (!options?.clientDocs?.[k]) { return acc }
+    if (!options?.clientDocs?.[k]?.length) { return acc }
 
     return {
       ...acc,
