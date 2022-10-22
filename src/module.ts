@@ -50,6 +50,7 @@ export default defineNuxtModule<GqlConfig>({
       skipTypename: true,
       useTypeImports: true,
       dedupeFragments: true,
+      disableOnBuild: false,
       onlyOperationTypes: true
     }
 
@@ -66,8 +67,8 @@ export default defineNuxtModule<GqlConfig>({
     const ctx: GqlContext = {
       clientOps: {},
       fnImports: [],
-      codegen: !config?.codegen ? false : nuxt.options._prepare || nuxt.options.dev,
-      clients: Object.keys(config.clients)
+      clients: Object.keys(config.clients),
+      codegen: !config?.codegen ? false : !(!nuxt.options._prepare && !nuxt.options.dev) ? (nuxt.options._prepare || nuxt.options.dev) : !config?.codegen?.disableOnBuild
     }
 
     if (!ctx?.clients?.length) {

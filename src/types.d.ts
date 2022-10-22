@@ -120,6 +120,14 @@ export interface StitchOptions {
 
 export interface GqlCodegen {
   /**
+   * Disable Code Generation for production builds.
+   *
+   * @type boolean
+   * @default false
+   */
+  disableOnBuild?: boolean
+
+  /**
    * Prevent codegen from printing to console in dev mode
    *
    * @type boolean
