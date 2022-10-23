@@ -97,6 +97,8 @@ export default defineNuxtModule<GqlConfig>({
       preferGETQueries: config?.preferGETQueries ?? false
     }
 
+    const defaultClient = (config?.clients?.default && 'default') || Object.keys(config.clients)[0]
+
     for (const [k, v] of Object.entries(config.clients)) {
       const conf = defu<GqlClient<TokenOpts>, [Partial<GqlClient<object>>]>(typeof v !== 'object'
         ? { host: v }
@@ -105,18 +107,18 @@ export default defineNuxtModule<GqlConfig>({
         ...(typeof v === 'object' && typeof v.token !== 'string' && v?.token?.type === null && { token: { type: null } })
       })
 
-      const runtimeHost = k === 'default' ? process.env.GQL_HOST : process.env?.[`GQL_${k.toUpperCase()}_HOST`]
+      const runtimeHost = k === defaultClient ? process.env.GQL_HOST : process.env?.[`GQL_${k.toUpperCase()}_HOST`]
       if (runtimeHost) { conf.host = runtimeHost }
 
-      const runtimeClientHost = k === 'default' ? process.env.GQL_CLIENT_HOST : process.env?.[`GQL_${k.toUpperCase()}_CLIENT_HOST`]
+      const runtimeClientHost = k === defaultClient ? process.env.GQL_CLIENT_HOST : process.env?.[`GQL_${k.toUpperCase()}_CLIENT_HOST`]
       if (runtimeClientHost) { conf.clientHost = runtimeClientHost }
 
       if (!conf?.host) { throw new Error(`GraphQL client (${k}) is missing it's host.`) }
 
-      const runtimeToken = k === 'default' ? process.env.GQL_TOKEN : process.env?.[`GQL_${k.toUpperCase()}_TOKEN`]
+      const runtimeToken = k === defaultClient ? process.env.GQL_TOKEN : process.env?.[`GQL_${k.toUpperCase()}_TOKEN`]
       if (runtimeToken) { conf.token.value = runtimeToken }
 
-      const runtimeTokenName = k === 'default' ? process.env.GQL_TOKEN_NAME : process.env?.[`GQL_${k.toUpperCase()}_TOKEN_NAME`]
+      const runtimeTokenName = k === defaultClient ? process.env.GQL_TOKEN_NAME : process.env?.[`GQL_${k.toUpperCase()}_TOKEN_NAME`]
       if (runtimeTokenName) { conf.token.name = runtimeTokenName }
 
       if (conf.tokenStorage) { conf.tokenStorage.name = conf.tokenStorage?.name || `gql:${k}` }
