@@ -43,7 +43,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           }),
           requestMiddleware: async (req) => {
             const token = ref<string>()
-            await nuxtApp.callHook('gql:auth', { token, client: name as GqlClients })
+            await nuxtApp.callHook('gql:auth:init', { token, client: name as GqlClients })
 
             const reqOpts = defu(nuxtApp._gqlState.value?.[name]?.options || {}, { headers: {} })
 
@@ -85,3 +85,12 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   }
 })
+
+declare module '#app' {
+  interface RuntimeNuxtHooks {
+    /**
+     * `gql:auth:init` hook specifies how the authentication token is retrieved.
+     */
+    'gql:auth:init': (params: { client: GqlClients, token: Ref<string> }) => void
+  }
+}

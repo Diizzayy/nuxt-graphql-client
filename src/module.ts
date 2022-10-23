@@ -1,6 +1,5 @@
 import { existsSync, statSync, readFileSync } from 'fs'
 import { defu } from 'defu'
-import type { Ref } from 'vue'
 import { parse } from 'graphql'
 import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createResolver, defineNuxtModule, extendViteConfig } from '@nuxt/kit'
 import type { NameNode, DefinitionNode } from 'graphql'
@@ -284,14 +283,5 @@ declare module '@nuxt/schema' {
 
     // @ts-ignore
     'graphql-client'?: GqlConfig<any>
-  }
-}
-
-declare module '#app' {
-  interface RuntimeNuxtHooks {
-    /**
-     * `gql:auth` hook specifies how the authentication token is retrieved.
-     */
-    'gql:auth': (params: { client: string, token: Ref<string> }) => void
   }
 }
