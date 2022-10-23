@@ -7,7 +7,7 @@ import type { GqlState, GqlConfig, GqlError, TokenOpts, OnGqlError, GqlStateOpts
 // eslint-disable-next-line import/named
 import { GqlSdks, GqClientOps } from '#gql'
 import type { GqlOps, GqlClients, GqlSdkFuncs } from '#gql'
-import { useState, useNuxtApp, useAsyncData, useRuntimeConfig, useCookie } from '#imports'
+import { useState, useCookie, useNuxtApp, useAsyncData, useRuntimeConfig } from '#imports'
 
 const getGqlClient = (client?: GqlClients, state?: Ref<GqlState>): GqlClients => {
   if (!state) { state = useGqlState() }
@@ -213,7 +213,7 @@ export const useGql = (): (<
           operationType,
           operationName,
           statusCode: err?.response?.status,
-          gqlErrors: err?.response?.errors
+          gqlErrors: err?.response?.errors || (err?.response?.message && [{ message: err?.response?.message }]) || []
         }
 
         if (state.value.onError) {
