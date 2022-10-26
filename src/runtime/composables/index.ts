@@ -1,6 +1,7 @@
 import { defu } from 'defu'
 import { hash } from 'ohash'
 import type { Ref } from 'vue'
+import { extractOperation } from 'ohmygql/utils'
 import type { AsyncData } from 'nuxt/dist/app/composables'
 import type { GqlState, GqlConfig, GqlError, TokenOpts, OnGqlError, GqlStateOpts } from '../../types'
 // @ts-ignore
@@ -180,7 +181,7 @@ export const useGqlHost = (host?: string, client?: GqlClients) => {
 
   client = getGqlClient(client, state)
 
-  return state.value?.[client].instance.setEndpoint(host)
+  return state.value?.[client].instance.setHost(host)
 }
 
 export const useGql = (): (<
@@ -204,25 +205,22 @@ export const useGql = (): (<
 
     const { instance } = state.value?.[client]
 
-    return GqlSdks[client]?.(instance, async (action, operationName, operationType): Promise<any> => {
-      try {
-        return await action()
-      } catch (err) {
+    instance.setMiddleware({
+      onResponseError: ({ options, response }) => {
         errState.value = {
           client,
-          operationType,
-          operationName,
-          statusCode: err?.response?.status,
-          gqlErrors: err?.response?.errors || (err?.response?.message && [{ message: err?.response?.message }]) || []
+          statusCode: response?.status,
+          operation: extractOperation(JSON.parse(options?.body as string)?.query || ''),
+          gqlErrors: Array.isArray(response?._data?.errors) ? response?._data?.errors : [response?._data]
         }
 
         if (state.value.onError) {
           state.value.onError(errState.value)
         }
-
-        throw errState.value
       }
-    })[operation](variables)
+    })
+
+    return !args?.[2] ? GqlSdks[client]?.(instance)[operation](variables) : GqlSdks[client]?.(instance)[operation](variables, args?.[2])
   }
 }
 

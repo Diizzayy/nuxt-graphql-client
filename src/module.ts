@@ -1,6 +1,7 @@
 import { existsSync, statSync, readFileSync } from 'fs'
 import { defu } from 'defu'
 import { parse } from 'graphql'
+import { mockPlugin } from 'ohmygql/plugin'
 import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createResolver, defineNuxtModule, extendViteConfig } from '@nuxt/kit'
 import type { NameNode, DefinitionNode } from 'graphql'
 import { name, version } from '../package.json'
@@ -8,7 +9,7 @@ import generate from './generate'
 import { deepmerge } from './runtime/utils'
 import { mapDocsToClients } from './utils'
 import type { GqlConfig, GqlClient, TokenOpts, GqlCodegen, TokenStorageOpts } from './types'
-import { prepareContext, mockTemplate } from './context'
+import { prepareContext } from './context'
 import type { GqlContext } from './context'
 
 const logger = useLogger('nuxt-graphql-client')
@@ -170,7 +171,7 @@ export default defineNuxtModule<GqlConfig>({
 
       if (documents?.length) {
         ctx.clientDocs = mapDocsToClients(documents, ctx.clients)
-        plugins.push('typescript-operations', 'typescript-graphql-request')
+        plugins.push('typescript-operations', 'ohmygql/plugin')
       }
 
       if (ctx.clientDocs) {
@@ -197,7 +198,7 @@ export default defineNuxtModule<GqlConfig>({
               }
             }
 
-            return { ...acc, [k]: mockTemplate(entries) }
+            return { ...acc, [k]: mockPlugin(entries) }
           }, {})
       }
 
@@ -256,10 +257,6 @@ export default defineNuxtModule<GqlConfig>({
     }
 
     await generateGqlTypes()
-
-    extendViteConfig((config) => {
-      config.optimizeDeps?.include?.push('graphql-request')
-    })
   }
 })
 

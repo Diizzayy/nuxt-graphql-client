@@ -9,7 +9,7 @@
     "gql",
     "graphql",
     "graphql-client",
-    "graphql-request",
+    "ohmyfetch",
     "codegen",
     "graphql-code-generator"
   ],
@@ -45,14 +45,13 @@
   "dependencies": {
     "@graphql-codegen/cli": "2.13.4",
     "@graphql-codegen/typescript": "^2.7.3",
-    "@graphql-codegen/typescript-graphql-request": "^4.5.5",
     "@graphql-codegen/typescript-operations": "^2.5.3",
     "@nuxt/kit": "3.0.0-rc.12",
     "defu": "^6.1.0",
     "graphql": "^16.6.0",
-    "graphql-request": "^5.0.0",
     "knitwork": "^0.1.2",
     "ohash": "^0.1.5",
+    "ohmygql": "^1.0.9",
     "scule": "^0.3.2"
   },
   "devDependencies": {

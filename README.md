@@ -36,7 +36,7 @@
 - 🚀 [Nuxt 3](https://v3.nuxtjs.org) Support
 - Full Typescript Support
 - HMR (Hot Module Reload) for GraphQL documents
-- Minimal [GraphQL Client](https://github.com/prisma-labs/graphql-request#graphql-request) + [Code Generation](https://www.graphql-code-generator.com/)
+- Minimal GraphQL Client + [Code Generation](https://www.graphql-code-generator.com/)
 
 ## Preview
 

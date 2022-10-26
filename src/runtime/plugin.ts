@@ -1,6 +1,6 @@
 import { defu } from 'defu'
 import type { Ref } from 'vue'
-import { GraphQLClient } from 'graphql-request'
+import { GqlClient } from 'ohmygql'
 import type { GqlState, GqlConfig } from '../types'
 import { ref, useCookie, useNuxtApp, defineNuxtPlugin, useRuntimeConfig, useRequestHeaders } from '#imports'
 import type { GqlClients } from '#gql'
@@ -36,51 +36,51 @@ export default defineNuxtPlugin((nuxtApp) => {
 
       nuxtApp._gqlState.value[name] = {
         options: opts,
-        instance: new GraphQLClient(host, {
-          ...(v?.preferGETQueries && {
-            method: 'GET',
-            jsonSerializer: { parse: JSON.parse, stringify: JSON.stringify }
-          }),
-          requestMiddleware: async (req) => {
-            const token = ref<string>()
-            await nuxtApp.callHook('gql:auth:init', { token, client: name as GqlClients })
+        instance: GqlClient({
+          host,
+          useGETForQueries: v?.preferGETQueries,
+          middleware: {
+            onRequest: async (ctx) => {
+              const token = ref<string>()
+              await nuxtApp.callHook('gql:auth:init', { token, client: name as GqlClients })
 
-            const reqOpts = defu(nuxtApp._gqlState.value?.[name]?.options || {}, { headers: {} })
+              const reqOpts = defu(nuxtApp._gqlState.value?.[name]?.options || {}, { headers: {} })
 
-            token.value ??= reqOpts?.token?.value
+              token.value ??= reqOpts?.token?.value
 
-            if (!token.value && typeof v.tokenStorage === 'object') {
-              if (v.tokenStorage?.mode === 'cookie') {
-                if (process.client) {
-                  token.value = useCookie(v.tokenStorage.name).value
-                } else if (cookie) {
-                  const cookieName = `${v.tokenStorage.name}=`
-                  token.value = cookie.split(';').find(c => c.trim().startsWith(cookieName))?.split('=')?.[1]
+              if (!token.value && typeof v.tokenStorage === 'object') {
+                if (v.tokenStorage?.mode === 'cookie') {
+                  if (process.client) {
+                    token.value = useCookie(v.tokenStorage.name).value
+                  } else if (cookie) {
+                    const cookieName = `${v.tokenStorage.name}=`
+                    token.value = cookie.split(';').find(c => c.trim().startsWith(cookieName))?.split('=')?.[1]
+                  }
+                } else if (process.client && v.tokenStorage?.mode === 'localStorage') {
+                  token.value = localStorage.getItem(v.tokenStorage.name)
                 }
-              } else if (process.client && v.tokenStorage?.mode === 'localStorage') {
-                token.value = localStorage.getItem(v.tokenStorage.name)
               }
-            }
 
-            token.value ??= v?.token?.value
+              token.value ??= v?.token?.value
 
-            if (token.value) {
-              token.value = token.value.trim()
+              if (token.value) {
+                token.value = token.value.trim()
 
-              const tokenName = token.value === reqOpts?.token?.value ? reqOpts?.token?.name || v?.token?.name : v?.token?.name
-              const tokenType = token.value === reqOpts?.token?.value ? reqOpts?.token?.type === null ? null : reqOpts?.token?.type || v?.token?.type : v?.token?.type
+                const tokenName = token.value === reqOpts?.token?.value ? reqOpts?.token?.name || v?.token?.name : v?.token?.name
+                const tokenType = token.value === reqOpts?.token?.value ? reqOpts?.token?.type === null ? null : reqOpts?.token?.type || v?.token?.type : v?.token?.type
 
-              const authScheme = !!token.value?.match(/^[a-zA-Z]+\s/)?.[0]
+                const authScheme = !!token.value?.match(/^[a-zA-Z]+\s/)?.[0]
 
-              if (authScheme) {
-                reqOpts.headers[tokenName] = token.value
-              } else {
-                reqOpts.headers[tokenName] = !tokenType ? token.value : `${tokenType} ${token.value}`
+                if (authScheme) {
+                  reqOpts.headers[tokenName] = token.value
+                } else {
+                  reqOpts.headers[tokenName] = !tokenType ? token.value : `${tokenType} ${token.value}`
+                }
               }
-            }
 
-            if (reqOpts?.token) { delete reqOpts.token }
-            return defu<RequestInit, [RequestInit]>(req, reqOpts)
+              if (reqOpts?.token) { delete reqOpts.token }
+              ctx.options = defu(ctx.options, reqOpts)
+            }
           }
         })
       }
