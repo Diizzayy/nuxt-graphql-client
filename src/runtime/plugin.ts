@@ -1,7 +1,7 @@
 import { defu } from 'defu'
 import type { Ref } from 'vue'
 import { GqlClient } from 'ohmygql'
-import type { GqlState, GqlConfig } from '../types'
+import type { GqlState, GqlConfig, GqlStateOpts } from '../types'
 import { ref, useCookie, useNuxtApp, defineNuxtPlugin, useRuntimeConfig, useRequestHeaders } from '#imports'
 import type { GqlClients } from '#gql'
 
@@ -34,6 +34,43 @@ export default defineNuxtPlugin((nuxtApp) => {
         })
       }
 
+      const authInit = async (reqOpts: GqlStateOpts['options']) => {
+        const token = ref<string>()
+        await nuxtApp.callHook('gql:auth:init', { token, client: name as GqlClients })
+
+        token.value ??= reqOpts?.token?.value
+
+        if (!token.value && typeof v.tokenStorage === 'object') {
+          if (v.tokenStorage?.mode === 'cookie') {
+            if (process.client) {
+              token.value = useCookie(v.tokenStorage.name).value
+            } else if (cookie) {
+              const cookieName = `${v.tokenStorage.name}=`
+              token.value = cookie.split(';').find(c => c.trim().startsWith(cookieName))?.split('=')?.[1]
+            }
+          } else if (process.client && v.tokenStorage?.mode === 'localStorage') {
+            token.value = localStorage.getItem(v.tokenStorage.name)
+          }
+        }
+
+        token.value ??= v?.token?.value
+
+        if (token.value) {
+          token.value = token.value.trim()
+
+          const tokenName = token.value === reqOpts?.token?.value ? reqOpts?.token?.name || v?.token?.name : v?.token?.name
+          const tokenType = token.value === reqOpts?.token?.value ? reqOpts?.token?.type === null ? null : reqOpts?.token?.type || v?.token?.type : v?.token?.type
+
+          const authScheme = !!token.value?.match(/^[a-zA-Z]+\s/)?.[0]
+
+          reqOpts.headers[tokenName] = authScheme ? token.value : !tokenType ? token.value : `${tokenType} ${token.value}`
+
+          return { name: tokenName, token: reqOpts.headers[tokenName] as string }
+        }
+
+        return undefined
+      }
+
       nuxtApp._gqlState.value[name] = {
         options: opts,
         instance: GqlClient({
@@ -41,45 +78,23 @@ export default defineNuxtPlugin((nuxtApp) => {
           useGETForQueries: v?.preferGETQueries,
           middleware: {
             onRequest: async (ctx) => {
-              const token = ref<string>()
-              await nuxtApp.callHook('gql:auth:init', { token, client: name as GqlClients })
-
               const reqOpts = defu(nuxtApp._gqlState.value?.[name]?.options || {}, { headers: {} })
 
-              token.value ??= reqOpts?.token?.value
-
-              if (!token.value && typeof v.tokenStorage === 'object') {
-                if (v.tokenStorage?.mode === 'cookie') {
-                  if (process.client) {
-                    token.value = useCookie(v.tokenStorage.name).value
-                  } else if (cookie) {
-                    const cookieName = `${v.tokenStorage.name}=`
-                    token.value = cookie.split(';').find(c => c.trim().startsWith(cookieName))?.split('=')?.[1]
-                  }
-                } else if (process.client && v.tokenStorage?.mode === 'localStorage') {
-                  token.value = localStorage.getItem(v.tokenStorage.name)
-                }
-              }
-
-              token.value ??= v?.token?.value
-
-              if (token.value) {
-                token.value = token.value.trim()
-
-                const tokenName = token.value === reqOpts?.token?.value ? reqOpts?.token?.name || v?.token?.name : v?.token?.name
-                const tokenType = token.value === reqOpts?.token?.value ? reqOpts?.token?.type === null ? null : reqOpts?.token?.type || v?.token?.type : v?.token?.type
-
-                const authScheme = !!token.value?.match(/^[a-zA-Z]+\s/)?.[0]
-
-                if (authScheme) {
-                  reqOpts.headers[tokenName] = token.value
-                } else {
-                  reqOpts.headers[tokenName] = !tokenType ? token.value : `${tokenType} ${token.value}`
-                }
-              }
+              await authInit(reqOpts)
 
               if (reqOpts?.token) { delete reqOpts.token }
               ctx.options = defu(ctx.options, reqOpts)
+            }
+          },
+          wsOptions: {
+            connectionParams: async () => {
+              const reqOpts = defu(nuxtApp._gqlState.value?.[name]?.options || {}, { headers: {} })
+
+              const token = await authInit(reqOpts)
+
+              if (!token) { return }
+
+              return { [token.name]: token.token }
             }
           }
         })
