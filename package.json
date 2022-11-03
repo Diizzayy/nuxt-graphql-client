@@ -43,10 +43,10 @@
     "prepare": "nuxt-module-build --stub && nuxi prepare playground"
   },
   "dependencies": {
-    "@graphql-codegen/cli": "2.13.4",
-    "@graphql-codegen/typescript": "^2.7.3",
-    "@graphql-codegen/typescript-graphql-request": "^4.5.5",
-    "@graphql-codegen/typescript-operations": "^2.5.3",
+    "@graphql-codegen/cli": "2.13.11",
+    "@graphql-codegen/typescript": "^2.8.1",
+    "@graphql-codegen/typescript-graphql-request": "^4.5.8",
+    "@graphql-codegen/typescript-operations": "^2.5.6",
     "@nuxt/kit": "3.0.0-rc.12",
     "defu": "^6.1.0",
     "graphql": "^16.6.0",
