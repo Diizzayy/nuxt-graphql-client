@@ -20,7 +20,7 @@ export const mapDocsToClients = (documents: string[], clients: string[]) => {
   })
 
   return clients.reduce((acc, client) => {
-    const isDefault = client === 'default' || client === clients[0]
+    const isDefault = client === 'default' || (!clients.includes('default') && client === clients[0])
 
     acc[client] = !isDefault ? docsWithClient(client) : [...docsWithClient(client), ...docsWithoutClient]
 
