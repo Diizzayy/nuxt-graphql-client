@@ -125,14 +125,14 @@ export function useGqlToken (...args: any[]) {
 
   const config: TokenOpts = args[0]?.config || args?.[1]?.config
   let client: GqlClients = args[0]?.client || args?.[1]?.client
-  let token: string = typeof args[0] === 'string' ? args[0] : args?.[0]?.token
+  let token: string = typeof args[0] === 'string' || args?.[0] === null ? args[0] : args?.[0]?.token
   if (token) { token = token.trim() }
 
   client = getGqlClient(client)
 
   const tokenStorage = (useRuntimeConfig()?.public?.['graphql-client'] as GqlConfig)?.clients?.[client]?.tokenStorage
 
-  if (token && typeof tokenStorage === 'object') {
+  if (token !== undefined && typeof tokenStorage === 'object') {
     if (tokenStorage.mode === 'cookie') {
       const cookie = useCookie(tokenStorage.name, tokenStorage.cookieOptions)
 
@@ -140,7 +140,11 @@ export function useGqlToken (...args: any[]) {
     }
 
     if (process.client && tokenStorage.mode === 'localStorage') {
-      localStorage.setItem(tokenStorage.name, token)
+      if (token !== null) {
+        localStorage.setItem(tokenStorage.name, token)
+      } else {
+        localStorage.removeItem(tokenStorage.name)
+      }
     }
   }
 

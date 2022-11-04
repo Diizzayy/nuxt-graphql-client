@@ -49,7 +49,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
             token.value ??= reqOpts?.token?.value
 
-            if (!token.value && typeof v.tokenStorage === 'object') {
+            if (token.value === undefined && typeof v.tokenStorage === 'object') {
               if (v.tokenStorage?.mode === 'cookie') {
                 if (process.client) {
                   token.value = useCookie(v.tokenStorage.name).value
@@ -62,7 +62,7 @@ export default defineNuxtPlugin((nuxtApp) => {
               }
             }
 
-            token.value ??= v?.token?.value
+            if (token.value === undefined) { token.value ??= v?.token?.value }
 
             if (token.value) {
               token.value = token.value.trim()
