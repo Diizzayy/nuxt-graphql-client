@@ -38,35 +38,35 @@ export async function prepareContext (ctx: GqlContext, prefix: string) {
     return `  export const ${name}: (...params: Parameters<GqlSdkFuncs['${fn}']>) => ReturnType<GqlSdkFuncs['${fn}']>`
   }
 
-  ctx.clients = ctx.clients.filter(c => ctx.clientDocs?.[c])
+  ctx.clients = ctx.clients?.filter(c => ctx.clientDocs?.[c])
 
   ctx.generateImports = () => [
     'import { useGql } from \'#imports\'',
-    ...ctx.clients.map(client => `import { getSdk as ${client}GqlSdk } from '#gql/${client}'`),
+    ...ctx.clients!.map(client => `import { getSdk as ${client}GqlSdk } from '#gql/${client}'`),
     'export const GqlSdks = {',
-    ...ctx.clients.map(client => `  ${client}: ${client}GqlSdk,`),
+    ...ctx.clients!.map(client => `  ${client}: ${client}GqlSdk,`),
     '}',
     `export const GqClientOps = ${JSON.stringify(ctx.clientOps)}`,
-    ...ctx.fns.map(f => fnExp(f))
+    ...ctx.fns!.map(f => fnExp(f))
   ].join('\n')
 
   ctx.generateDeclarations = () => [
     ...(!ctx.codegen
       ? []
-      : ctx.clients.map(client => `import { getSdk as ${client}GqlSdk } from '#gql/${client}'`)),
+      : ctx.clients!.map(client => `import { getSdk as ${client}GqlSdk } from '#gql/${client}'`)),
     ...Object.entries(ctx.clientTypes || {}).map(([k, v]) => genExport(`#gql/${k}`, v)),
     'declare module \'#gql\' {',
-      `  type GqlClients = '${ctx.clients.join("' | '") || 'default'}'`,
-      `  type GqlOps = '${Object.values(ctx.clientOps).flat().join("' | '")}'`,
-      '  const GqClientOps = {}',
+      `  type GqlClients = '${ctx.clients?.join("' | '") || 'default'}'`,
+      `  type GqlOps = '${Object.values(ctx.clientOps!).flat().join("' | '")}'`,
+      `  const GqClientOps = ${JSON.stringify(ctx.clientOps)}`,
       ...(!ctx.codegen
         ? []
         : [
             '  const GqlSdks = {',
-            ...ctx.clients.map(client => `    ${client}: ${client}GqlSdk,`),
+            ...ctx.clients!.map(client => `    ${client}: ${client}GqlSdk,`),
             '  }',
-            ...ctx.fns.map(f => fnExp(f, true)),
-            `  type GqlSdkFuncs = ${ctx.clients.map(c => `ReturnType<typeof ${c}GqlSdk>`).join(' & ') || 'any'}`
+            ...ctx.fns!.map(f => fnExp(f, true)),
+            `  type GqlSdkFuncs = ${ctx.clients?.map(c => `ReturnType<typeof ${c}GqlSdk>`).join(' & ') || 'any'}`
           ]),
       '}'
   ].join('\n')
@@ -88,7 +88,7 @@ async function prepareOperations (ctx: GqlContext) {
     for (const op of operations) {
       if (ctx.clientOps?.[client]?.includes(op)) { continue }
 
-      ctx.clientOps[client].push(op)
+      ctx.clientOps?.[client].push(op)
     }
   }
 
@@ -105,11 +105,13 @@ function prepareTemplate (ctx: GqlContext) {
   ctx.clientTypes ||= {}
 
   ctx.clientTypes = Object.entries(ctx.template || {}).reduce((acc, [key, template]) => {
-    acc[key] = template.match(/^export\stype\s\w+(?=\s=\s)/gm)
+    const results = template.match(/^export\stype\s\w+(?=\s=\s)/gm)
       ?.filter(e => !['Scalars', 'SdkFunctionWrapper', 'Sdk'].some(f => e.includes(f)))
       .map(e => e.replace('export type ', ''))
 
-    return acc
+    if (!results) { return acc }
+
+    return { ...acc, [key]: results }
   }, {} as Record<string, string[]>)
 }
 

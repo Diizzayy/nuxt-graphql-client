@@ -5,7 +5,6 @@ import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createR
 import type { NameNode, DefinitionNode } from 'graphql'
 import { name, version } from '../package.json'
 import generate from './generate'
-import { deepmerge } from './runtime/utils'
 import { mapDocsToClients } from './utils'
 import type { GqlConfig, GqlClient, TokenOpts, GqlCodegen, TokenStorageOpts } from './types'
 import { prepareContext, mockTemplate } from './context'
@@ -66,7 +65,7 @@ export default defineNuxtModule<GqlConfig>({
     const ctx: GqlContext = {
       clientOps: {},
       fnImports: [],
-      clients: Object.keys(config.clients),
+      clients: Object.keys(config.clients!),
       codegen: !config?.codegen ? false : !(!nuxt.options._prepare && !nuxt.options.dev) ? (nuxt.options._prepare || nuxt.options.dev) : !config?.codegen?.disableOnBuild
     }
 
@@ -90,17 +89,17 @@ export default defineNuxtModule<GqlConfig>({
     nuxt.options.runtimeConfig['graphql-client'] = { clients: {} }
     nuxt.options.runtimeConfig.public['graphql-client'] = defu(nuxt.options.runtimeConfig.public['graphql-client'], { clients: {} })
 
-    const clientDefaults: Partial<GqlClient<TokenOpts> > = {
+    const clientDefaults = {
       token: { type: 'Bearer', name: 'Authorization' },
       proxyCookies: true,
       tokenStorage: config.tokenStorage,
       preferGETQueries: config?.preferGETQueries ?? false
-    }
+    } as GqlClient<object>
 
-    const defaultClient = (config?.clients?.default && 'default') || Object.keys(config.clients)[0]
+    const defaultClient = (config?.clients?.default && 'default') || Object.keys(config.clients!)[0]
 
-    for (const [k, v] of Object.entries(config.clients)) {
-      const conf = defu<GqlClient<TokenOpts>, [Partial<GqlClient<object>>]>(typeof v !== 'object'
+    for (const [k, v] of Object.entries(config.clients!)) {
+      const conf = defu<GqlClient<object>, [GqlClient<object>]>(typeof v !== 'object'
         ? { host: v }
         : { ...v, token: typeof v.token === 'string' ? { value: v.token } : v.token }, {
         ...clientDefaults,
@@ -116,10 +115,10 @@ export default defineNuxtModule<GqlConfig>({
       if (!conf?.host) { throw new Error(`GraphQL client (${k}) is missing it's host.`) }
 
       const runtimeToken = k === defaultClient ? process.env.GQL_TOKEN : process.env?.[`GQL_${k.toUpperCase()}_TOKEN`]
-      if (runtimeToken) { conf.token.value = runtimeToken }
+      if (runtimeToken) { conf.token = { ...conf.token, value: runtimeToken } }
 
       const runtimeTokenName = k === defaultClient ? process.env.GQL_TOKEN_NAME : process.env?.[`GQL_${k.toUpperCase()}_TOKEN_NAME`]
-      if (runtimeTokenName) { conf.token.name = runtimeTokenName }
+      if (runtimeTokenName) { conf.token = { ...conf.token, name: runtimeTokenName } }
 
       if (conf.tokenStorage) { conf.tokenStorage.name = conf.tokenStorage?.name || `gql:${k}` }
 
@@ -130,15 +129,15 @@ export default defineNuxtModule<GqlConfig>({
         logger.warn(`[nuxt-graphql-client] The Schema provided for the (${k}) GraphQL Client does not exist. \`host\` will be used as fallback.`)
       }
 
-      ctx.clientOps[k] = []
-      config.clients[k] = deepmerge({}, conf)
-      nuxt.options.runtimeConfig.public['graphql-client'].clients[k] = deepmerge({}, conf)
+      ctx.clientOps![k] = []
+      config.clients![k] = defu(conf, {})
+      nuxt.options.runtimeConfig.public['graphql-client'].clients![k] = defu(conf, {})
 
       if (conf?.token?.value) {
         nuxt.options.runtimeConfig['graphql-client'].clients[k] = { token: conf.token }
 
         if (!conf?.retainToken) {
-          (nuxt.options.runtimeConfig.public['graphql-client'] as GqlConfig).clients[k].token.value = undefined
+          (nuxt.options.runtimeConfig.public['graphql-client'] as GqlConfig).clients![k].token!.value = undefined
         }
       }
     }
@@ -169,7 +168,7 @@ export default defineNuxtModule<GqlConfig>({
       const plugins = ['typescript']
 
       if (documents?.length) {
-        ctx.clientDocs = mapDocsToClients(documents, ctx.clients)
+        ctx.clientDocs = mapDocsToClients(documents, ctx.clients!)
         plugins.push('typescript-operations', 'typescript-graphql-request')
       }
 
@@ -183,7 +182,7 @@ export default defineNuxtModule<GqlConfig>({
             clientDocs: ctx.clientDocs,
             ...(typeof config.codegen !== 'boolean' && config.codegen)
           }).then(output => output.reduce((acc, c) => ({ ...acc, [c.filename.split('.ts')[0]]: c.content }), {}))
-          : ctx.template = ctx.clients.reduce<Record<string, string>>((acc, k) => {
+          : ctx.template = ctx.clients?.reduce<Record<string, string>>((acc, k) => {
             const entries: Record<string, string> = {}
 
             for (const doc of ctx?.clientDocs?.[k] || []) {
@@ -201,7 +200,7 @@ export default defineNuxtModule<GqlConfig>({
           }, {})
       }
 
-      await prepareContext(ctx, config.functionPrefix)
+      await prepareContext(ctx, config.functionPrefix!)
     }
 
     addPlugin(resolver.resolve('runtime/plugin'))
@@ -211,12 +210,12 @@ export default defineNuxtModule<GqlConfig>({
 
       addTemplate({
         filename: 'gql.mjs',
-        getContents: () => ctx.generateImports()
+        getContents: () => ctx.generateImports?.() || ''
       })
 
       addTemplate({
         filename: 'gql/index.d.ts',
-        getContents: () => ctx.generateDeclarations()
+        getContents: () => ctx.generateDeclarations?.() || ''
       })
 
       for (const client of ctx.clients) {
@@ -228,7 +227,7 @@ export default defineNuxtModule<GqlConfig>({
       }
 
       nuxt.hook('imports:extend', (autoimports) => {
-        autoimports.push(...ctx.fnImports)
+        autoimports.push(...(ctx.fnImports || []))
       })
 
       addImportsDir(resolver.resolve('runtime/composables'))

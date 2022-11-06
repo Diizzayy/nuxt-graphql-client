@@ -2,6 +2,7 @@ import { defu } from 'defu'
 import { hash } from 'ohash'
 import type { Ref } from 'vue'
 import type { AsyncData } from 'nuxt/dist/app/composables'
+import type { ClientError } from 'graphql-request'
 import type { GqlState, GqlConfig, GqlError, TokenOpts, OnGqlError, GqlStateOpts } from '../../types'
 // @ts-ignore
 // eslint-disable-next-line import/named
@@ -18,6 +19,8 @@ const getGqlClient = (client?: GqlClients, state?: Ref<GqlState>): GqlClients =>
 const useGqlState = (): Ref<GqlState> => {
   const nuxtApp = useNuxtApp() as Partial<{ _gqlState: Ref<GqlState> }>
 
+  if (!nuxtApp._gqlState) { throw new Error('GQL State is not available.') }
+
   return nuxtApp?._gqlState
 }
 
@@ -27,7 +30,7 @@ const useGqlState = (): Ref<GqlState> => {
  *
  * */
 // The decision was made to avert using `GraphQLClient's` `setHeader(s)` helper in favor of reactivity and more granular control.
-const setGqlState = ({ client, patch }: {client: GqlClients, patch: GqlStateOpts['options']}) => {
+const setGqlState = ({ client, patch }: {client?: GqlClients, patch: GqlStateOpts['options']}) => {
   const state = useGqlState()
 
   client = getGqlClient(client, state)
@@ -35,7 +38,7 @@ const setGqlState = ({ client, patch }: {client: GqlClients, patch: GqlStateOpts
   const resetToken = patch?.token && !patch.token.value
   const resetHeaders = patch?.headers && !Object.keys(patch.headers).length
 
-  state.value[client].options = defu<GqlStateOpts['options'], [GqlStateOpts['options']]>(patch, {
+  state.value[client].options = defu(patch, {
     ...state.value[client]?.options,
     ...(resetToken && { token: undefined }),
     ...(resetHeaders && { headers: undefined })
@@ -134,16 +137,16 @@ export function useGqlToken (...args: any[]) {
 
   if (token !== undefined && typeof tokenStorage === 'object') {
     if (tokenStorage.mode === 'cookie') {
-      const cookie = useCookie(tokenStorage.name, tokenStorage.cookieOptions)
+      const cookie = useCookie(tokenStorage.name!, tokenStorage.cookieOptions)
 
       cookie.value = token
     }
 
     if (process.client && tokenStorage.mode === 'localStorage') {
       if (token !== null) {
-        localStorage.setItem(tokenStorage.name, token)
+        localStorage.setItem(tokenStorage.name!, token)
       } else {
-        localStorage.removeItem(tokenStorage.name)
+        localStorage.removeItem(tokenStorage.name!)
       }
     }
   }
@@ -165,10 +168,10 @@ interface GqlCors {
 /**
  * `useGqlCors` adds CORS headers to every request.
  *
- * @param {object} cors Options for the CORS headers
+ * @param {object} opts Options for the CORS headers
  * */
-export const useGqlCors = (cors: GqlCors) => {
-  const { mode, credentials, client } = cors || {}
+export const useGqlCors = (opts: GqlCors) => {
+  const { mode, credentials, client } = opts || {}
 
   setGqlState({ client, patch: { mode, credentials } })
 }
@@ -179,12 +182,12 @@ export const useGqlCors = (cors: GqlCors) => {
  * @param {string} host The host to be used for subsequent requests
  * @param {string} client The name of your GraphQL client. Defaults to either the client named `default` or the first configured client.
  */
-export const useGqlHost = (host?: string, client?: GqlClients) => {
+export const useGqlHost = (host: string, client?: GqlClients) => {
   const state = useGqlState()
 
   client = getGqlClient(client, state)
 
-  return state.value?.[client].instance.setEndpoint(host)
+  return state.value?.[client].instance!.setEndpoint(host)
 }
 
 export const useGql = (): (<
@@ -204,14 +207,16 @@ export const useGql = (): (<
     const operation = (typeof args?.[0] !== 'string' && 'operation' in args?.[0] ? args[0].operation : args[0]) ?? undefined
     const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? args[0].variables : args[1]) ?? undefined
 
-    const client = Object.keys(GqClientOps).find(k => GqClientOps[k].includes(operation)) ?? 'default'
+    const client = Object.keys(GqClientOps).find(k => GqClientOps[k as keyof typeof GqClientOps].includes(operation)) ?? 'default'
 
-    const { instance } = state.value?.[client]
+    const { instance } = state!.value?.[client]
 
-    return GqlSdks[client]?.(instance, async (action, operationName, operationType): Promise<any> => {
+    if (!instance) { throw new Error('Invalid GraphQL Operation') }
+
+    return GqlSdks[client as keyof typeof GqlSdks]!(instance, async (action, operationName, operationType): Promise<any> => {
       try {
         return await action()
-      } catch (err) {
+      } catch (err: ClientError | any) {
         errState.value = {
           client,
           operationType,
@@ -226,7 +231,7 @@ export const useGql = (): (<
 
         throw errState.value
       }
-    })[operation](variables)
+    })[operation as GqlOps](variables) as any
   }
 }
 
@@ -246,7 +251,7 @@ export const useGqlError = (onError: OnGqlError) => {
   // proactive measure to prevent context reliant calls
   useGqlState().value.onError = process.client
     ? onError
-    : process.env.NODE_ENV !== 'production' && (e => console.error('[nuxt-graphql-client] [GraphQL error]', e))
+    : (process.env.NODE_ENV !== 'production' && (e => console.error('[nuxt-graphql-client] [GraphQL error]', e))) || undefined
 
   const errState = useGqlErrorState()
 
@@ -255,7 +260,7 @@ export const useGqlError = (onError: OnGqlError) => {
   onError(errState.value)
 }
 
-const useGqlErrorState = () => useState<GqlError>('_gqlErrors', () => null)
+const useGqlErrorState = () => useState<GqlError | null>('_gqlErrors', () => null)
 
 /**
  * Asynchronously query data that is required to load a page or component.
