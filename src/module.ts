@@ -7,7 +7,7 @@ import type { NameNode, DefinitionNode } from 'graphql'
 import { name, version } from '../package.json'
 import generate from './generate'
 import { mapDocsToClients } from './utils'
-import type { GqlConfig, GqlClient, TokenOpts, GqlCodegen, TokenStorageOpts } from './types'
+import type { GqlConfig, GqlClient, GqlCodegen, TokenStorageOpts } from './types'
 import { prepareContext } from './context'
 import type { GqlContext } from './context'
 
@@ -169,7 +169,7 @@ export default defineNuxtModule<GqlConfig>({
       const plugins = ['typescript']
 
       if (documents?.length) {
-        ctx.clientDocs = mapDocsToClients(documents, ctx.clients)
+        ctx.clientDocs = mapDocsToClients(documents, ctx.clients!)
         plugins.push('typescript-operations', 'ohmygql/plugin')
       }
 
