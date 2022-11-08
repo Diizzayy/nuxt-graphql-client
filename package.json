@@ -66,5 +66,10 @@
     "nuxt": "^3.0.0-rc.13",
     "vitest": "^0.25.1"
   },
-  "packageManager": "pnpm@7.14.2"
+  "packageManager": "pnpm@7.14.2",
+  "pnpm": {
+    "patchedDependencies": {
+      "@graphql-codegen/cli@2.13.11": "patches/@graphql-codegen__cli@2.13.11.patch"
+    }
+  }
 }
