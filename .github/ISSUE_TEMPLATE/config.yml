@@ -1,0 +1,8 @@
+contact_links:
+  - name: 📚 Documentation
+    about: Check documentation for usage
+    url: https://nuxt-graphql-client.web.app
+
+  - name: 💬 Discussions
+    url: https://github.com/diizzayy/nuxt-graphql-client/discussions
+    about: Use discussions if you have an idea for improvement and asking questions

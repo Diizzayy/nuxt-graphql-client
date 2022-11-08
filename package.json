@@ -35,6 +35,8 @@
   "scripts": {
     "prepack": "pnpm build",
     "build": "nuxt-module-build",
+    "example": "./scripts/example.sh dev",
+    "example:build": "./scripts/example.sh build",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "test": "vitest run",
@@ -46,7 +48,7 @@
     "@graphql-codegen/cli": "2.13.4",
     "@graphql-codegen/typescript": "^2.7.3",
     "@graphql-codegen/typescript-operations": "^2.5.3",
-    "@nuxt/kit": "3.0.0-rc.12",
+    "@nuxt/kit": "3.0.0-rc.13",
     "defu": "^6.1.0",
     "graphql": "^16.6.0",
     "knitwork": "^0.1.2",
@@ -56,12 +58,12 @@
   },
   "devDependencies": {
     "@nuxt/module-builder": "latest",
-    "@nuxt/test-utils": "3.0.0-rc.12",
+    "@nuxt/test-utils": "3.0.0-rc.13",
     "@nuxtjs/eslint-config-typescript": "latest",
     "@vitest/coverage-c8": "^0.24.3",
     "eslint": "^8.23.1",
-    "nuxt": "^3.0.0-rc.12",
+    "nuxt": "^3.0.0-rc.13",
     "vitest": "^0.24.3"
   },
-  "packageManager": "pnpm@7.13.6"
+  "packageManager": "pnpm@7.14.2"
 }

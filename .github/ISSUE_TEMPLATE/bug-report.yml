@@ -1,0 +1,53 @@
+name: "\U0001F41B Bug report"
+description: "Something isn't working"
+
+labels: ["bug"]
+
+body:
+  - type: textarea
+    id: environment
+    validations:
+      required: true
+    attributes:
+      label: Environment
+      description: You can use `npx nuxi info` to fill this section
+      placeholder: Environment
+
+  - type: textarea
+    id: bug-description
+    validations:
+      required: true
+    attributes:
+      label: Describe the bug
+      description: "What isn't working? Describe the bug you've encountered."
+      placeholder: Bug description
+      
+  - type: textarea
+    id: expected-behaviour
+    validations:
+      required: true
+    attributes:
+      label: Expected behaviour
+      description: "What did you expect to happen? Is there a section in the docs about this?"
+      
+  - type: input
+    id: reproduction
+    validations:
+      required: false
+    attributes:
+      label: Reproduction
+      description: "A reproduction of the bug via https://stackblitz.com/github/diizzayy/nuxt-graphql-client/tree/main/examples/starter"
+      placeholder: https://stackblitz.com/[...]  
+      
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here.
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Optional if a reproduction is provided. Please try not to insert an image but copy paste the log text.
+      render: shell

@@ -17,7 +17,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     const cookie = (process.server && useRequestHeaders(['cookie'])?.cookie) || undefined
 
-    for (const [name, v] of Object.entries(clients)) {
+    for (const [name, v] of Object.entries(clients || {})) {
       const host = (process.client && v?.clientHost) || v.host
 
       const proxyCookie = v?.proxyCookies && !!cookie
@@ -43,13 +43,15 @@ export default defineNuxtPlugin((nuxtApp) => {
         if (token.value === undefined && typeof v.tokenStorage === 'object') {
           if (v.tokenStorage?.mode === 'cookie') {
             if (process.client) {
-              token.value = useCookie(v.tokenStorage.name).value
+              token.value = useCookie(v.tokenStorage.name!).value
             } else if (cookie) {
               const cookieName = `${v.tokenStorage.name}=`
               token.value = cookie.split(';').find(c => c.trim().startsWith(cookieName))?.split('=')?.[1]
             }
           } else if (process.client && v.tokenStorage?.mode === 'localStorage') {
-            token.value = localStorage.getItem(v.tokenStorage.name)
+            const storedToken = localStorage.getItem(v.tokenStorage.name!)
+
+            if (storedToken) { token.value = storedToken }
           }
         }
 
@@ -108,6 +110,6 @@ declare module '#app' {
     /**
      * `gql:auth:init` hook specifies how the authentication token is retrieved.
      */
-    'gql:auth:init': (params: { client: GqlClients, token: Ref<string> }) => void
+    'gql:auth:init': (params: { client: GqlClients, token: Ref<string | undefined> }) => void
   }
 }

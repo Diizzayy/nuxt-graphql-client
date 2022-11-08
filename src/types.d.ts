@@ -14,7 +14,7 @@ type TokenOpts = {
    *
    * @default "Bearer"
    * */
-  type?: string;
+  type?: string | null;
 
   value?: string;
 }
@@ -94,7 +94,7 @@ export interface GqlClient<T = string> {
     /**
      * Declare headers that should only be applied on server side.
      * */
-    serverOnly: Record<string, string>
+    serverOnly?: Record<string, string>
   }
 
   /**
@@ -109,12 +109,6 @@ export interface GqlClient<T = string> {
    * Declare headers that should only be applied to the GraphQL Code Generator.
    * */
   codegenHeaders?: Record<string, string>
-}
-
-export interface StitchOptions {
-  mergeTypes?: boolean
-  prefixTypes?: boolean
-  prefixFields?: boolean
 }
 
 export interface GqlCodegen {
@@ -222,7 +216,7 @@ export interface GqlConfig<T = GqlClient> {
    *
    * @note this option overrides the `GQL_HOST` in `runtimeConfig`.
    * */
-  clients?: Record<string, T extends GqlClient ? Partial<GqlClient<T>> : string | GqlClient<T>>
+  clients?: Record<string, T extends GqlClient ? GqlClient<T> : string | GqlClient<T>>
 
   /**
    * When enabled, queries will be sent as GET requests instead of POST requests.

@@ -4,7 +4,7 @@ import { setup, $fetch } from '@nuxt/test-utils'
 
 await setup({
   server: true,
-  rootDir: fileURLToPath(new URL('./fixtures/multi-client', import.meta.url))
+  rootDir: fileURLToPath(new URL('../examples/multi-client', import.meta.url))
 })
 
 describe('test multiple clients', () => {

@@ -5,6 +5,10 @@ export default defineNuxtConfig({
     preference: 'dark'
   },
 
+  routeRules: {
+    '/': { prerender: true }
+  },
+
   content: {
     highlight: {
       preload: ['graphql']

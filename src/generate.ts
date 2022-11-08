@@ -3,22 +3,22 @@ import { generate } from '@graphql-codegen/cli'
 import type { Resolver } from '@nuxt/kit'
 import type { CodegenConfig } from '@graphql-codegen/cli'
 
-import type { GqlConfig, GqlCodegen } from './types'
+import type { GqlClient, GqlCodegen } from './types'
 
 interface GenerateOptions {
   silent?: boolean
   plugins?: string[]
-  resolver? : Resolver
+  resolver?: Resolver
   documents?: string[]
   onlyOperationTypes?: boolean
-  clients?: GqlConfig['clients']
+  clients?: Record<string, GqlClient<GqlClient>>
   clientDocs?: Record<string, string[]>
 }
 
 function prepareConfig (options: GenerateOptions & GqlCodegen): CodegenConfig {
-  const prepareSchema = (v: GqlConfig['clients'][number]) => {
+  const prepareSchema = (v: GqlClient<object>) => {
     if (v.schema) {
-      v.schema = options.resolver.resolve(v.schema)
+      v.schema = options.resolver?.resolve(v.schema)
       return [v.schema]
     }
 
@@ -33,7 +33,7 @@ function prepareConfig (options: GenerateOptions & GqlCodegen): CodegenConfig {
 
     const headers = {
       ...(v?.headers && { ...(v.headers as Record<string, string>), ...serverHeaders }),
-      ...(token && { [v.token.name]: token }),
+      ...(token && { [v.token!.name!]: token }),
       ...v?.codegenHeaders
     }
 
@@ -50,7 +50,7 @@ function prepareConfig (options: GenerateOptions & GqlCodegen): CodegenConfig {
     }
   }
 
-  const generates: CodegenConfig['generates'] = Object.entries(options.clients).reduce((acc, [k, v]) => {
+  const generates: CodegenConfig['generates'] = Object.entries(options.clients || {}).reduce((acc, [k, v]) => {
     if (!options?.clientDocs?.[k]?.length) { return acc }
 
     return {
