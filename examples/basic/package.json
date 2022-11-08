@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "name": "example-basic",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "generate": "nuxt generate",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@nuxt/ui": "latest",
+    "nuxt": "3.0.0-rc.13",
+    "nuxt-graphql-client": "latest"
+  }
+}

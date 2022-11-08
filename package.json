@@ -35,6 +35,8 @@
   "scripts": {
     "prepack": "pnpm build",
     "build": "nuxt-module-build",
+    "example": "./scripts/example.sh dev",
+    "example:build": "./scripts/example.sh build",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "test": "vitest run",

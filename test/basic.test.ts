@@ -4,7 +4,7 @@ import { setup, $fetch } from '@nuxt/test-utils'
 
 await setup({
   server: true,
-  rootDir: fileURLToPath(new URL('./fixtures/basic', import.meta.url))
+  rootDir: fileURLToPath(new URL('../examples/basic', import.meta.url))
 })
 
 describe('test suite', () => {

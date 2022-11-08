@@ -1,0 +1,6 @@
+query ships($limit: Int = 5) {
+  ships(limit: $limit) {
+    id
+    name
+  }
+}
