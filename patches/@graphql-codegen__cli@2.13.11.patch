@@ -1,0 +1,44 @@
+diff --git a/cjs/config.js b/cjs/config.js
+index 29a8350e60ed2c262bb537ce2c164b29643768e0..915035f5d356bcb213085c1c7f07a27da0a87258 100644
+--- a/cjs/config.js
++++ b/cjs/config.js
+@@ -16,8 +16,6 @@ const module_1 = require("module");
+ const fs_1 = require("fs");
+ const crypto_1 = require("crypto");
+ const { lstat } = fs_1.promises;
+-// #8437: conflict with `graphql-config` also using TypeScriptLoader(), causing a double `ts-node` register.
+-const tsLoader = (0, cosmiconfig_typescript_loader_1.TypeScriptLoader)({ transpileOnly: true });
+ function generateSearchPlaces(moduleName) {
+     const extensions = ['json', 'yaml', 'yml', 'js', 'ts', 'config.js'];
+     // gives codegen.json...
+@@ -49,6 +47,8 @@ function customLoader(ext) {
+             return cosmiconfig_1.defaultLoaders['.js'](filepath, content);
+         }
+         if (ext === 'ts') {
++            // #8437: conflict with `graphql-config` also using TypeScriptLoader(), causing a double `ts-node` register.
++            const tsLoader = (0, cosmiconfig_typescript_loader_1.TypeScriptLoader)({ transpileOnly: true });
+             return tsLoader(filepath, content);
+         }
+     }
+diff --git a/esm/config.js b/esm/config.js
+index 3ee128a1156e1789ea37a7904f2fbfa795cce8d1..7343e8b7ea4f32e3a2acb47d93095b832dcbfef0 100644
+--- a/esm/config.js
++++ b/esm/config.js
+@@ -12,8 +12,6 @@ import { createRequire } from 'module';
+ import { promises } from 'fs';
+ import { createHash } from 'crypto';
+ const { lstat } = promises;
+-// #8437: conflict with `graphql-config` also using TypeScriptLoader(), causing a double `ts-node` register.
+-const tsLoader = TypeScriptLoader({ transpileOnly: true });
+ export function generateSearchPlaces(moduleName) {
+     const extensions = ['json', 'yaml', 'yml', 'js', 'ts', 'config.js'];
+     // gives codegen.json...
+@@ -44,6 +42,8 @@ function customLoader(ext) {
+             return defaultLoaders['.js'](filepath, content);
+         }
+         if (ext === 'ts') {
++            // #8437: conflict with `graphql-config` also using TypeScriptLoader(), causing a double `ts-node` register.
++            const tsLoader = TypeScriptLoader({ transpileOnly: true });
+             return tsLoader(filepath, content);
+         }
+     }
