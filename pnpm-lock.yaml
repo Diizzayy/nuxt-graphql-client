@@ -1,5 +1,10 @@
 lockfileVersion: 5.4
 
+patchedDependencies:
+  '@graphql-codegen/cli@2.13.11':
+    hash: td4ggolxjzqdvjgwrqv47k6kqi
+    path: patches/@graphql-codegen__cli@2.13.11.patch
+
 importers:
 
   .:
@@ -23,7 +28,7 @@ importers:
       scule: ^0.3.2
       vitest: ^0.25.1
     dependencies:
-      '@graphql-codegen/cli': 2.13.11_graphql@16.6.0
+      '@graphql-codegen/cli': 2.13.11_td4ggolxjzqdvjgwrqv47k6kqi_graphql@16.6.0
       '@graphql-codegen/typescript': 2.8.1_graphql@16.6.0
       '@graphql-codegen/typescript-graphql-request': 4.5.8_7lz647nkgovf4mzr2sitna7qte
       '@graphql-codegen/typescript-operations': 2.5.6_graphql@16.6.0
@@ -722,7 +727,7 @@ packages:
       - supports-color
     dev: true
 
-  /@graphql-codegen/cli/2.13.11_graphql@16.6.0:
+  /@graphql-codegen/cli/2.13.11_td4ggolxjzqdvjgwrqv47k6kqi_graphql@16.6.0:
     resolution: {integrity: sha512-PJF36a1i6M7Btj1kB4PWWzBUO3u2BJzsd/6KXxRmEugcxrbaCnbTDDktopy0CZYKdqaFbXaowwbRY8Tk8DV99Q==}
     hasBin: true
     peerDependencies:
@@ -777,8 +782,9 @@ packages:
       - typescript
       - utf-8-validate
     dev: false
+    patched: true
 
-  /@graphql-codegen/cli/2.13.11_siotesyb2nuw4tqpprclj4vbfq:
+  /@graphql-codegen/cli/2.13.11_td4ggolxjzqdvjgwrqv47k6kqi_siotesyb2nuw4tqpprclj4vbfq:
     resolution: {integrity: sha512-PJF36a1i6M7Btj1kB4PWWzBUO3u2BJzsd/6KXxRmEugcxrbaCnbTDDktopy0CZYKdqaFbXaowwbRY8Tk8DV99Q==}
     hasBin: true
     peerDependencies:
@@ -833,6 +839,7 @@ packages:
       - typescript
       - utf-8-validate
     dev: true
+    patched: true
 
   /@graphql-codegen/cli/2.13.4_siotesyb2nuw4tqpprclj4vbfq:
     resolution: {integrity: sha512-HhaLumR9/rov2WzDchZmIarD/MteNQOCiwgrOdS+A3WcUYBomeL8t5CoRsarFTc6McKoQIAdAqSl+eiNJ5oxJw==}
@@ -6851,7 +6858,7 @@ packages:
   /nuxt-graphql-client/0.2.10-edge.5db617e:
     resolution: {integrity: sha512-D+TC1wLvLcvGTtKPCHu53ioA6ECOdDcDvd0sTEiZtCHWSq7PU8q67l/UA5rJkQvksM83TUffCLrlIbjQantQmg==}
     dependencies:
-      '@graphql-codegen/cli': 2.13.11_siotesyb2nuw4tqpprclj4vbfq
+      '@graphql-codegen/cli': 2.13.11_td4ggolxjzqdvjgwrqv47k6kqi_siotesyb2nuw4tqpprclj4vbfq
       '@graphql-codegen/typescript': 2.8.1_graphql@16.6.0
       '@graphql-codegen/typescript-operations': 2.5.6_graphql@16.6.0
       '@nuxt/kit': 3.0.0-rc.13
