@@ -17,10 +17,10 @@ importers:
       eslint: ^8.27.0
       graphql: ^16.6.0
       graphql-request: ^5.0.0
-      knitwork: ^0.1.3
+      knitwork: ^1.0.0
       nuxt: latest
-      ohash: ^0.1.5
-      scule: ^0.3.2
+      ohash: ^1.0.0
+      scule: ^1.0.0
       vitest: ^0.25.1
     dependencies:
       '@graphql-codegen/cli': /graphql-codegen-cli-nuxt/0.0.0-patch.2.13.12-fix_graphql@16.6.0
@@ -31,9 +31,9 @@ importers:
       defu: 6.1.1
       graphql: 16.6.0
       graphql-request: 5.0.0_graphql@16.6.0
-      knitwork: 0.1.3
-      ohash: 0.1.5
-      scule: 0.3.2
+      knitwork: 1.0.0
+      ohash: 1.0.0
+      scule: 1.0.0
     devDependencies:
       '@nuxt/module-builder': 0.2.1
       '@nuxt/test-utils': 3.0.0
@@ -1084,18 +1084,6 @@ packages:
     dependencies:
       '@graphql-tools/schema': 9.0.4_graphql@16.6.0
       '@graphql-tools/utils': 8.12.0_graphql@16.6.0
-      graphql: 16.6.0
-      p-limit: 3.1.0
-      tslib: 2.4.1
-    dev: false
-
-  /@graphql-tools/load/7.8.6_graphql@16.6.0:
-    resolution: {integrity: sha512-yFDM5hVhV0eOom3SGyc+mjL8FvEb+0PZTZ/OSc4zrs3m/ABiQFHm2ilhzNS+OsMCpOsfGl2kXguEdt86QPp60Q==}
-    peerDependencies:
-      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
-    dependencies:
-      '@graphql-tools/schema': 9.0.10_graphql@16.6.0
-      '@graphql-tools/utils': 9.1.1_graphql@16.6.0
       graphql: 16.6.0
       p-limit: 3.1.0
       tslib: 2.4.1
@@ -5225,7 +5213,7 @@ packages:
     dependencies:
       '@graphql-tools/graphql-file-loader': 7.5.11_graphql@16.6.0
       '@graphql-tools/json-file-loader': 7.4.12_graphql@16.6.0
-      '@graphql-tools/load': 7.8.6_graphql@16.6.0
+      '@graphql-tools/load': 7.8.0_graphql@16.6.0
       '@graphql-tools/merge': 8.3.12_graphql@16.6.0
       '@graphql-tools/url-loader': 7.16.17_graphql@16.6.0
       '@graphql-tools/utils': 8.13.1_graphql@16.6.0
@@ -5958,10 +5946,6 @@ packages:
     resolution: {integrity: sha512-pJiBpiXMbt7dkzXe8Ghj/u4FfXOOa98fPW+bihOJ4SjnoijweJrNThJfd3ifXpXhREjpoF2mZVH1GfS9LV3kHQ==}
     engines: {node: '>= 8'}
     dev: true
-
-  /knitwork/0.1.3:
-    resolution: {integrity: sha512-f6Mz4kK8k0BAlGZn9Eb7mCUwSyRLoKTLr//u75tyLKm0jgt0ydnI8ubcTPwZjSJredpBZV7ry1EOrNbMJYT0mA==}
-    dev: false
 
   /knitwork/1.0.0:
     resolution: {integrity: sha512-dWl0Dbjm6Xm+kDxhPQJsCBTxrJzuGl0aP9rhr+TG8D3l+GL90N8O8lYUi7dTSAN2uuDqCtNgb6aEuQH5wsiV8Q==}
@@ -6829,13 +6813,8 @@ packages:
       ufo: 1.0.0
     dev: true
 
-  /ohash/0.1.5:
-    resolution: {integrity: sha512-qynly1AFIpGWEAW88p6DhMNqok/Swb52/KsiU+Toi7er058Ptvno3tkfTML6wYcEgFgp2GsUziW4Nqn62ciuyw==}
-    dev: false
-
   /ohash/1.0.0:
     resolution: {integrity: sha512-kxSyzq6tt+6EE/xCnD1XaFhCCjUNUaz3X30rJp6mnjGLXAAvuPFqohMdv0aScWzajR45C29HyBaXZ8jXBwnh9A==}
-    dev: true
 
   /ohmyfetch/0.4.21:
     resolution: {integrity: sha512-VG7f/JRvqvBOYvL0tHyEIEG7XHWm7OqIfAs6/HqwWwDfjiJ1g0huIpe5sFEmyb+7hpFa1EGNH2aERWR72tlClw==}
@@ -7789,10 +7768,6 @@ packages:
 
   /scuid/1.1.0:
     resolution: {integrity: sha512-MuCAyrGZcTLfQoH2XoBlQ8C6bzwN88XT/0slOGz0pn8+gIP85BOAfYa44ZXQUTOwRwPU0QvgU+V+OSajl/59Xg==}
-    dev: false
-
-  /scule/0.3.2:
-    resolution: {integrity: sha512-zIvPdjOH8fv8CgrPT5eqtxHQXmPNnV/vHJYffZhE43KZkvULvpCTvOt1HPlFaCZx287INL9qaqrZg34e8NgI4g==}
     dev: false
 
   /scule/1.0.0:
