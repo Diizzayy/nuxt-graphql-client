@@ -33,12 +33,12 @@ export default defineNuxtPlugin((nuxtApp) => {
           }
         })
       }
-
+      
       const authInit = async (reqOpts: GqlStateOpts['options']) => {
         const token = ref<string>()
         await nuxtApp.callHook('gql:auth:init', { token, client: name as GqlClients })
 
-        token.value ??= reqOpts?.token?.value
+        if (!token.value) { token.value = reqOpts?.token?.value }
 
         if (token.value === undefined && typeof v.tokenStorage === 'object') {
           if (v.tokenStorage?.mode === 'cookie') {
@@ -55,7 +55,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           }
         }
 
-        if (token.value === undefined) { token.value ??= v?.token?.value }
+        if (token.value === undefined) { token.value = v?.token?.value }
 
         if (token.value) {
           token.value = token.value.trim()
