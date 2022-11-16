@@ -33,7 +33,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           }
         })
       }
-      
+
       const authInit = async (reqOpts: GqlStateOpts['options']) => {
         const token = ref<string>()
         await nuxtApp.callHook('gql:auth:init', { token, client: name as GqlClients })
