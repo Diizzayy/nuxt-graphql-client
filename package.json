@@ -45,7 +45,7 @@
     "prepare": "nuxt-module-build --stub && nuxi prepare playground"
   },
   "dependencies": {
-    "@graphql-codegen/cli": "2.13.11",
+    "@graphql-codegen/cli": "npm:graphql-codegen-cli-nuxt@latest",
     "@graphql-codegen/typescript": "^2.8.1",
     "@graphql-codegen/typescript-graphql-request": "^4.5.8",
     "@graphql-codegen/typescript-operations": "^2.5.6",
@@ -66,10 +66,5 @@
     "nuxt": "latest",
     "vitest": "^0.25.1"
   },
-  "packageManager": "pnpm@7.14.2",
-  "pnpm": {
-    "patchedDependencies": {
-      "@graphql-codegen/cli@2.13.11": "patches/@graphql-codegen__cli@2.13.11.patch"
-    }
-  }
+  "packageManager": "pnpm@7.16.0"
 }

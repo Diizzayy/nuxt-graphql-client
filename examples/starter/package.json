@@ -10,6 +10,6 @@
   "devDependencies": {
     "@nuxt/ui": "latest",
     "nuxt": "latest",
-    "nuxt-graphql-client": "0.2.10-edge.5db617e"
+    "nuxt-graphql-client": "latest"
   }
 }
