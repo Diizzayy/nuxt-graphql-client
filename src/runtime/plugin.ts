@@ -47,7 +47,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
             const reqOpts = defu(nuxtApp._gqlState.value?.[name]?.options || {}, { headers: {} })
 
-            token.value ??= reqOpts?.token?.value
+            if (!token.value) { token.value = reqOpts?.token?.value }
 
             if (token.value === undefined && typeof v.tokenStorage === 'object') {
               if (v.tokenStorage?.mode === 'cookie') {
@@ -64,7 +64,7 @@ export default defineNuxtPlugin((nuxtApp) => {
               }
             }
 
-            if (token.value === undefined) { token.value ??= v?.token?.value }
+            if (token.value === undefined) { token.value = v?.token?.value }
 
             if (token.value) {
               token.value = token.value.trim()
