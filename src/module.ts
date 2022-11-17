@@ -130,10 +130,11 @@ export default defineNuxtModule<GqlConfig>({
       }
 
       ctx.clientOps![k] = []
-      config.clients![k] = defu(conf, {})
+      config.clients![k] = JSON.parse(JSON.stringify(conf))
       nuxt.options.runtimeConfig.public['graphql-client'].clients![k] = defu(conf, {})
 
       if (conf?.token?.value) {
+        // @ts-ignore
         nuxt.options.runtimeConfig['graphql-client'].clients[k] = { token: conf.token }
 
         if (!conf?.retainToken) {
