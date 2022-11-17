@@ -129,6 +129,25 @@ export default defineNuxtModule<GqlConfig>({
         logger.warn(`[nuxt-graphql-client] The Schema provided for the (${k}) GraphQL Client does not exist. \`host\` will be used as fallback.`)
       }
 
+      switch (conf?.preset) {
+        case 'supabase':
+          if (!process.env.SUPABASE_API_KEY) { throw new Error('Missing Supabase API Key') }
+          conf.headers = defu(conf.headers, { apiKey: process.env.SUPABASE_API_KEY })
+          break
+        case 'hasura':
+          if (!process.env.HASURA_ADMIN_SECRET) { throw new Error('Missing Hasura Admin Secret') }
+          // conf.headers = defu(conf.headers, {
+          //   serverOnly: { 'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET }
+          // })
+
+          conf.codegenHeaders = defu(conf.codegenHeaders, {
+            'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET
+          })
+          break
+      }
+
+      // Add client presets for popular GraphQL APIs such
+
       ctx.clientOps![k] = []
       config.clients![k] = JSON.parse(JSON.stringify(conf))
       nuxt.options.runtimeConfig.public['graphql-client'].clients![k] = defu(conf, {})

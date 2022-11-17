@@ -40,6 +40,8 @@ type TokenStorageOpts = {
   cookieOptions?: Omit< CookieOptions, 'encode' | 'decode' | 'expires' | 'default'>;
 }
 
+export type GqlClientPreset = 'hasura' | 'supabase' | 'strapi' | 'sanity'
+
 export interface GqlClient<T = string> {
   host: string
 
@@ -110,6 +112,8 @@ export interface GqlClient<T = string> {
    * Declare headers that should only be applied to the GraphQL Code Generator.
    * */
   codegenHeaders?: Record<string, string>
+
+  preset?: GqlClientPreset
 }
 
 export interface GqlCodegen {
