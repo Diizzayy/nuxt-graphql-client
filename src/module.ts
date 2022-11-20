@@ -131,7 +131,7 @@ export default defineNuxtModule<GqlConfig>({
 
       ctx.clientOps![k] = []
       config.clients![k] = JSON.parse(JSON.stringify(conf))
-      nuxt.options.runtimeConfig.public['graphql-client'].clients![k] = defu(conf, {})
+      nuxt.options.runtimeConfig.public['graphql-client'].clients![k] = JSON.parse(JSON.stringify(conf))
 
       if (conf?.token?.value) {
         // @ts-ignore
