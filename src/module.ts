@@ -104,7 +104,7 @@ export default defineNuxtModule<GqlConfig>({
         ? { host: v }
         : { ...v, token: typeof v.token === 'string' ? { value: v.token } : v.token }, {
         ...clientDefaults,
-        ...(typeof v === 'object' && typeof v.token !== 'string' && v?.token?.type === null && { token: { type: null } })
+        ...(typeof v === 'object' && typeof v.token !== 'string' && v?.token?.type === null && { token: { ...clientDefaults.token, type: null } })
       })
 
       const runtimeHost = k === defaultClient ? process.env.GQL_HOST : process.env?.[`GQL_${k.toUpperCase()}_HOST`]
@@ -131,10 +131,11 @@ export default defineNuxtModule<GqlConfig>({
       }
 
       ctx.clientOps![k] = []
-      config.clients![k] = defu(conf, {})
-      nuxt.options.runtimeConfig.public['graphql-client'].clients![k] = defu(conf, {})
+      config.clients![k] = JSON.parse(JSON.stringify(conf))
+      nuxt.options.runtimeConfig.public['graphql-client'].clients![k] = JSON.parse(JSON.stringify(conf))
 
       if (conf?.token?.value) {
+        // @ts-ignore
         nuxt.options.runtimeConfig['graphql-client'].clients[k] = { token: conf.token }
 
         if (!conf?.retainToken) {
@@ -158,7 +159,7 @@ export default defineNuxtModule<GqlConfig>({
     }
 
     const gqlMatch = '**/*.{gql,graphql}'
-    async function generateGqlTypes () {
+    async function generateGqlTypes (hmrDoc?: string) {
       const documents: string[] = []
       for await (const path of documentPaths) {
         const files = (await resolveFiles(path, [gqlMatch, '!**/schemas'], { followSymbolicLinks: false })).filter(allowDocument)
@@ -174,19 +175,27 @@ export default defineNuxtModule<GqlConfig>({
       }
 
       if (ctx.clientDocs) {
-        ctx.template = ctx?.codegen
+        const clientDocs = !hmrDoc
+          ? ctx.clientDocs
+          : Object.keys(ctx.clientDocs)
+            .filter(k => ctx.clientDocs?.[k]?.some(e => e.endsWith(hmrDoc)))
+            .reduce((acc, k) => ({ ...acc, [k]: ctx.clientDocs?.[k] }), {})
+
+        const codegenResult = ctx?.codegen
           ? await generate({
             clients: config.clients as GqlConfig['clients'],
             plugins,
             documents,
             resolver: srcResolver,
-            clientDocs: ctx.clientDocs,
+            clientDocs,
             ...(typeof config.codegen !== 'boolean' && config.codegen)
-          }).then(output => output.reduce((acc, c) => ({ ...acc, [c.filename.split('.ts')[0]]: c.content }), {}))
-          : ctx.template = ctx.clients?.reduce<Record<string, string>>((acc, k) => {
+          }).then(output => output.reduce<Record<string, string>>((acc, c) => ({ ...acc, [c.filename.split('.ts')[0]]: c.content }), {}))
+          : ctx.clients!.reduce<Record<string, string>>((acc, k) => {
             const entries: Record<string, string> = {}
 
-            for (const doc of ctx?.clientDocs?.[k] || []) {
+            if (!clientDocs?.[k]?.length) { return acc }
+
+            for (const doc of clientDocs?.[k] || []) {
               const definitions = parse(readFileSync(doc, 'utf-8'))?.definitions as (DefinitionNode & { name: NameNode })[]
 
               for (const op of definitions) {
@@ -199,6 +208,8 @@ export default defineNuxtModule<GqlConfig>({
 
             return { ...acc, [k]: mockPlugin(entries) }
           }, {})
+
+        ctx.template = defu(codegenResult, ctx.template)
       }
 
       await prepareContext(ctx, config.functionPrefix!)
@@ -247,7 +258,7 @@ export default defineNuxtModule<GqlConfig>({
         if (event !== 'unlink' && !allowDocument(path)) { return }
 
         const start = Date.now()
-        await generateGqlTypes()
+        await generateGqlTypes(path)
         await nuxt.callHook('builder:generateApp')
 
         const time = Date.now() - start
