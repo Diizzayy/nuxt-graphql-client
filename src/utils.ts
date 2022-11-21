@@ -1,3 +1,7 @@
+import { readFileSync } from 'fs'
+import { parse } from 'graphql'
+import type { DefinitionNode, NameNode } from 'graphql'
+
 export const mapDocsToClients = (documents: string[], clients: string[]) => {
   const mappedDocs = new Set()
 
@@ -26,4 +30,21 @@ export const mapDocsToClients = (documents: string[], clients: string[]) => {
 
     return acc
   }, {} as Record<string, string[]>)
+}
+
+export const extractGqlOperations = (docs: string[]): Record<string, string> => {
+  const entries: Record<string, string> = {}
+
+  for (const doc of docs) {
+    const definitions = parse(readFileSync(doc, 'utf-8'))?.definitions as (DefinitionNode & { name: NameNode })[]
+
+    for (const op of definitions) {
+      const name: string = op?.name?.value
+      const operation = op.loc?.source.body.slice(op.loc.start, op.loc.end) || undefined
+
+      if (name && operation) { entries[name] = operation }
+    }
+  }
+
+  return entries
 }
