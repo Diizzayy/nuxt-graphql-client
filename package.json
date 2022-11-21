@@ -9,7 +9,7 @@
     "gql",
     "graphql",
     "graphql-client",
-    "ohmyfetch",
+    "ofetch",
     "codegen",
     "graphql-code-generator"
   ],
@@ -54,7 +54,7 @@
     "graphql": "^16.6.0",
     "knitwork": "^1.0.0",
     "ohash": "^1.0.0",
-    "ohmygql": "^1.0.10",
+    "ohmygql": "^1.0.11",
     "scule": "^1.0.0"
   },
   "devDependencies": {
@@ -62,7 +62,7 @@
     "@nuxt/test-utils": "latest",
     "@nuxtjs/eslint-config-typescript": "latest",
     "@vitest/coverage-c8": "^0.25.1",
-    "eslint": "^8.27.0",
+    "eslint": "^8.28.0",
     "nuxt": "latest",
     "playwright": "^1.28.0",
     "vitest": "^0.25.1"
