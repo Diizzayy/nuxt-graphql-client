@@ -4,6 +4,7 @@ import { setup, createPage } from '@nuxt/test-utils'
 
 await setup({
   server: true,
+  browser: true,
   rootDir: fileURLToPath(new URL('../examples/subscription', import.meta.url))
 })
 
