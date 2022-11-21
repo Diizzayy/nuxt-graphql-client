@@ -1,0 +1,7 @@
+query getTodos { todos { id text } }
+
+query getTodo($id: Int!) { todo (id: $id) { id text } }
+
+mutation createTodo($todo: TodoInput!) { createTodo(todo: $todo) { id text } }
+
+subscription todoAdded { todoAdded { id text } }
