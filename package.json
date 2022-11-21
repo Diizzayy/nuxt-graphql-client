@@ -64,6 +64,7 @@
     "@vitest/coverage-c8": "^0.25.1",
     "eslint": "^8.27.0",
     "nuxt": "latest",
+    "playwright": "^1.28.0",
     "vitest": "^0.25.1"
   },
   "packageManager": "pnpm@7.16.0"
