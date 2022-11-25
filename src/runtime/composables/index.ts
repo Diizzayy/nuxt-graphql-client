@@ -272,7 +272,8 @@ const useGqlErrorState = () => useState<GqlError | null>('_gqlErrors', () => nul
  */
 export function useAsyncGql<
 T extends GqlOps,
-P extends Parameters<GqlSdkFuncs[T]>['0'],
+p extends Parameters<GqlSdkFuncs[T]>['0'],
+P extends { [K in keyof p]: Ref<p[K]> | p[K] },
 R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
 O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variables?: P, options?: O }): Promise<R>
 
@@ -285,14 +286,19 @@ O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variab
  */
 export function useAsyncGql<
 T extends GqlOps,
-P extends Parameters<GqlSdkFuncs[T]>['0'],
+p extends Parameters<GqlSdkFuncs[T]>['0'],
+P extends { [K in keyof p]: Ref<p[K]> | p[K] },
 R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
 O extends Parameters<typeof useAsyncData>['2']> (operation: T, variables?: P, options?: O): Promise<R>
 
 export function useAsyncGql (...args: any[]) {
   const operation = (typeof args?.[0] !== 'string' && 'operation' in args?.[0] ? args[0].operation : args[0]) ?? undefined
-  const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? args[0].variables : args[1]) ?? undefined
-  const options = (typeof args?.[0] !== 'string' && 'options' in args?.[0] ? args[0].options : args[2]) ?? undefined
+  const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? reactive(args[0].variables) : reactive(args[1])) ?? undefined
+  const options = (typeof args?.[0] !== 'string' && 'options' in args?.[0] ? args[0].options : args[2]) ?? {}
+  if (variables) {
+    options.watch = options.watch || []
+    options.watch.push(variables)
+  }
   const key = hash({ operation, variables })
   // @ts-ignore
   return useAsyncData(key, () => useGql()(operation, variables), options)
