@@ -1,5 +1,6 @@
 import { defu } from 'defu'
 import { hash } from 'ohash'
+import { reactive } from 'vue'
 import type { Ref } from 'vue'
 import type { AsyncData } from 'nuxt/dist/app/composables'
 import type { ClientError } from 'graphql-request'
