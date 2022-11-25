@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request'
-import type { GqlConfig } from '../../types'
+import type { GqlConfig } from '../types'
 // @ts-ignore
 import { defineNitroPlugin } from '#internal/nitro'
 // @ts-ignore
