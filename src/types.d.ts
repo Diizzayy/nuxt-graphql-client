@@ -88,6 +88,15 @@ export interface GqlClient<T = string> {
   proxyCookies?: boolean
 
   /**
+   * Specify CORS options to be used for client-side requests.
+   * @type {object}
+   * */
+  corsOptions?: {
+    mode?: RequestMode
+    credentials?: RequestCredentials
+  }
+
+  /**
    * Specify additional headers to be passed to the GraphQL client.
    * */
   headers?: Record<string, string> | {
@@ -236,7 +245,7 @@ export type GqlError = {
   client?: string
   statusCode?: number
   operation?: GqlOperation
-  gqlErrors?: GraphQLError[]
+  gqlErrors: GraphQLError[]
 }
 
 export type OnGqlError = <T>(error: GqlError) => Promise<T> | any

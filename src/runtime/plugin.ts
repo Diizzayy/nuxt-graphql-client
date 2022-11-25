@@ -31,7 +31,8 @@ export default defineNuxtPlugin((nuxtApp) => {
             ...(v?.headers && { ...(v.headers as Record<string, string>), ...serverHeaders }),
             ...(proxyCookie && { cookie })
           }
-        })
+        }),
+        ...v?.corsOptions
       }
 
       const authInit = async (reqOpts: GqlStateOpts['options']) => {

@@ -1,12 +1,12 @@
 import { defu } from 'defu'
 import { hash } from 'ohash'
+import { reactive } from 'vue'
 import type { Ref } from 'vue'
 import { extractOperation } from 'ohmygql/utils'
 import type { AsyncData } from 'nuxt/dist/app/composables'
 import type { ClientError } from 'graphql-request'
 import type { GqlState, GqlConfig, GqlError, TokenOpts, OnGqlError, GqlStateOpts } from '../../types'
 // @ts-ignore
-// eslint-disable-next-line import/named
 import { GqlSdks, GqClientOps } from '#gql'
 import type { GqlOps, GqlClients, GqlSdkFuncs } from '#gql'
 import { useState, useCookie, useNuxtApp, useAsyncData, useRuntimeConfig } from '#imports'
@@ -188,7 +188,15 @@ export const useGqlHost = (host: string, client?: GqlClients) => {
 
   client = getGqlClient(client, state)
 
-  return state.value?.[client].instance.setHost(host)
+  if (!host.match(/^https?:\/\//)) {
+    const initialHost = (useRuntimeConfig()?.public?.['graphql-client'] as GqlConfig)?.clients?.[client]?.host
+
+    if (initialHost?.endsWith('/') && host.startsWith('/')) { host = host.slice(1) }
+
+    host = `${initialHost}${host}`
+  }
+
+  state.value?.[client].instance!.setHost(host)
 }
 
 export const useGql = (): (<
@@ -268,7 +276,8 @@ const useGqlErrorState = () => useState<GqlError | null>('_gqlErrors', () => nul
  */
 export function useAsyncGql<
 T extends GqlOps,
-P extends Parameters<GqlSdkFuncs[T]>['0'],
+p extends Parameters<GqlSdkFuncs[T]>['0'],
+P extends { [K in keyof p]: Ref<p[K]> | p[K] },
 R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
 O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variables?: P, options?: O }): Promise<R>
 
@@ -281,14 +290,19 @@ O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variab
  */
 export function useAsyncGql<
 T extends GqlOps,
-P extends Parameters<GqlSdkFuncs[T]>['0'],
+p extends Parameters<GqlSdkFuncs[T]>['0'],
+P extends { [K in keyof p]: Ref<p[K]> | p[K] },
 R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
 O extends Parameters<typeof useAsyncData>['2']> (operation: T, variables?: P, options?: O): Promise<R>
 
 export function useAsyncGql (...args: any[]) {
   const operation = (typeof args?.[0] !== 'string' && 'operation' in args?.[0] ? args[0].operation : args[0]) ?? undefined
-  const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? args[0].variables : args[1]) ?? undefined
-  const options = (typeof args?.[0] !== 'string' && 'options' in args?.[0] ? args[0].options : args[2]) ?? undefined
+  const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? reactive(args[0].variables) : reactive(args[1])) ?? undefined
+  const options = (typeof args?.[0] !== 'string' && 'options' in args?.[0] ? args[0].options : args[2]) ?? {}
+  if (variables) {
+    options.watch = options.watch || []
+    options.watch.push(variables)
+  }
   const key = hash({ operation, variables })
   // @ts-ignore
   return useAsyncData(key, () => useGql()(operation, variables), options)

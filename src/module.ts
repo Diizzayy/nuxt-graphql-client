@@ -1,12 +1,11 @@
-import { existsSync, statSync, readFileSync } from 'fs'
+import { existsSync, statSync } from 'fs'
 import { defu } from 'defu'
-import { parse } from 'graphql'
+import { upperFirst } from 'scule'
 import { mockPlugin } from 'ohmygql/plugin'
-import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createResolver, defineNuxtModule, extendViteConfig } from '@nuxt/kit'
-import type { NameNode, DefinitionNode } from 'graphql'
+import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createResolver, defineNuxtModule } from '@nuxt/kit'
 import { name, version } from '../package.json'
 import generate from './generate'
-import { mapDocsToClients } from './utils'
+import { mapDocsToClients, extractGqlOperations } from './utils'
 import type { GqlConfig, GqlClient, GqlCodegen, TokenStorageOpts } from './types'
 import { prepareContext } from './context'
 import type { GqlContext } from './context'
@@ -191,20 +190,9 @@ export default defineNuxtModule<GqlConfig>({
             ...(typeof config.codegen !== 'boolean' && config.codegen)
           }).then(output => output.reduce<Record<string, string>>((acc, c) => ({ ...acc, [c.filename.split('.ts')[0]]: c.content }), {}))
           : ctx.clients!.reduce<Record<string, string>>((acc, k) => {
-            const entries: Record<string, string> = {}
-
             if (!clientDocs?.[k]?.length) { return acc }
 
-            for (const doc of clientDocs?.[k] || []) {
-              const definitions = parse(readFileSync(doc, 'utf-8'))?.definitions as (DefinitionNode & { name: NameNode })[]
-
-              for (const op of definitions) {
-                const name: string = op?.name?.value
-                const operation = op.loc?.source.body.slice(op.loc.start, op.loc.end) || undefined
-
-                if (name && operation) { entries[name] = operation }
-              }
-            }
+            const entries = extractGqlOperations(ctx?.clientDocs?.[k] || [])
 
             return { ...acc, [k]: mockPlugin(entries) }
           }, {})
@@ -244,6 +232,44 @@ export default defineNuxtModule<GqlConfig>({
 
       addImportsDir(resolver.resolve('runtime/composables'))
     }
+
+    nuxt.hook('nitro:config', (nitro) => {
+      if (nitro.imports === false) { return }
+
+      nitro.externals = nitro.externals || {}
+      nitro.externals.inline = nitro.externals.inline || []
+      nitro.externals.inline.push(resolver.resolve('runtime'))
+
+      const clientSdks = Object.entries(ctx.clientDocs || {}).reduce<string[]>((acc, [client, docs]) => {
+        const entries = extractGqlOperations(docs)
+
+        return [...acc, `${client}: ` + mockPlugin(entries).replace('export ', '')]
+      }, [])
+
+      nitro.virtual = nitro.virtual || {}
+      nitro.virtual['#gql-nitro'] = [
+        'const clientSdks = {' + clientSdks + '}',
+        'const config = ' + JSON.stringify(config.clients),
+        'const ops = ' + JSON.stringify(ctx.clientOps),
+        'const clients = {}',
+        'const useGql = (op, variables = undefined) => {',
+        ' const client = Object.keys(ops).find(k => ops[k].includes(op))',
+        ' return clientSdks[client](clients?.[client])[op](variables)',
+        '}',
+        ctx.fns?.map(fn => `export const ${config.functionPrefix + upperFirst(fn)} = (...params) => useGql('${fn}', ...params)`).join('\n'),
+        'export default { clients, config }'
+      ].join('\n')
+
+      nitro.imports = defu(nitro.imports, {
+        presets: [{
+          from: '#gql-nitro',
+          imports: ctx.fns?.map(fn => config.functionPrefix + upperFirst(fn))
+        }]
+      })
+
+      nitro.plugins = nitro.plugins || []
+      nitro.plugins.push(resolver.resolve('runtime/nitro'))
+    })
 
     const allowDocument = (f: string) => {
       const isSchema = f.match(/([^/]+)\.(gql|graphql)$/)?.[0]?.toLowerCase().includes('schema')
