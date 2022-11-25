@@ -6,7 +6,6 @@ import type { AsyncData } from 'nuxt/dist/app/composables'
 import type { ClientError } from 'graphql-request'
 import type { GqlState, GqlConfig, GqlError, TokenOpts, OnGqlError, GqlStateOpts } from '../../types'
 // @ts-ignore
-// eslint-disable-next-line import/named
 import { GqlSdks, GqClientOps } from '#gql'
 import type { GqlOps, GqlClients, GqlSdkFuncs } from '#gql'
 import { useState, useCookie, useNuxtApp, useAsyncData, useRuntimeConfig } from '#imports'
@@ -187,6 +186,14 @@ export const useGqlHost = (host: string, client?: GqlClients) => {
   const state = useGqlState()
 
   client = getGqlClient(client, state)
+
+  if (!host.match(/^https?:\/\//)) {
+    const initialHost = (useRuntimeConfig()?.public?.['graphql-client'] as GqlConfig)?.clients?.[client]?.host
+
+    if (initialHost?.endsWith('/') && host.startsWith('/')) { host = host.slice(1) }
+
+    host = `${initialHost}${host}`
+  }
 
   return state.value?.[client].instance!.setEndpoint(host)
 }
