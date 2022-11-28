@@ -1,7 +1,7 @@
 import { existsSync, statSync } from 'fs'
 import { defu } from 'defu'
 import { upperFirst } from 'scule'
-import { mockPlugin } from 'ohmygql/plugin'
+import { mockPlugin } from 'ogql/plugin'
 import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createResolver, defineNuxtModule } from '@nuxt/kit'
 import { name, version } from '../package.json'
 import generate from './generate'
@@ -170,7 +170,7 @@ export default defineNuxtModule<GqlConfig>({
 
       if (documents?.length) {
         ctx.clientDocs = mapDocsToClients(documents, ctx.clients!)
-        plugins.push('typescript-operations', 'ohmygql/plugin')
+        plugins.push('typescript-operations', 'ogql/plugin')
       }
 
       if (ctx.clientDocs) {

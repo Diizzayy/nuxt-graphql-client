@@ -1,6 +1,6 @@
 import { defu } from 'defu'
 import type { Ref } from 'vue'
-import { GqlClient } from 'ohmygql'
+import { GqlClient } from 'ogql'
 import type { GqlState, GqlConfig, GqlStateOpts } from '../types'
 import { ref, useCookie, useNuxtApp, defineNuxtPlugin, useRuntimeConfig, useRequestHeaders } from '#imports'
 import type { GqlClients } from '#gql'

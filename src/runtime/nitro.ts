@@ -1,4 +1,4 @@
-import { GqlClient } from 'ohmygql'
+import { GqlClient } from 'ogql'
 import type { GqlConfig } from '../types'
 // @ts-ignore
 import { defineNitroPlugin } from '#internal/nitro'

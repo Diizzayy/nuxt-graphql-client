@@ -1,4 +1,4 @@
-import type { GqlClient as GQLClient, GraphQLError, GqlOperation } from 'ohmygql'
+import type { GqlClient as GQLClient, GraphQLError, GqlOperation } from 'ogql'
 import type { CookieOptions } from 'nuxt/dist/app/composables'
 
 type TokenOpts = {

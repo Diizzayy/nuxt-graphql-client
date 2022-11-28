@@ -47,14 +47,13 @@
   "dependencies": {
     "@graphql-codegen/cli": "npm:graphql-codegen-cli-nuxt@latest",
     "@graphql-codegen/typescript": "^2.8.1",
-    "@graphql-codegen/typescript-graphql-request": "^4.5.8",
     "@graphql-codegen/typescript-operations": "^2.5.6",
     "@nuxt/kit": "latest",
     "defu": "^6.1.0",
     "graphql": "^16.6.0",
     "knitwork": "^1.0.0",
+    "ogql": "^0.0.1",
     "ohash": "^1.0.0",
-    "ohmygql": "^1.0.11",
     "scule": "^1.0.0"
   },
   "devDependencies": {
@@ -67,5 +66,8 @@
     "playwright": "^1.28.0",
     "vitest": "^0.25.1"
   },
-  "packageManager": "pnpm@7.16.0"
+  "resolutions": {
+    "nuxt-graphql-client": "workspace:*"
+  },
+  "packageManager": "pnpm@7.17.1"
 }
