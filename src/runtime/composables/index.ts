@@ -1,6 +1,6 @@
 import { defu } from 'defu'
 import { hash } from 'ohash'
-import { reactive } from 'vue'
+import { isRef, reactive } from 'vue'
 import type { Ref } from 'vue'
 import type { AsyncData } from 'nuxt/dist/app/composables'
 import type { ClientError } from 'graphql-request'
@@ -300,9 +300,10 @@ R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
 O extends Parameters<typeof useAsyncData>['2']> (operation: T, variables?: P, options?: O): Promise<R>
 
 export function useAsyncGql (...args: any[]) {
+  const toReactive = val => isRef(val) ? val : reactive(val)
   const options = (typeof args?.[0] !== 'string' && 'options' in args?.[0] ? args[0].options : args[2]) ?? {}
   const operation = (typeof args?.[0] !== 'string' && 'operation' in args?.[0] ? args[0].operation : args[0]) ?? undefined
-  const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? reactive(args[0].variables) : args[1] && reactive(args[1])) ?? undefined
+  const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? toReactive(args[0].variables) : args[1] && toReactive(args[1])) ?? undefined
   if (variables) {
     options.watch = options.watch || []
     options.watch.push(variables)
