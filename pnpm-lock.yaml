@@ -53,6 +53,16 @@ importers:
       nuxt: 3.0.0
       nuxt-graphql-client: link:../..
 
+  examples/extends:
+    specifiers:
+      '@nuxt/ui': latest
+      nuxt: latest
+      nuxt-graphql-client: latest
+    devDependencies:
+      '@nuxt/ui': 0.3.3_nuxt@3.0.0
+      nuxt: 3.0.0
+      nuxt-graphql-client: link:../..
+
   examples/multi-client:
     specifiers:
       '@nuxt/ui': latest
@@ -7683,6 +7693,7 @@ packages:
 
   /rollup-plugin-terser/7.0.2_rollup@2.79.1:
     resolution: {integrity: sha512-w3iIaU4OxcF52UUXiZNsNeuXIMDvFrr+ZXK6bFZ0Q60qyVfq4uLptoS4bbq3paG3x216eQllFZX7zt6TIImguQ==}
+    deprecated: This package has been deprecated and is no longer maintained. Please use @rollup/plugin-terser
     peerDependencies:
       rollup: ^2.0.0
     dependencies:
@@ -7951,6 +7962,7 @@ packages:
 
   /sourcemap-codec/1.4.8:
     resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
+    deprecated: Please use @jridgewell/sourcemap-codec instead
 
   /spdx-correct/3.1.1:
     resolution: {integrity: sha512-cOYcUWwhCuHCXi49RhFRCyJEK3iPj1Ziz9DpViV3tbZOwXD49QzIN3MpOLJNxh2qwq2lJJZaKMVw9qNi4jTC0w==}

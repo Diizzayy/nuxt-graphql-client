@@ -142,7 +142,8 @@ export default defineNuxtModule<GqlConfig>({
       }
     }
 
-    const documentPaths = [srcResolver.resolve()]
+    // Resolve all document path layers that extend the default layer
+    const documentPaths = nuxt.options._layers.map(layer => layer.config.srcDir)
 
     if (config.documentPaths) {
       for (const path of config.documentPaths) {
