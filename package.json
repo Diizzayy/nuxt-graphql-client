@@ -38,7 +38,6 @@
     "example": "./scripts/example.sh dev",
     "example:build": "./scripts/example.sh build",
     "dev": "nuxi dev playground",
-    "dev:extends": "nuxi prepare playground/.extends && nuxi dev playground/.extends",
     "dev:build": "nuxi build playground",
     "test": "vitest run",
     "lint": "eslint --ext .js,.ts,.vue .",
