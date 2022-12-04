@@ -31,6 +31,8 @@ export default defineNuxtModule<GqlConfig>({
     functionPrefix: 'Gql'
   },
   async setup (opts, nuxt) {
+    const { _layers } = nuxt.options
+
     const resolver = createResolver(import.meta.url)
     const srcResolver = createResolver(nuxt.options.srcDir)
 
@@ -40,7 +42,8 @@ export default defineNuxtModule<GqlConfig>({
       {},
       nuxt.options.runtimeConfig.public['graphql-client'],
       nuxt.options.runtimeConfig.public.gql,
-      opts)
+      opts
+    )
 
     const codegenDefaults: GqlCodegen = {
       silent: true,
@@ -142,7 +145,8 @@ export default defineNuxtModule<GqlConfig>({
       }
     }
 
-    const documentPaths = [srcResolver.resolve()]
+    // Resolve all document path layers that extend the default layer
+    const documentPaths = _layers.map(layer => layer.config.srcDir)
 
     if (config.documentPaths) {
       for (const path of config.documentPaths) {
