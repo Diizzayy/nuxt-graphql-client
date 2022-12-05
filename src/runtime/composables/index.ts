@@ -1,6 +1,6 @@
 import { defu } from 'defu'
 import { hash } from 'ohash'
-import { reactive } from 'vue'
+import { isRef, reactive } from 'vue'
 import type { Ref } from 'vue'
 import { extractOperation } from 'ogql/utils'
 import type { AsyncData } from 'nuxt/dist/app/composables'
@@ -276,7 +276,7 @@ const useGqlErrorState = () => useState<GqlError | null>('_gqlErrors', () => nul
 export function useAsyncGql<
 T extends GqlOps,
 p extends Parameters<GqlSdkFuncs[T]>['0'],
-P extends { [K in keyof p]: Ref<p[K]> | p[K] },
+P extends { [K in keyof p]: Ref<p[K]> | p[K] } | Omit<Ref<p>, 'value'>,
 R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
 O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variables?: P, options?: O }): Promise<R>
 
@@ -290,19 +290,20 @@ O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variab
 export function useAsyncGql<
 T extends GqlOps,
 p extends Parameters<GqlSdkFuncs[T]>['0'],
-P extends { [K in keyof p]: Ref<p[K]> | p[K] },
+P extends { [K in keyof p]: Ref<p[K]> | p[K] } | Omit<Ref<p>, 'value'>,
 R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
 O extends Parameters<typeof useAsyncData>['2']> (operation: T, variables?: P, options?: O): Promise<R>
 
 export function useAsyncGql (...args: any[]) {
+  const toReactive = (v: any) => v && isRef(v) ? v : reactive(v)
   const options = (typeof args?.[0] !== 'string' && 'options' in args?.[0] ? args[0].options : args[2]) ?? {}
   const operation = (typeof args?.[0] !== 'string' && 'operation' in args?.[0] ? args[0].operation : args[0]) ?? undefined
-  const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? reactive(args[0].variables) : args[1] && reactive(args[1])) ?? undefined
+  const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? toReactive(args[0].variables) : args[1] && toReactive(args[1])) ?? undefined
   if (variables) {
     options.watch = options.watch || []
     options.watch.push(variables)
   }
   const key = hash({ operation, variables })
   // @ts-ignore
-  return useAsyncData(key, () => useGql()(operation, variables), options)
+  return useAsyncData(key, () => useGql()(operation, unref(variables)), options)
 }

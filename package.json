@@ -1,6 +1,6 @@
 {
   "name": "nuxt-graphql-client",
-  "version": "0.2.17",
+  "version": "0.2.20",
   "keywords": [
     "vue",
     "nuxt",
@@ -46,10 +46,10 @@
   },
   "dependencies": {
     "@graphql-codegen/cli": "npm:graphql-codegen-cli-nuxt@latest",
-    "@graphql-codegen/typescript": "^2.8.1",
-    "@graphql-codegen/typescript-operations": "^2.5.6",
+    "@graphql-codegen/typescript": "^2.8.3",
+    "@graphql-codegen/typescript-operations": "^2.5.8",
     "@nuxt/kit": "latest",
-    "defu": "^6.1.0",
+    "defu": "^6.1.1",
     "graphql": "^16.6.0",
     "knitwork": "^1.0.0",
     "ogql": "^0.0.1",
@@ -60,14 +60,11 @@
     "@nuxt/module-builder": "latest",
     "@nuxt/test-utils": "latest",
     "@nuxtjs/eslint-config-typescript": "latest",
-    "@vitest/coverage-c8": "^0.25.1",
-    "eslint": "^8.28.0",
+    "@vitest/coverage-c8": "^0.25.3",
+    "eslint": "^8.29.0",
     "nuxt": "latest",
-    "playwright": "^1.28.0",
-    "vitest": "^0.25.1"
+    "playwright": "^1.28.1",
+    "vitest": "^0.25.3"
   },
-  "resolutions": {
-    "nuxt-graphql-client": "workspace:*"
-  },
-  "packageManager": "pnpm@7.17.1"
+  "packageManager": "pnpm@7.18.0"
 }

@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "name": "example-extends",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "generate": "nuxt generate",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@nuxt/ui": "latest",
+    "nuxt": "latest",
+    "nuxt-graphql-client": "latest"
+  }
+}
