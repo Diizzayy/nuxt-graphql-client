@@ -10,7 +10,7 @@ export default defineNuxtConfig({
             host: 'https://spacex-api-2gl6xp7kua-ue.a.run.app/graphql',
             headers: {
               serverOnly: {
-                'X-SERVER-ONLY': 'vcvxcvx',
+                'X-SERVER-ONLY': 'vcvxcvx'
               }
             }
           },
