@@ -280,10 +280,13 @@ export default defineNuxtModule<GqlConfig>({
 
     if (config.watch) {
       nuxt.hook('builder:watch', async (event, path) => {
-        if (!path.match(/\.(gql|graphql)$/)) { return }
+        // Ignore paths with `../` for nuxt layers & non gql files
+        if (!path.match(/\.(gql|graphql)$/) || path.match(/^\.\.\//)) { return }
 
-        if (event !== 'unlink' && !allowDocument(path)) { return }
+        // Ignore schema files & `unlink` events
+        if (event !== 'unlink' && !allowDocument(path) || event === 'unlink') { return }
 
+        // Start Codegen Generation
         const start = Date.now()
         await generateGqlTypes(path)
         await nuxt.callHook('builder:generateApp')
