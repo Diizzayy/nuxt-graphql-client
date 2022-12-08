@@ -22,7 +22,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
       const proxyCookie = v?.proxyCookies && !!cookie
 
-      let headers = v?.headers as Record<string, string> | undefined;
+      let headers = v?.headers as Record<string, string> | undefined
       const serverHeaders = (process.server && (typeof headers?.serverOnly === 'object' && headers?.serverOnly)) || {}
 
       if (headers?.serverOnly) {
