@@ -208,6 +208,7 @@ export default defineNuxtModule<GqlConfig>({
 
     if (config.autoImport) {
       nuxt.options.alias['#gql'] = resolver.resolve(nuxt.options.buildDir, 'gql')
+      nuxt.options.alias['#gql/*'] = resolver.resolve(nuxt.options.buildDir, 'gql', '*')
 
       addTemplate({
         filename: 'gql.mjs',
