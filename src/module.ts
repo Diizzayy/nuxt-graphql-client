@@ -284,7 +284,7 @@ export default defineNuxtModule<GqlConfig>({
         if (!path.match(/\.(gql|graphql)$/) || path.match(/^\.\.\//)) { return }
 
         // Ignore schema files & `unlink` events
-        if (event !== 'unlink' && !allowDocument(path) || event === 'unlink') { return }
+        if ((event !== 'unlink' && !allowDocument(path)) || (event === 'unlink')) { return }
 
         // Start Codegen Generation
         const start = Date.now()
