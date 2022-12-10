@@ -1,4 +1,4 @@
-import { GraphQLClient } from 'graphql-request'
+import { GqlClient } from 'ogql'
 import type { GqlConfig } from '../types'
 // @ts-ignore
 import { defineNitroPlugin } from '#internal/nitro'
@@ -22,6 +22,6 @@ export default defineNitroPlugin(() => {
       ...(conf?.token?.value && { [tokenName]: authToken })
     }
 
-    GqlNitro.clients[client] = new GraphQLClient(conf.host, { headers })
+    GqlNitro.clients[client] = GqlClient({ host: conf.host, headers })
   }
 })

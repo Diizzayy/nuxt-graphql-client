@@ -1,5 +1,4 @@
-import type { GraphQLClient } from 'graphql-request'
-import type { GraphQLError } from 'graphql-request/dist/types'
+import type { GqlClient as GQLClient, GraphQLError, GqlOperation } from 'ogql'
 import type { CookieOptions } from 'nuxt/dist/app/composables'
 
 type TokenOpts = {
@@ -243,14 +242,13 @@ export interface GqlConfig<T = GqlClient> {
 }
 
 export type GqlError = {
-  client: string
-  operationName?: string
-  operationType?: string
+  client?: string
   statusCode?: number
+  operation?: GqlOperation
   gqlErrors: GraphQLError[]
 }
 
 export type OnGqlError = <T>(error: GqlError) => Promise<T> | any
 
-type GqlStateOpts = {instance?: GraphQLClient, options?: { token?: TokenOpts } & Pick<RequestInit, 'headers' | 'mode' | 'credentials'> }
+type GqlStateOpts = {instance?: GQLClient, options?: { token?: TokenOpts } & Pick<RequestInit, 'headers' | 'mode' | 'credentials'> }
 export type GqlState = Record<string, GqlStateOpts> & { onError?: OnGqlError }

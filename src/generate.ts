@@ -44,7 +44,6 @@ function prepareConfig (options: GenerateOptions & GqlCodegen): CodegenConfig {
     skipTypename: options?.skipTypename,
     useTypeImports: options?.useTypeImports,
     dedupeFragments: options?.dedupeFragments,
-    gqlImport: 'graphql-request#gql',
     onlyOperationTypes: options.onlyOperationTypes,
     namingConvention: {
       enumValues: 'change-case-all#upperCaseFirst'

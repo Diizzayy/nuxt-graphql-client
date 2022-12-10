@@ -2,8 +2,8 @@ import { defu } from 'defu'
 import { hash } from 'ohash'
 import { unref, isRef, reactive } from 'vue'
 import type { Ref } from 'vue'
+import { extractOperation } from 'ogql/utils'
 import type { AsyncData } from 'nuxt/dist/app/composables'
-import type { ClientError } from 'graphql-request'
 import type { GqlState, GqlConfig, GqlError, TokenOpts, OnGqlError, GqlStateOpts } from '../../types'
 // @ts-ignore
 import { GqlSdks, GqClientOps } from '#gql'
@@ -195,7 +195,7 @@ export const useGqlHost = (host: string, client?: GqlClients) => {
     host = `${initialHost}${host}`
   }
 
-  return state.value?.[client].instance!.setEndpoint(host)
+  state.value?.[client].instance!.setHost(host)
 }
 
 export const useGql = (): (<
@@ -219,27 +219,22 @@ export const useGql = (): (<
 
     const { instance } = state!.value?.[client]
 
-    if (!instance) { throw new Error('Invalid GraphQL Operation') }
-
-    return GqlSdks[client as keyof typeof GqlSdks]!(instance, async (action, operationName, operationType): Promise<any> => {
-      try {
-        return await action()
-      } catch (err: ClientError | any) {
+    instance.setMiddleware({
+      onResponseError: ({ options, response }) => {
         errState.value = {
           client,
-          operationType,
-          operationName,
-          statusCode: err?.response?.status,
-          gqlErrors: err?.response?.errors || (err?.response?.message && [{ message: err?.response?.message }]) || []
+          statusCode: response?.status,
+          operation: extractOperation(JSON.parse(options?.body as string)?.query || ''),
+          gqlErrors: Array.isArray(response?._data?.errors) ? response?._data?.errors : [response?._data]
         }
 
         if (state.value.onError) {
           state.value.onError(errState.value)
         }
-
-        throw errState.value
       }
-    })[operation as GqlOps](variables) as any
+    })
+
+    return !args?.[2] ? GqlSdks[client]?.(instance)[operation](variables) : GqlSdks[client]?.(instance)[operation](variables, args?.[2])
   }
 }
 

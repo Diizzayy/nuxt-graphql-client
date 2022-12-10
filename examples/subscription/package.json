@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "name": "example-subscription",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "generate": "nuxt generate",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "nuxt": "latest",
+    "@nuxt/ui": "latest",
+    "nuxt-graphql-client": "latest"
+  }
+}

@@ -23,7 +23,7 @@ export async function prepareContext (ctx: GqlContext, prefix: string) {
   if (ctx.template) { prepareTemplate(ctx) }
 
   ctx.fns = Object.values(ctx.template || {}).reduce((acc, template) => {
-    const fns = template.match(ctx?.codegen ? /\w+\s*(?=\(variables)/g : /\w+(?=:\s\(variables)/g)?.sort() || []
+    const fns = template.match(!ctx?.codegen ? /\w+(?=:\s\(variables)/g : /\w+(?=:\s<T\sextends\s\w+(Query|Mutation|Subscription))/g)?.sort() || []
 
     return [...acc, ...fns]
   }, [] as string[])
@@ -42,7 +42,7 @@ export async function prepareContext (ctx: GqlContext, prefix: string) {
 
   ctx.generateImports = () => [
     'import { useGql } from \'#imports\'',
-    ...ctx.clients!.map(client => `import { getSdk as ${client}GqlSdk } from '#gql/${client}'`),
+    ...ctx.clients.map(client => `import { gqlSdk as ${client}GqlSdk } from '#gql/${client}'`),
     'export const GqlSdks = {',
     ...ctx.clients!.map(client => `  ${client}: ${client}GqlSdk,`),
     '}',
@@ -53,7 +53,7 @@ export async function prepareContext (ctx: GqlContext, prefix: string) {
   ctx.generateDeclarations = () => [
     ...(!ctx.codegen
       ? []
-      : ctx.clients!.map(client => `import { getSdk as ${client}GqlSdk } from '#gql/${client}'`)),
+      : ctx.clients.map(client => `import { gqlSdk as ${client}GqlSdk } from '#gql/${client}'`)),
     ...Object.entries(ctx.clientTypes || {}).map(([k, v]) => genExport(`#gql/${k}`, v)),
     'declare module \'#gql\' {',
       `  type GqlClients = '${ctx.clients?.join("' | '") || 'default'}'`,
@@ -113,20 +113,4 @@ function prepareTemplate (ctx: GqlContext) {
 
     return { ...acc, [key]: results }
   }, {} as Record<string, string[]>)
-}
-
-export const mockTemplate = (operations: Record<string, string>) => {
-  const GqlFunctions: string[] = []
-
-  for (const [k, v] of Object.entries(operations)) {
-    GqlFunctions.push(`    ${k}: (variables = undefined, requestHeaders = undefined) => withWrapper((wrappedRequestHeaders) => client.request(\`${v}\`, variables, {...requestHeaders, ...wrappedRequestHeaders}), '${k}', 'query')`)
-  }
-
-  return [
-    'export function getSdk(client, withWrapper = (action, _operationName, _operationType) => action()) {',
-    '  return {',
-    GqlFunctions.join(',\n'),
-    '  }',
-    '}'
-  ].join('\n')
 }

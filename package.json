@@ -9,7 +9,7 @@
     "gql",
     "graphql",
     "graphql-client",
-    "graphql-request",
+    "ofetch",
     "codegen",
     "graphql-code-generator"
   ],
@@ -47,13 +47,12 @@
   "dependencies": {
     "@graphql-codegen/cli": "npm:graphql-codegen-cli-nuxt@latest",
     "@graphql-codegen/typescript": "^2.8.3",
-    "@graphql-codegen/typescript-graphql-request": "^4.5.8",
     "@graphql-codegen/typescript-operations": "^2.5.8",
     "@nuxt/kit": "latest",
     "defu": "^6.1.1",
     "graphql": "^16.6.0",
-    "graphql-request": "^5.0.0",
     "knitwork": "^1.0.0",
+    "ogql": "^0.0.1",
     "ohash": "^1.0.0",
     "scule": "^1.0.0"
   },
@@ -64,6 +63,7 @@
     "@vitest/coverage-c8": "^0.25.3",
     "eslint": "^8.29.0",
     "nuxt": "latest",
+    "playwright": "^1.28.1",
     "vitest": "^0.25.3"
   },
   "packageManager": "pnpm@7.18.0"
