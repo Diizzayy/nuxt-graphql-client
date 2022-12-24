@@ -195,19 +195,16 @@ export const useGqlHost = (host: string, client?: GqlClients) => {
     host = `${initialHost}${host}`
   }
 
-  return state.value?.[client].instance!.setEndpoint(host)
+  state.value?.[client].instance!.setEndpoint(host)
 }
 
-export const useGql = (): (<
-  T extends GqlOps,
-  R extends ReturnType<GqlSdkFuncs[T]>,
-  P extends Parameters<GqlSdkFuncs[T]>['0'],
-  > (args: { operation: T, variables?: P }) => R) &
-  (<
-    T extends GqlOps,
-    R extends ReturnType<GqlSdkFuncs[T]>,
-    P extends Parameters<GqlSdkFuncs[T]>['0'],
-    > (operation: T, variables?: P) => R) => {
+export function useGql (): <
+T extends GqlOps,
+R extends ReturnType<GqlSdkFuncs[T]>,
+P extends Parameters<GqlSdkFuncs[T]>['0'],
+> (...args: [T, P] | [{ operation: T, variables?: P }]) => R
+
+export function useGql () {
   const state = useGqlState()
   const errState = useGqlErrorState()
 
