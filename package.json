@@ -61,7 +61,7 @@
     "@nuxt/module-builder": "latest",
     "@nuxt/test-utils": "latest",
     "@nuxtjs/eslint-config-typescript": "latest",
-    "@vitest/coverage-c8": "^0.25.3",
+    "@vitest/coverage-c8": "^0.28.3",
     "eslint": "^8.29.0",
     "nuxt": "latest",
     "vitest": "^0.25.3"
