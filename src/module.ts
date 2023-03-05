@@ -111,7 +111,10 @@ export default defineNuxtModule<GqlConfig>({
       const runtimeClientHost = k === defaultClient ? process.env.GQL_CLIENT_HOST : process.env?.[`GQL_${k.toUpperCase()}_CLIENT_HOST`]
       if (runtimeClientHost) { conf.clientHost = runtimeClientHost }
 
-      if (!conf?.host) { throw new Error(`GraphQL client (${k}) is missing it's host.`) }
+      if (!conf?.host) {
+        logger.warn(`GraphQL client (${k}) is missing it's host.`)
+        return
+      }
 
       const runtimeToken = k === defaultClient ? process.env.GQL_TOKEN : process.env?.[`GQL_${k.toUpperCase()}_TOKEN`]
       if (runtimeToken) { conf.token = { ...conf.token, value: runtimeToken } }
