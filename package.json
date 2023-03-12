@@ -39,7 +39,7 @@
     "example:build": "./scripts/example.sh build",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
-    "test": "vitest run",
+    "test": "nuxi prepare examples/basic && nuxi prepare examples/multi-client && vitest run",
     "lint": "eslint --ext .js,.ts,.vue .",
     "lint:fix": "eslint --fix --ext .js,.ts,.vue .",
     "prepare": "nuxt-module-build --stub && nuxi prepare playground"
@@ -66,5 +66,5 @@
     "nuxt": "latest",
     "vitest": "^0.29.2"
   },
-  "packageManager": "pnpm@7.28.0"
+  "packageManager": "pnpm@7.29.1"
 }
