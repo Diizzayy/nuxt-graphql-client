@@ -39,10 +39,10 @@
     "example:build": "./scripts/example.sh build",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
+    "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground",
     "test": "nuxi prepare examples/basic && nuxi prepare examples/multi-client && vitest run",
     "lint": "eslint --ext .js,.ts,.vue .",
-    "lint:fix": "eslint --fix --ext .js,.ts,.vue .",
-    "prepare": "nuxt-module-build --stub && nuxi prepare playground"
+    "lint:fix": "eslint --fix --ext .js,.ts,.vue ."
   },
   "dependencies": {
     "@graphql-codegen/cli": "^3.2.1",
