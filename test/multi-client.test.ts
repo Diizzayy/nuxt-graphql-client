@@ -13,9 +13,9 @@ describe('test multiple clients', () => {
     expect(result).toContain('<p>Launch Count: 10</p>')
   }, 15000)
 
-  it('fetches the spacex Iridium NEXT mission', async () => {
-    const result = await $fetch('/spacex/mission')
-    expect(result).toContain('<p>Mission Name: Iridium NEXT</p>')
+  it('fetch a spacex crew', async () => {
+    const result = await $fetch('/spacex/crew')
+    expect(result).toContain('<p>Crew Name: Douglas Hurley</p>')
   }, 15000)
 
   it('renders the character morty', async () => {

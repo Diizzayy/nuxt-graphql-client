@@ -39,20 +39,20 @@
     "example:build": "./scripts/example.sh build",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
-    "test": "vitest run",
+    "test": "nuxi prepare examples/basic && nuxi prepare examples/multi-client && vitest run",
     "lint": "eslint --ext .js,.ts,.vue .",
     "lint:fix": "eslint --fix --ext .js,.ts,.vue .",
     "prepare": "nuxt-module-build --stub && nuxi prepare playground"
   },
   "dependencies": {
-    "@graphql-codegen/cli": "npm:graphql-codegen-cli-nuxt@latest",
-    "@graphql-codegen/typescript": "^2.8.3",
+    "@graphql-codegen/cli": "^3.2.1",
+    "@graphql-codegen/typescript": "^3.0.1",
     "@graphql-codegen/typescript-graphql-request": "^4.5.8",
-    "@graphql-codegen/typescript-operations": "^2.5.8",
+    "@graphql-codegen/typescript-operations": "^3.0.1",
     "@nuxt/kit": "latest",
-    "defu": "^6.1.1",
+    "defu": "^6.1.2",
     "graphql": "^16.6.0",
-    "graphql-request": "^5.0.0",
+    "graphql-request": "5.0.0",
     "knitwork": "^1.0.0",
     "ohash": "^1.0.0",
     "scule": "^1.0.0"
@@ -61,10 +61,10 @@
     "@nuxt/module-builder": "latest",
     "@nuxt/test-utils": "latest",
     "@nuxtjs/eslint-config-typescript": "latest",
-    "@vitest/coverage-c8": "^0.25.3",
-    "eslint": "^8.29.0",
+    "@vitest/coverage-c8": "^0.29.2",
+    "eslint": "^8.35.0",
     "nuxt": "latest",
-    "vitest": "^0.25.3"
+    "vitest": "^0.29.2"
   },
-  "packageManager": "pnpm@7.18.0"
+  "packageManager": "pnpm@7.29.1"
 }

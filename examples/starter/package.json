@@ -5,8 +5,7 @@
     "dev": "nuxt dev",
     "build": "nuxt build",
     "preview": "nuxt preview",
-    "generate": "nuxt generate",
-    "postinstall": "nuxt prepare"
+    "generate": "nuxt generate"
   },
   "devDependencies": {
     "@nuxt/ui": "latest",

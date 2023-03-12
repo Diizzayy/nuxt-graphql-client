@@ -3,7 +3,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      GQL_HOST: 'https://spacex-api-2gl6xp7kua-ue.a.run.app/graphql'
+      GQL_HOST: 'https://spacex-api-2gl6xp7kua-ue.a.run.app/query'
     }
   }
 })

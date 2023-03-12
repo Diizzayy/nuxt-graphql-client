@@ -10,13 +10,13 @@
       <p>Launch Count: {{ data?.launches.length || 0 }}</p>
 
       <div v-if="!pending" class="launches mt-4">
-        <div v-for="entry in data?.launches" :key="entry.id">
-          <div v-if="entry?.links.flickr_images[0]" class="thumbnail">
+        <div v-for="(entry, i) in data?.launches" :key="entry.id">
+          <div v-if="entry?.links?.patch?.small" class="thumbnail">
             <img
               class="lazyload"
               src="https://placehold.co/150"
-              :data-src="entry?.links.flickr_images[0]"
-              :alt="entry.mission_name"
+              :data-src="entry?.links.patch?.small"
+              :alt="entry.name || `Launch ${i}`"
             />
           </div>
 
@@ -24,17 +24,17 @@
             <div class="thumbnail">
               <img
                 src="https://placehold.co/150"
-                :alt="entry.mission_name"
+                :alt="entry.name || `Launch ${i}`"
               />
             </div>
           </div>
 
-          <h2>{{ `${entry.mission_name} (${entry.launch_year})` }}</h2>
-          <p>Launch Status: {{ entry.launch_success ? '🚀' : '🪂' }}</p>
+          <h2>{{ `${entry.name} (${new Date(entry.date).getFullYear()})` }}</h2>
+          <p>Launch Status: {{ entry.success ? '🚀' : '🪂' }}</p>
 
-          <p>
+          <p v-if="entry.links?.article">
             More info:
-            <a :href="entry.links.article_link" target="_blank">Read Article</a>
+            <a :href="entry.links?.article" target="_blank">Read Article</a>
           </p>
         </div>
       </div>
