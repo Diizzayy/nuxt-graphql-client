@@ -52,7 +52,7 @@
     "@nuxt/kit": "latest",
     "defu": "^6.1.2",
     "graphql": "^16.6.0",
-    "graphql-request": "5.0.0",
+    "graphql-request": "5.2.0",
     "knitwork": "^1.0.0",
     "ohash": "^1.0.0",
     "scule": "^1.0.0"
