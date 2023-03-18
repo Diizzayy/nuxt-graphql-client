@@ -38,7 +38,7 @@ export async function prepareContext (ctx: GqlContext, prefix: string) {
     return `  export const ${name}: (...params: Parameters<GqlSdkFuncs['${fn}']>) => ReturnType<GqlSdkFuncs['${fn}']>`
   }
 
-  ctx.clients = ctx.clients?.filter(c => ctx.clientDocs?.[c])
+  ctx.clients = ctx.clients?.filter(c => ctx.clientDocs?.[c]?.length)
 
   ctx.generateImports = () => [
     'import { useGql } from \'#imports\'',

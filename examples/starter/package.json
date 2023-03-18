@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@nuxt/ui": "latest",
-    "nuxt": "3.0.0-rc.13",
-    "nuxt-graphql-client": "0.2.10-edge.5db617e"
+    "nuxt": "latest",
+    "nuxt-graphql-client": "latest"
   }
 }

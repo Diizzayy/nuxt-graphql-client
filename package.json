@@ -1,6 +1,6 @@
 {
   "name": "nuxt-graphql-client",
-  "version": "0.2.10",
+  "version": "0.2.27",
   "keywords": [
     "vue",
     "nuxt",
@@ -39,32 +39,32 @@
     "example:build": "./scripts/example.sh build",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
-    "test": "vitest run",
+    "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground",
+    "test": "nuxi prepare examples/basic && nuxi prepare examples/multi-client && vitest run",
     "lint": "eslint --ext .js,.ts,.vue .",
-    "lint:fix": "eslint --fix --ext .js,.ts,.vue .",
-    "prepare": "nuxt-module-build --stub && nuxi prepare playground"
+    "lint:fix": "eslint --fix --ext .js,.ts,.vue ."
   },
   "dependencies": {
-    "@graphql-codegen/cli": "2.13.4",
-    "@graphql-codegen/typescript": "^2.7.3",
-    "@graphql-codegen/typescript-graphql-request": "^4.5.5",
-    "@graphql-codegen/typescript-operations": "^2.5.3",
-    "@nuxt/kit": "3.0.0-rc.13",
-    "defu": "^6.1.0",
+    "@graphql-codegen/cli": "^3.2.1",
+    "@graphql-codegen/typescript": "^3.0.1",
+    "@graphql-codegen/typescript-graphql-request": "^4.5.8",
+    "@graphql-codegen/typescript-operations": "^3.0.1",
+    "@nuxt/kit": "latest",
+    "defu": "^6.1.2",
     "graphql": "^16.6.0",
-    "graphql-request": "^5.0.0",
-    "knitwork": "^0.1.2",
-    "ohash": "^0.1.5",
-    "scule": "^0.3.2"
+    "graphql-request": "5.0.0",
+    "knitwork": "^1.0.0",
+    "ohash": "^1.0.0",
+    "scule": "^1.0.0"
   },
   "devDependencies": {
     "@nuxt/module-builder": "latest",
-    "@nuxt/test-utils": "3.0.0-rc.13",
+    "@nuxt/test-utils": "latest",
     "@nuxtjs/eslint-config-typescript": "latest",
-    "@vitest/coverage-c8": "^0.24.3",
-    "eslint": "^8.23.1",
-    "nuxt": "^3.0.0-rc.13",
-    "vitest": "^0.24.3"
+    "@vitest/coverage-c8": "^0.29.2",
+    "eslint": "^8.35.0",
+    "nuxt": "latest",
+    "vitest": "^0.29.2"
   },
-  "packageManager": "pnpm@7.14.2"
+  "packageManager": "pnpm@7.29.1"
 }

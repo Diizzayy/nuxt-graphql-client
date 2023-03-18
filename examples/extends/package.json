@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "example-basic",
+  "name": "example-extends",
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt build",
