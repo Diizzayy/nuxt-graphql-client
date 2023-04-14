@@ -172,6 +172,16 @@ export interface GqlCodegen {
    * @default true
    * */
   onlyOperationTypes?: boolean
+
+  /**
+   * Avoid using TypeScript optionals on generated types.
+   */
+  avoidOptionals?: boolean | {
+    field?: boolean
+    inputValue?: boolean
+    object?: boolean
+    defaultValue?: boolean
+  }
 }
 
 export interface GqlConfig<T = GqlClient> {
