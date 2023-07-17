@@ -23,6 +23,7 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/types.d.ts",
       "import": "./dist/module.mjs",
       "require": "./dist/module.cjs"
     }
@@ -40,7 +41,7 @@
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground",
-    "test": "nuxi prepare examples/basic && nuxi prepare examples/multi-client && vitest run",
+    "test": "pnpm dev:prepare && nuxi prepare examples/basic && nuxi prepare examples/multi-client && vitest run",
     "lint": "eslint --ext .js,.ts,.vue .",
     "lint:fix": "eslint --fix --ext .js,.ts,.vue ."
   },
