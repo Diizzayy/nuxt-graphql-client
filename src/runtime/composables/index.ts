@@ -2,8 +2,9 @@ import { defu } from 'defu'
 import { hash } from 'ohash'
 import { unref, isRef, reactive } from 'vue'
 import type { Ref } from 'vue'
-import type { AsyncData } from 'nuxt/dist/app/composables'
+import type { AsyncData, AsyncDataOptions } from 'nuxt/dist/app/composables'
 import type { ClientError } from 'graphql-request'
+import { KeysOf, PickFrom } from 'nuxt/dist/app/composables/asyncData'
 import type { GqlState, GqlConfig, GqlError, TokenOpts, OnGqlError, GqlStateOpts } from '../../types'
 // @ts-ignore
 import { GqlSdks, GqClientOps } from '#gql'
@@ -276,11 +277,20 @@ const useGqlErrorState = () => useState<GqlError | null>('_gqlErrors', () => nul
  * @param {Object} options.options AsyncData options.
  */
 export function useAsyncGql<
-T extends GqlOps,
-p extends Parameters<GqlSdkFuncs[T]>['0'],
-P extends { [K in keyof p]: Ref<p[K]> | p[K] } | Omit<Ref<p>, 'value'>,
-R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
-O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variables?: P, options?: O }): Promise<R>
+  T extends GqlOps,
+  p extends Parameters<GqlSdkFuncs[T]>['0'],
+  P extends { [K in keyof p]: Ref<p[K]> | p[K] } | Omit<Ref<p>, 'value'>,
+  d extends Awaited<ReturnType<GqlSdkFuncs[T]>>,
+  D = d,
+  E = GqlError,
+  PK extends KeysOf<D> = KeysOf<D>,
+>(
+  options: {
+    operation: T,
+    variables?: P,
+    options?: AsyncDataOptions<d, D, PK>
+  }
+): AsyncData<PickFrom<D, PK>, E | null>
 
 /**
  * Asynchronously query data that is required to load a page or component.
@@ -290,11 +300,18 @@ O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variab
  * @param {Object} options AsyncData options.
  */
 export function useAsyncGql<
-T extends GqlOps,
-p extends Parameters<GqlSdkFuncs[T]>['0'],
-P extends { [K in keyof p]: Ref<p[K]> | p[K] } | Omit<Ref<p>, 'value'>,
-R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
-O extends Parameters<typeof useAsyncData>['2']> (operation: T, variables?: P, options?: O): Promise<R>
+  T extends GqlOps,
+  p extends Parameters<GqlSdkFuncs[T]>['0'],
+  P extends { [K in keyof p]: Ref<p[K]> | p[K] } | Omit<Ref<p>, 'value'>,
+  d extends Awaited<ReturnType<GqlSdkFuncs[T]>>,
+  D = d,
+  E = GqlError,
+  PK extends KeysOf<D> = KeysOf<D>,
+>(
+  operation: T,
+  variables?: P,
+  options?: AsyncDataOptions<d, D, PK>
+): AsyncData<PickFrom<D, PK>, E | null>
 
 export function useAsyncGql (...args: any[]) {
   const toReactive = (v: any) => v && isRef(v) ? v : reactive(v)
