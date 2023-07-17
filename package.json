@@ -45,26 +45,37 @@
     "lint:fix": "eslint --fix --ext .js,.ts,.vue ."
   },
   "dependencies": {
-    "@graphql-codegen/cli": "^3.2.1",
-    "@graphql-codegen/typescript": "^3.0.1",
-    "@graphql-codegen/typescript-graphql-request": "^4.5.8",
-    "@graphql-codegen/typescript-operations": "^3.0.1",
-    "@nuxt/kit": "latest",
+    "@graphql-codegen/cli": "^4.0.1",
+    "@graphql-codegen/typescript": "^4.0.1",
+    "@graphql-codegen/typescript-graphql-request": "^5.0.0",
+    "@graphql-codegen/typescript-operations": "^4.0.1",
+    "@nuxt/kit": "^3.6.3",
     "defu": "^6.1.2",
-    "graphql": "^16.6.0",
-    "graphql-request": "5.0.0",
+    "graphql": "^16.7.1",
+    "graphql-request": "^6.1.0",
     "knitwork": "^1.0.0",
-    "ohash": "^1.0.0",
+    "ohash": "^1.1.2",
     "scule": "^1.0.0"
   },
   "devDependencies": {
     "@nuxt/module-builder": "latest",
-    "@nuxt/test-utils": "latest",
+    "@nuxt/test-utils": "^3.6.3",
     "@nuxtjs/eslint-config-typescript": "latest",
-    "@vitest/coverage-c8": "^0.29.2",
-    "eslint": "^8.35.0",
-    "nuxt": "latest",
-    "vitest": "^0.29.2"
+    "@vitest/coverage-v8": "^0.33.0",
+    "eslint": "^8.45.0",
+    "nuxt": "^3.6.3",
+    "vitest": "^0.33.0"
   },
-  "packageManager": "pnpm@7.29.1"
+  "overrides": {
+    "node-fetch": "npm:node-fetch-native@latest"
+  },
+  "resolutions": {
+    "node-fetch": "npm:node-fetch-native@latest"
+  },
+  "pnpm": {
+    "overrides": {
+      "node-fetch": "npm:node-fetch-native@latest"
+    }
+  },
+  "packageManager": "pnpm@8.6.7"
 }
