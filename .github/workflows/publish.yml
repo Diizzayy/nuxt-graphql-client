@@ -41,7 +41,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Prepare module
+        run: pnpm prepare
+
       - name: Publish Package
-        run: pnpm publish --access public
+        run: pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
