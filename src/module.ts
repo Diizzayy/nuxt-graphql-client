@@ -1,7 +1,7 @@
 import { existsSync, statSync } from 'fs'
 import { defu } from 'defu'
 import { upperFirst } from 'scule'
-import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createResolver, defineNuxtModule, extendViteConfig } from '@nuxt/kit'
+import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createResolver, defineNuxtModule } from '@nuxt/kit'
 import { name, version } from '../package.json'
 import generate from './generate'
 import { mapDocsToClients, extractGqlOperations } from './utils'
@@ -182,7 +182,7 @@ export default defineNuxtModule<GqlConfig>({
           ? ctx.clientDocs
           : Object.keys(ctx.clientDocs)
             .filter(k => ctx.clientDocs?.[k]?.some(e => e.endsWith(hmrDoc)))
-            .reduce((acc, k) => ({ ...acc, [k]: ctx.clientDocs?.[k] }), {})
+            .reduce((acc, k) => ({ ...acc, [k]: ctx.clientDocs?.[k] }), {}) as Record<string, string[]>
 
         const codegenResult = ctx?.codegen
           ? await generate({
@@ -299,8 +299,12 @@ export default defineNuxtModule<GqlConfig>({
 
     await generateGqlTypes()
 
-    extendViteConfig((config) => {
+    nuxt.hook('vite:extendConfig', (config, { isServer }) => {
       config.optimizeDeps?.include?.push('graphql-request')
+
+      if (isServer && config.define?.['typeof document']) {
+        delete config.define['typeof document']
+      }
     })
   }
 })
