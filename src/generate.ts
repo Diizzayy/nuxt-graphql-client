@@ -48,7 +48,8 @@ function prepareConfig (options: GenerateOptions & GqlCodegen): CodegenConfig {
     onlyOperationTypes: options.onlyOperationTypes,
     namingConvention: {
       enumValues: 'change-case-all#upperCaseFirst'
-    }
+    },
+    avoidOptionals: options?.avoidOptionals
   }
 
   const generates: CodegenConfig['generates'] = Object.entries(options.clients || {}).reduce((acc, [k, v]) => {
