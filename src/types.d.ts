@@ -88,6 +88,14 @@ export interface GqlClient<T = string> {
    * */
   proxyCookies?: boolean
 
+
+  /**
+   * Headers to be passed from the browser to the GraphQL API in SSR mode.
+   * 
+   * @type {string[]}
+   */
+  proxyHeaders?: string[]
+
   /**
    * Specify CORS options to be used for client-side requests.
    * @type {object}
