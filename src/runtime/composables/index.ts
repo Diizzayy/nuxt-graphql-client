@@ -107,6 +107,12 @@ type GqlTokenOptions = {
    * @note defined in `nuxt.config`
    * */
   client?: GqlClients
+
+  /**
+   * Refresh Gql Data on token change.
+   * @default true
+   * */
+  refreshData?: boolean
 }
 
 type GqlToken = string | null
@@ -128,6 +134,8 @@ export function useGqlToken (...args: any[]) {
   args = args || []
 
   const config: TokenOpts = args[0]?.config || args?.[1]?.config
+  const refreshData = args[0]?.refreshData ?? args?.[1]?.refreshData ?? true
+
   let client: GqlClients = args[0]?.client || args?.[1]?.client
   let token: string = typeof args[0] === 'string' || args?.[0] === null ? args[0] : args?.[0]?.token
   if (token) { token = token.trim() }
@@ -149,6 +157,12 @@ export function useGqlToken (...args: any[]) {
       } else {
         localStorage.removeItem(tokenStorage.name!)
       }
+    }
+
+    if (refreshData) {
+      const nuxtApp = useNuxtApp()
+      const _gqlDataKeys = Object.keys(nuxtApp.payload.data).filter(k => k.startsWith('gql:data:'))
+      if (_gqlDataKeys.length) { refreshNuxtData(_gqlDataKeys) }
     }
   }
 
@@ -322,7 +336,6 @@ export function useAsyncGql (...args: any[]) {
     options.watch = options.watch || []
     options.watch.push(variables)
   }
-  const key = hash({ operation, variables })
-  // @ts-ignore
+  const key = `gql:data:${hash({ operation, variables })}`
   return useAsyncData(key, () => useGql()(operation, unref(variables)), options)
 }
