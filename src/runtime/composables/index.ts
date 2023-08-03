@@ -9,7 +9,7 @@ import type { GqlState, GqlConfig, GqlError, TokenOpts, OnGqlError, GqlStateOpts
 // @ts-ignore
 import { GqlSdks, GqClientOps } from '#gql'
 import type { GqlOps, GqlClients, GqlSdkFuncs } from '#gql'
-import { useState, useCookie, useNuxtApp, useAsyncData, useRuntimeConfig } from '#imports'
+import { useState, useCookie, useNuxtApp, useAsyncData, refreshNuxtData, useRuntimeConfig } from '#imports'
 
 const getGqlClient = (client?: GqlClients, state?: Ref<GqlState>): GqlClients => {
   if (!state) { state = useGqlState() }
