@@ -104,7 +104,7 @@ jobs:
       - name: Run Tests
         run: pnpm test -- --coverage --no-threads
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
   
   release-build:
     if: |
