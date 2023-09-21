@@ -52,7 +52,7 @@
     "@graphql-codegen/typescript-operations": "^4.0.1",
     "@nuxt/kit": "^3.6.3",
     "defu": "^6.1.2",
-    "graphql": "^16.7.1",
+    "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
     "knitwork": "^1.0.0",
     "ohash": "^1.1.2",
