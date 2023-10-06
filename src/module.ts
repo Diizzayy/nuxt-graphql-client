@@ -220,7 +220,6 @@ export default defineNuxtModule<GqlConfig>({
       })
 
       addTemplate({
-        write: 'true',
         filename: 'gql/index.d.ts',
         getContents: () => ctx.generateDeclarations?.() || ''
       })
