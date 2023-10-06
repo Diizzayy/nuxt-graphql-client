@@ -214,11 +214,13 @@ export default defineNuxtModule<GqlConfig>({
       nuxt.options.alias['#gql/*'] = resolver.resolve(nuxt.options.buildDir, 'gql', '*')
 
       addTemplate({
+        write: 'true',
         filename: 'gql.mjs',
         getContents: () => ctx.generateImports?.() || ''
       })
 
       addTemplate({
+        write: 'true',
         filename: 'gql/index.d.ts',
         getContents: () => ctx.generateDeclarations?.() || ''
       })
