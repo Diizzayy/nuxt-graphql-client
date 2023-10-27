@@ -35,12 +35,13 @@
   ],
   "scripts": {
     "prepack": "pnpm build",
-    "build": "nuxt-module-build",
+    "prepare": "pnpm dev:prepare",
+    "build": "nuxt-module-build build",
     "example": "./scripts/example.sh dev",
     "example:build": "./scripts/example.sh build",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
-    "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground",
+    "dev:prepare": "nuxt-module-build build --stub && nuxi prepare playground",
     "docs:dev": "nuxi dev docs",
     "docs:generate": "nuxi generate docs",
     "test": "pnpm dev:prepare && nuxi prepare examples/basic && nuxi prepare examples/multi-client && vitest run",
@@ -80,5 +81,5 @@
       "node-fetch": "npm:node-fetch-native@latest"
     }
   },
-  "packageManager": "pnpm@8.6.7"
+  "packageManager": "pnpm@8.9.2"
 }

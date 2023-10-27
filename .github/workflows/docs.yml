@@ -1,4 +1,4 @@
-name: Docs
+name: Publish Docs
 
 on:
   push:
@@ -24,12 +24,10 @@ jobs:
         os: [ubuntu-latest]
         node: [18]
     
-    defaults:
-      run:
-        working-directory: docs
-
     steps:
       - uses: actions/checkout@v4
+
+      - run: corepack enable
 
       - uses: actions/setup-node@v3
         with:
@@ -37,13 +35,10 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies 👨🏻‍💻
-        run: pnpm
-
-      - name: Generate Docs
-        run: pnpm generate
+        run: pnpm install
 
       - name: Deploy To Firebase
-        run: ../scripts/deploy-docs.sh
+        run: ./scripts/deploy-docs.sh
         shell: bash
         env:
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
