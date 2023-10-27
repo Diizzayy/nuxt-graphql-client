@@ -29,25 +29,22 @@ jobs:
         working-directory: docs
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v3
         with:
-          cache: 'yarn'
+          cache: 'pnpm'
           node-version: ${{ matrix.node }}
-          cache-dependency-path: docs/yarn.lock
 
       - name: Install dependencies 👨🏻‍💻
-        run: yarn
+        run: pnpm
 
       - name: Generate Docs
-        run: yarn generate
+        run: pnpm generate
 
       - name: Deploy To Firebase
-        run: |
-          curl -sL firebase.tools | bash > /dev/null
-          firebase use --add "$PROJECT_ID" > /dev/null
-          firebase deploy --only hosting --message "$COMMIT_MESSAGE"
+        run: ../scripts/deploy-docs.sh
+        shell: bash
         env:
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}

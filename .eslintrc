@@ -1,10 +1,12 @@
 {
-  "extends": ["@nuxtjs/eslint-config-typescript"],
+  "extends": ["@nuxt/eslint-config"],
   "rules": {
     "no-redeclare": "off",
     "import/named": "off",
     "vue/html-self-closing": "off",
+    "vue/max-attributes-per-line": "off",
     "vue/multi-word-component-names": "off",
-    "@typescript-eslint/no-unused-vars": "off"
+    "@typescript-eslint/no-unused-vars": "off",
+    "no-unsafe-optional-chaining": "off"
   }
 }
