@@ -91,7 +91,7 @@ export interface GqlClient<T = string> {
 
   /**
    * Headers to be passed from the browser to the GraphQL API in SSR mode.
-   * 
+   *
    * @type {string[]}
    */
   proxyHeaders?: string[]
@@ -190,6 +190,12 @@ export interface GqlCodegen {
     object?: boolean
     defaultValue?: boolean
   }
+
+  /**
+   * Allow to override the type value of Maybe.
+   (https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#maybevalue)
+   */
+  maybeValue?: string
 }
 
 export interface GqlConfig<T = GqlClient> {

@@ -49,7 +49,8 @@ export default defineNuxtModule<GqlConfig>({
       dedupeFragments: true,
       disableOnBuild: false,
       onlyOperationTypes: true,
-      avoidOptionals: false
+      avoidOptionals: false,
+      maybeValue: 'T | null'
     }
 
     config.codegen = !!config.codegen && defu<GqlCodegen, [GqlCodegen]>(config.codegen, codegenDefaults)
