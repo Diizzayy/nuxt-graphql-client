@@ -5,8 +5,8 @@
     </button>
 
     <pre v-if="!pending">
-        {{ data || error }}
-  </pre>
+      {{ data || error }}
+    </pre>
   </div>
 </template>
 
