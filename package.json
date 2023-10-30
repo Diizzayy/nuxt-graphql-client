@@ -51,7 +51,7 @@
   "dependencies": {
     "@graphql-codegen/cli": "^4.0.1",
     "@graphql-codegen/typescript": "^4.0.1",
-    "@graphql-codegen/typescript-graphql-request": "^5.0.0",
+    "@graphql-codegen/typescript-graphql-request": "^6.0.1",
     "@graphql-codegen/typescript-operations": "^4.0.1",
     "@nuxt/kit": "^3.6.3",
     "defu": "^6.1.2",
