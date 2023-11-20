@@ -66,7 +66,7 @@
     "@nuxt/module-builder": "latest",
     "@nuxt/test-utils": "^3.6.3",
     "@vitest/coverage-v8": "^0.33.0",
-    "eslint": "^8.52.0",
+    "eslint": "^8.54.0",
     "nuxt": "^3.6.3",
     "vitest": "^0.33.0"
   },
