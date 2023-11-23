@@ -85,6 +85,10 @@ async function prepareOperations (ctx: GqlContext) {
       return name.value
     })
 
+    if (ctx.clientOps?.[client]) { 
+      ctx.clientOps[client] = [] 
+    }
+
     for (const op of operations) {
       if (ctx.clientOps?.[client]?.includes(op)) { continue }
 

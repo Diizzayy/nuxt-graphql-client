@@ -4,7 +4,7 @@ import { unref, isRef, reactive } from 'vue'
 import type { Ref } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/dist/app/composables'
 import type { ClientError } from 'graphql-request'
-import { KeysOf, PickFrom } from 'nuxt/dist/app/composables/asyncData'
+import type { KeysOf, PickFrom } from 'nuxt/dist/app/composables/asyncData'
 import type { GqlState, GqlConfig, GqlError, TokenOpts, OnGqlError, GqlStateOpts } from '../../types'
 // @ts-ignore
 import { GqlSdks, GqClientOps } from '#gql'
