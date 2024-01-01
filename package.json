@@ -67,7 +67,7 @@
     "@nuxt/test-utils": "^3.8.1",
     "@vitest/coverage-v8": "^0.34.6",
     "eslint": "^8.54.0",
-    "nuxt": "^3.8.2",
+    "nuxt": "^3.9.0",
     "vitest": "^0.34.6"
   },
   "overrides": {
