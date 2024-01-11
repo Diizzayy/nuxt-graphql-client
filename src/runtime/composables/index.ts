@@ -2,9 +2,8 @@ import { defu } from 'defu'
 import { hash } from 'ohash'
 import { unref, isRef, reactive } from 'vue'
 import type { Ref } from 'vue'
-import type { AsyncData, AsyncDataOptions } from 'nuxt/dist/app/composables'
+import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
 import type { ClientError } from 'graphql-request'
-import { KeysOf, PickFrom } from 'nuxt/dist/app/composables/asyncData'
 import type { GqlState, GqlConfig, GqlError, TokenOpts, OnGqlError, GqlStateOpts } from '../../types'
 // @ts-ignore
 import { GqlSdks, GqClientOps } from '#gql'
@@ -281,6 +280,9 @@ export const useGqlError = (onError: OnGqlError) => {
 }
 
 const useGqlErrorState = () => useState<GqlError | null>('_gqlErrors', () => null)
+
+type PickFrom<T, K extends Array<string>> = T extends Array<any> ? T : T extends Record<string, any> ? keyof T extends K[number] ? T : K[number] extends never ? T : Pick<T, K[number]> : T;
+type KeysOf<T> = Array<T extends T ? keyof T extends string ? keyof T : never : never>;
 
 /**
  * Asynchronously query data that is required to load a page or component.
