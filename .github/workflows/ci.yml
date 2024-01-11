@@ -104,7 +104,7 @@ jobs:
       - run: pnpm dev:prepare
 
       - name: Run Tests
-        run: pnpm test -- --coverage --no-threads
+        run: pnpm test -- --coverage
 
       - uses: codecov/codecov-action@v3
   
