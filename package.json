@@ -35,7 +35,6 @@
   ],
   "scripts": {
     "prepack": "pnpm build",
-    "prepare": "pnpm dev:prepare",
     "build": "nuxt-module-build build",
     "example": "./scripts/example.sh dev",
     "example:build": "./scripts/example.sh build",
@@ -81,5 +80,5 @@
       "node-fetch": "npm:node-fetch-native@latest"
     }
   },
-  "packageManager": "pnpm@8.9.2"
+  "packageManager": "pnpm@8.14.0"
 }
