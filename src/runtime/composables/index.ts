@@ -81,7 +81,7 @@ export function useGqlHeaders (...args: any[]) {
   if (respectDefaults && !Object.keys(headers).length) {
     const defaultHeaders = (useRuntimeConfig()?.public?.['graphql-client'] as GqlConfig)?.clients?.[client || 'default']?.headers
 
-    const serverHeaders = (process.server && (typeof defaultHeaders?.serverOnly === 'object' && defaultHeaders?.serverOnly)) || undefined
+    const serverHeaders = (import.meta.server && (typeof defaultHeaders?.serverOnly === 'object' && defaultHeaders?.serverOnly)) || undefined
     if (defaultHeaders?.serverOnly) { delete defaultHeaders.serverOnly }
 
     headers = { ...(defaultHeaders as Record<string, string>), ...serverHeaders }
@@ -150,7 +150,7 @@ export function useGqlToken (...args: any[]) {
       cookie.value = token
     }
 
-    if (process.client && tokenStorage.mode === 'localStorage') {
+    if (import.meta.client && tokenStorage.mode === 'localStorage') {
       if (token !== null) {
         localStorage.setItem(tokenStorage.name!, token)
       } else {
@@ -268,7 +268,7 @@ export function useGql () {
  * */
 export const useGqlError = (onError: OnGqlError) => {
   // proactive measure to prevent context reliant calls
-  useGqlState().value.onError = process.client
+  useGqlState().value.onError = import.meta.client
     ? onError
     : (process.env.NODE_ENV !== 'production' && (e => console.error('[nuxt-graphql-client] [GraphQL error]', e))) || undefined
 
