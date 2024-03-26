@@ -1,3 +1,4 @@
+import { relative, resolve } from 'node:path'
 import { existsSync, statSync } from 'fs'
 import { defu } from 'defu'
 import { upperFirst } from 'scule'
@@ -285,6 +286,7 @@ export default defineNuxtModule<GqlConfig>({
 
     if (config.watch) {
       nuxt.hook('builder:watch', async (event, path) => {
+        path = relative(nuxt.options.srcDir, resolve(nuxt.options.srcDir, path))
         if (!path.match(/\.(gql|graphql)$/)) { return }
 
         if (event !== 'unlink' && !allowDocument(path)) { return }
