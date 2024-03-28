@@ -1,5 +1,0 @@
-query mission {
-  mission(id: "F3364BF") {
-    name
-  }
-}

@@ -7,7 +7,7 @@ export default defineNuxtConfig({
         codegen: false,
         clients: {
           spacex: {
-            host: 'https://spacex-api-2gl6xp7kua-ue.a.run.app/graphql',
+            host: 'https://spacex-api-2gl6xp7kua-ue.a.run.app/query',
             headers: {
               serverOnly: {
                 'X-SERVER-ONLY': 'vcvxcvx'

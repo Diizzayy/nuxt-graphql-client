@@ -87,6 +87,14 @@ export interface GqlClient<T = string> {
    * */
   proxyCookies?: boolean
 
+
+  /**
+   * Headers to be passed from the browser to the GraphQL API in SSR mode.
+   *
+   * @type {string[]}
+   */
+  proxyHeaders?: string[]
+
   /**
    * Specify CORS options to be used for client-side requests.
    * @type {object}
@@ -171,6 +179,22 @@ export interface GqlCodegen {
    * @default true
    * */
   onlyOperationTypes?: boolean
+
+  /**
+   * Avoid using TypeScript optionals on generated types.
+   */
+  avoidOptionals?: boolean | {
+    field?: boolean
+    inputValue?: boolean
+    object?: boolean
+    defaultValue?: boolean
+  }
+
+  /**
+   * Allow to override the type value of Maybe.
+   (https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#maybevalue)
+   */
+  maybeValue?: string
 }
 
 export interface GqlConfig<T = GqlClient> {

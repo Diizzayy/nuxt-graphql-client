@@ -1,14 +1,16 @@
 import { defu } from 'defu'
 import { hash } from 'ohash'
-import { isRef, reactive } from 'vue'
+import { unref, isRef, reactive } from 'vue'
 import type { Ref } from 'vue'
 import { extractOperation } from 'ogql/utils'
-import type { AsyncData } from 'nuxt/dist/app/composables'
+import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
+import type { ClientError } from 'graphql-request'
+
 import type { GqlState, GqlConfig, GqlError, TokenOpts, OnGqlError, GqlStateOpts } from '../../types'
 // @ts-ignore
 import { GqlSdks, GqClientOps } from '#gql'
 import type { GqlOps, GqlClients, GqlSdkFuncs } from '#gql'
-import { useState, useCookie, useNuxtApp, useAsyncData, useRuntimeConfig } from '#imports'
+import { useState, useCookie, useNuxtApp, useAsyncData, refreshNuxtData, useRuntimeConfig } from '#imports'
 
 const getGqlClient = (client?: GqlClients, state?: Ref<GqlState>): GqlClients => {
   if (!state) { state = useGqlState() }
@@ -106,6 +108,12 @@ type GqlTokenOptions = {
    * @note defined in `nuxt.config`
    * */
   client?: GqlClients
+
+  /**
+   * Refresh Gql Data on token change.
+   * @default true
+   * */
+  refreshData?: boolean
 }
 
 type GqlToken = string | null
@@ -127,6 +135,8 @@ export function useGqlToken (...args: any[]) {
   args = args || []
 
   const config: TokenOpts = args[0]?.config || args?.[1]?.config
+  const refreshData = args[0]?.refreshData ?? args?.[1]?.refreshData ?? true
+
   let client: GqlClients = args[0]?.client || args?.[1]?.client
   let token: string = typeof args[0] === 'string' || args?.[0] === null ? args[0] : args?.[0]?.token
   if (token) { token = token.trim() }
@@ -148,6 +158,12 @@ export function useGqlToken (...args: any[]) {
       } else {
         localStorage.removeItem(tokenStorage.name!)
       }
+    }
+
+    if (refreshData) {
+      const nuxtApp = useNuxtApp()
+      const _gqlDataKeys = Object.keys(nuxtApp.payload.data).filter(k => k.startsWith('gql:data:'))
+      if (_gqlDataKeys.length) { refreshNuxtData(_gqlDataKeys) }
     }
   }
 
@@ -195,19 +211,16 @@ export const useGqlHost = (host: string, client?: GqlClients) => {
     host = `${initialHost}${host}`
   }
 
-  state.value?.[client].instance!.setHost(host)
+  state.value?.[client].instance!.setEndpoint(host)
 }
 
-export const useGql = (): (<
-  T extends GqlOps,
-  R extends ReturnType<GqlSdkFuncs[T]>,
-  P extends Parameters<GqlSdkFuncs[T]>['0'],
-  > (args: { operation: T, variables?: P }) => R) &
-  (<
-    T extends GqlOps,
-    R extends ReturnType<GqlSdkFuncs[T]>,
-    P extends Parameters<GqlSdkFuncs[T]>['0'],
-    > (operation: T, variables?: P) => R) => {
+export function useGql (): <
+T extends GqlOps,
+R extends ReturnType<GqlSdkFuncs[T]>,
+P extends Parameters<GqlSdkFuncs[T]>['0'],
+> (...args: [T, P] | [{ operation: T, variables?: P }]) => R
+
+export function useGql () {
   const state = useGqlState()
   const errState = useGqlErrorState()
 
@@ -265,6 +278,9 @@ export const useGqlError = (onError: OnGqlError) => {
 
 const useGqlErrorState = () => useState<GqlError | null>('_gqlErrors', () => null)
 
+type PickFrom<T, K extends Array<string>> = T extends Array<any> ? T : T extends Record<string, any> ? keyof T extends K[number] ? T : K[number] extends never ? T : Pick<T, K[number]> : T;
+type KeysOf<T> = Array<T extends T ? keyof T extends string ? keyof T : never : never>;
+
 /**
  * Asynchronously query data that is required to load a page or component.
  *
@@ -274,11 +290,20 @@ const useGqlErrorState = () => useState<GqlError | null>('_gqlErrors', () => nul
  * @param {Object} options.options AsyncData options.
  */
 export function useAsyncGql<
-T extends GqlOps,
-p extends Parameters<GqlSdkFuncs[T]>['0'],
-P extends { [K in keyof p]: Ref<p[K]> | p[K] } | Omit<Ref<p>, 'value'>,
-R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
-O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variables?: P, options?: O }): Promise<R>
+  T extends GqlOps,
+  p extends Parameters<GqlSdkFuncs[T]>['0'],
+  P extends { [K in keyof p]: Ref<p[K]> | p[K] } | Omit<Ref<p>, 'value'>,
+  d extends Awaited<ReturnType<GqlSdkFuncs[T]>>,
+  D = d,
+  E = GqlError,
+  PK extends KeysOf<D> = KeysOf<D>,
+>(
+  options: {
+    operation: T,
+    variables?: P,
+    options?: AsyncDataOptions<d, D, PK>
+  }
+): AsyncData<PickFrom<D, PK>, E | null>
 
 /**
  * Asynchronously query data that is required to load a page or component.
@@ -288,11 +313,18 @@ O extends Parameters<typeof useAsyncData>['2']> (options: { operation: T, variab
  * @param {Object} options AsyncData options.
  */
 export function useAsyncGql<
-T extends GqlOps,
-p extends Parameters<GqlSdkFuncs[T]>['0'],
-P extends { [K in keyof p]: Ref<p[K]> | p[K] } | Omit<Ref<p>, 'value'>,
-R extends AsyncData<Awaited<ReturnType<GqlSdkFuncs[T]>>, GqlError>,
-O extends Parameters<typeof useAsyncData>['2']> (operation: T, variables?: P, options?: O): Promise<R>
+  T extends GqlOps,
+  p extends Parameters<GqlSdkFuncs[T]>['0'],
+  P extends { [K in keyof p]: Ref<p[K]> | p[K] } | Omit<Ref<p>, 'value'>,
+  d extends Awaited<ReturnType<GqlSdkFuncs[T]>>,
+  D = d,
+  E = GqlError,
+  PK extends KeysOf<D> = KeysOf<D>,
+>(
+  operation: T,
+  variables?: P,
+  options?: AsyncDataOptions<d, D, PK>
+): AsyncData<PickFrom<D, PK>, E | null>
 
 export function useAsyncGql (...args: any[]) {
   const toReactive = (v: any) => v && isRef(v) ? v : reactive(v)
@@ -303,7 +335,6 @@ export function useAsyncGql (...args: any[]) {
     options.watch = options.watch || []
     options.watch.push(variables)
   }
-  const key = hash({ operation, variables })
-  // @ts-ignore
+  const key = `gql:data:${hash({ operation, variables })}`
   return useAsyncData(key, () => useGql()(operation, unref(variables)), options)
 }

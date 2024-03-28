@@ -6,11 +6,13 @@ on:
       - main
     paths-ignore:
       - 'docs/**'
+      - '.github/workflows/docs.yml'
   pull_request:
     branches:
       - main
     paths-ignore:
       - 'docs/**'
+      - '.github/workflows/docs.yml'
   workflow_dispatch:
 
 jobs:
@@ -19,12 +21,12 @@ jobs:
 
     strategy:
       matrix:
-        node: [16]
+        node: [18]
         os: [ubuntu-latest]
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - run: corepack enable
 
@@ -36,6 +38,8 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+
+      - run: pnpm dev:prepare
 
       - name: Build
         run: pnpm build
@@ -48,7 +52,7 @@ jobs:
 
     strategy:
       matrix:
-        node: [16]
+        node: [18]
         os: [ubuntu-latest]
 
     steps:
@@ -66,6 +70,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - run: pnpm dev:prepare
+
       - name: Lint
         run: pnpm lint
   
@@ -74,7 +80,7 @@ jobs:
 
     strategy:
       matrix:
-        node: [16]
+        node: [18]
         os: [ubuntu-latest]
       fail-fast: true
 
@@ -95,8 +101,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - run: pnpm dev:prepare
+
       - name: Run Tests
-        run: pnpm test -- --coverage --no-threads
+        run: pnpm test -- --coverage
 
       - uses: codecov/codecov-action@v3
   
@@ -116,7 +124,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node: [16]
+        node: [18]
 
     permissions:
       contents: write

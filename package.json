@@ -1,6 +1,6 @@
 {
   "name": "nuxt-graphql-client",
-  "version": "0.2.22",
+  "version": "0.2.33",
   "keywords": [
     "vue",
     "nuxt",
@@ -23,6 +23,7 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/types.d.ts",
       "import": "./dist/module.mjs",
       "require": "./dist/module.cjs"
     }
@@ -34,15 +35,17 @@
   ],
   "scripts": {
     "prepack": "pnpm build",
-    "build": "nuxt-module-build",
+    "build": "nuxt-module-build build",
     "example": "./scripts/example.sh dev",
     "example:build": "./scripts/example.sh build",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
-    "test": "vitest run",
+    "dev:prepare": "nuxt-module-build build --stub && nuxi prepare playground",
+    "docs:dev": "nuxi dev docs",
+    "docs:generate": "nuxi generate docs",
+    "test": "pnpm dev:prepare && nuxi prepare examples/basic && nuxi prepare examples/multi-client && vitest run",
     "lint": "eslint --ext .js,.ts,.vue .",
-    "lint:fix": "eslint --fix --ext .js,.ts,.vue .",
-    "prepare": "nuxt-module-build --stub && nuxi prepare playground"
+    "lint:fix": "eslint --fix --ext .js,.ts,.vue ."
   },
   "dependencies": {
     "@graphql-codegen/cli": "npm:graphql-codegen-cli-nuxt@latest",
@@ -51,6 +54,7 @@
     "@nuxt/kit": "latest",
     "defu": "^6.1.1",
     "graphql": "^16.6.0",
+    "graphql-request": "^6.1.0",
     "knitwork": "^1.0.0",
     "ogql": "^0.0.1",
     "ohash": "^1.0.0",
@@ -66,5 +70,16 @@
     "playwright": "^1.28.1",
     "vitest": "^0.25.3"
   },
-  "packageManager": "pnpm@7.18.0"
+  "overrides": {
+    "node-fetch": "npm:node-fetch-native@latest"
+  },
+  "resolutions": {
+    "node-fetch": "npm:node-fetch-native@latest"
+  },
+  "pnpm": {
+    "overrides": {
+      "node-fetch": "npm:node-fetch-native@latest"
+    }
+  },
+  "packageManager": "pnpm@8.14.0"
 }

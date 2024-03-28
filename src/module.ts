@@ -1,7 +1,6 @@
 import { existsSync, statSync } from 'fs'
 import { defu } from 'defu'
 import { upperFirst } from 'scule'
-import { mockPlugin } from 'ogql/plugin'
 import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createResolver, defineNuxtModule } from '@nuxt/kit'
 import { name, version } from '../package.json'
 import generate from './generate'
@@ -49,7 +48,9 @@ export default defineNuxtModule<GqlConfig>({
       useTypeImports: true,
       dedupeFragments: true,
       disableOnBuild: false,
-      onlyOperationTypes: true
+      onlyOperationTypes: true,
+      avoidOptionals: false,
+      maybeValue: 'T | null'
     }
 
     config.codegen = !!config.codegen && defu<GqlCodegen, [GqlCodegen]>(config.codegen, codegenDefaults)
@@ -112,7 +113,10 @@ export default defineNuxtModule<GqlConfig>({
       const runtimeClientHost = k === defaultClient ? process.env.GQL_CLIENT_HOST : process.env?.[`GQL_${k.toUpperCase()}_CLIENT_HOST`]
       if (runtimeClientHost) { conf.clientHost = runtimeClientHost }
 
-      if (!conf?.host) { throw new Error(`GraphQL client (${k}) is missing it's host.`) }
+      if (!conf?.host) {
+        logger.warn(`GraphQL client (${k}) is missing it's host.`)
+        return
+      }
 
       const runtimeToken = k === defaultClient ? process.env.GQL_TOKEN : process.env?.[`GQL_${k.toUpperCase()}_TOKEN`]
       if (runtimeToken) { conf.token = { ...conf.token, value: runtimeToken } }
@@ -179,7 +183,7 @@ export default defineNuxtModule<GqlConfig>({
           ? ctx.clientDocs
           : Object.keys(ctx.clientDocs)
             .filter(k => ctx.clientDocs?.[k]?.some(e => e.endsWith(hmrDoc)))
-            .reduce((acc, k) => ({ ...acc, [k]: ctx.clientDocs?.[k] }), {})
+            .reduce((acc, k) => ({ ...acc, [k]: ctx.clientDocs?.[k] }), {}) as Record<string, string[]>
 
         const codegenResult = ctx?.codegen
           ? await generate({
