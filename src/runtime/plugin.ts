@@ -18,15 +18,15 @@ export default defineNuxtPlugin((nuxtApp) => {
     const proxyHeaders = Object.values(clients || {}).flatMap(v => v?.proxyHeaders).filter((v, i, a) => Boolean(v) && a.indexOf(v) === i) as string[]
     if (!proxyHeaders.includes('cookie')) { proxyHeaders.push('cookie') }
 
-    const requestHeaders = ((process.server && useRequestHeaders(proxyHeaders)) as Record<string, string>) || undefined
+    const requestHeaders = ((import.meta.server && useRequestHeaders(proxyHeaders)) as Record<string, string>) || undefined
 
     for (const [name, v] of Object.entries(clients || {})) {
-      const host = (process.client && v?.clientHost) || v.host
+      const host = (import.meta.client && v?.clientHost) || v.host
 
       const proxyCookie = v?.proxyCookies && !!requestHeaders?.cookie
 
       let headers = v?.headers as Record<string, string> | undefined
-      const serverHeaders = (process.server && (typeof headers?.serverOnly === 'object' && headers?.serverOnly)) || {}
+      const serverHeaders = (import.meta.server && (typeof headers?.serverOnly === 'object' && headers?.serverOnly)) || {}
 
       if (headers?.serverOnly) {
         headers = { ...headers }
@@ -65,13 +65,13 @@ export default defineNuxtPlugin((nuxtApp) => {
 
             if (token.value === undefined && typeof v.tokenStorage === 'object') {
               if (v.tokenStorage?.mode === 'cookie') {
-                if (process.client) {
+                if (import.meta.client) {
                   token.value = useCookie(v.tokenStorage.name!).value
                 } else if (requestHeaders?.cookie) {
                   const cookieName = `${v.tokenStorage.name}=`
                   token.value = requestHeaders?.cookie.split(';').find(c => c.trim().startsWith(cookieName))?.split('=')?.[1]
                 }
-              } else if (process.client && v.tokenStorage?.mode === 'localStorage') {
+              } else if (import.meta.client && v.tokenStorage?.mode === 'localStorage') {
                 const storedToken = localStorage.getItem(v.tokenStorage.name!)
 
                 if (storedToken) { token.value = storedToken }
