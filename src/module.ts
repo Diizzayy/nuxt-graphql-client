@@ -6,13 +6,14 @@ import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createR
 import { name, version } from '../package.json'
 import generate from './generate'
 import { mapDocsToClients, extractGqlOperations } from './utils'
-import type { GqlConfig, GqlClient, GqlCodegen, TokenStorageOpts } from './types'
+import type { GqlConfig, GqlClient, GqlCodegen, TokenStorageOpts, GqlError } from './types'
 import { prepareContext, mockTemplate } from './context'
 import type { GqlContext } from './context'
 
 const logger = useLogger('nuxt-graphql-client')
 
 export type ModuleOptions = Partial<GqlConfig>
+export type { GqlError }
 
 export default defineNuxtModule<GqlConfig>({
   meta: {
