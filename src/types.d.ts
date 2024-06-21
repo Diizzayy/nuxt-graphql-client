@@ -1,4 +1,4 @@
-import type { GraphQLClient } from 'graphql-request'
+import type { GraphQLClient, FetchOptions } from 'graphql-request'
 import type { GraphQLError } from 'graphql-request/dist/types'
 import type { CookieOptions } from 'nuxt/dist/app/composables'
 
@@ -127,6 +127,12 @@ export interface GqlClient<T = string> {
    * Declare headers that should only be applied to the GraphQL Code Generator.
    * */
   codegenHeaders?: Record<string, string>
+
+  /**
+   * Additional fetch options to be passed to the GraphQL client.
+   * @see https://github.com/jasonkuhrt/graphql-request#configuration
+   */
+  fetchOptions?: FetchOptions
 }
 
 export interface GqlCodegen {

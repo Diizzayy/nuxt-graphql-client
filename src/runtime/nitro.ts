@@ -22,6 +22,6 @@ export default defineNitroPlugin(() => {
       ...(conf?.token?.value && { [tokenName]: authToken })
     }
 
-    GqlNitro.clients[client] = new GraphQLClient(conf.host, { headers })
+    GqlNitro.clients[client] = new GraphQLClient(conf.host, { headers, ...conf.fetchOptions })
   }
 })
