@@ -303,7 +303,9 @@ export default defineNuxtModule<GqlConfig>({
     await generateGqlTypes()
 
     nuxt.hook('vite:extendConfig', (config, { isServer }) => {
-      config.optimizeDeps?.include?.push('graphql-request')
+      config.optimizeDeps = config.optimizeDeps || {};
+      config.optimizeDeps.include = config.optimizeDeps.include || [];
+      config.optimizeDeps.include.push('nuxt-graphql-request > graphql-request');
 
       if (isServer && config.define?.['typeof document']) {
         delete config.define['typeof document']
