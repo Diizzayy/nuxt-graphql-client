@@ -45,7 +45,8 @@ export default defineNuxtPlugin((nuxtApp) => {
           ...serverHeaders,
           ...(proxyCookie && { cookie: requestHeaders?.cookie })
         },
-        ...v?.corsOptions
+        ...v?.corsOptions,
+        ...v?.fetchOptions,
       }
 
       nuxtApp._gqlState.value[name] = {
@@ -97,7 +98,8 @@ export default defineNuxtPlugin((nuxtApp) => {
 
             if (reqOpts?.token) { delete reqOpts.token }
             return defu(req, reqOpts)
-          }
+          },
+          ...v?.fetchOptions,
         })
       }
     }
