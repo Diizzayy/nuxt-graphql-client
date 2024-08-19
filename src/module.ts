@@ -21,7 +21,7 @@ export default defineNuxtModule<GqlConfig>({
     version,
     configKey: 'graphql-client',
     compatibility: {
-      nuxt: '^3.7.0'
+      nuxt: '>=3.7.0'
     }
   },
   defaults: {
