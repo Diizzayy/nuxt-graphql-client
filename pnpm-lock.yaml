@@ -18,8 +18,8 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1(graphql@16.8.1)
       '@graphql-codegen/typescript-graphql-request':
-        specifier: ^6.1.0
-        version: 6.1.0(graphql-request@6.1.0)(graphql-tag@2.12.6)(graphql@16.8.1)
+        specifier: ^6.2.0
+        version: 6.2.0(graphql-request@6.1.0)(graphql-tag@2.12.6)(graphql@16.8.1)
       '@graphql-codegen/typescript-operations':
         specifier: ^4.0.1
         version: 4.0.1(graphql@16.8.1)
@@ -250,7 +250,7 @@ packages:
     dependencies:
       '@babel/compat-data': 7.23.5
       '@babel/helper-validator-option': 7.23.5
-      browserslist: 4.22.2
+      browserslist: 4.23.3
       lru-cache: 5.1.1
       semver: 6.3.1
 
@@ -1807,8 +1807,8 @@ packages:
       tslib: 2.5.3
     dev: false
 
-  /@graphql-codegen/typescript-graphql-request@6.1.0(graphql-request@6.1.0)(graphql-tag@2.12.6)(graphql@16.8.1):
-    resolution: {integrity: sha512-hMhBazvdSQWuOrH6GnYew8zb9wDq9le0o3tPu07if/v97LVVKsVfPNcMG/cTLYZufaog9o2jScLbyo17HEqicg==}
+  /@graphql-codegen/typescript-graphql-request@6.2.0(graphql-request@6.1.0)(graphql-tag@2.12.6)(graphql@16.8.1):
+    resolution: {integrity: sha512-nkp5tr4PrC/+2QkQqi+IB+bc7AavUnUvXPW8MC93HZRvwfMGy6m2Oo7b9JCPZ3vhNpqT2VDWOn/zIZXKz6zJAw==}
     engines: {node: '>= 16.0.0'}
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
@@ -2153,7 +2153,7 @@ packages:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
       graphql: 16.8.1
-      tslib: 2.5.3
+      tslib: 2.6.2
     dev: false
 
   /@graphql-tools/prisma-loader@8.0.2(graphql@16.8.1):
@@ -2210,7 +2210,7 @@ packages:
       '@ardatan/relay-compiler': 12.0.0(graphql@16.8.1)
       '@graphql-tools/utils': 10.0.12(graphql@16.8.1)
       graphql: 16.8.1
-      tslib: 2.5.3
+      tslib: 2.6.2
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -2461,7 +2461,7 @@ packages:
       nopt: 5.0.0
       npmlog: 5.0.1
       rimraf: 3.0.2
-      semver: 7.5.4
+      semver: 7.6.3
       tar: 6.2.0
     transitivePeerDependencies:
       - supports-color
@@ -2523,7 +2523,7 @@ packages:
     resolution: {integrity: sha512-7kZUAaLscfgbwBQRbvdMYaZOWyMEcPTH/tJjnyAWJ/dvvs9Ef+CERx/qJb9GExJpl1qipaDGn7KqHnFGGixd0w==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     dependencies:
-      semver: 7.5.4
+      semver: 7.6.3
     dev: true
 
   /@npmcli/git@5.0.4:
@@ -2536,7 +2536,7 @@ packages:
       proc-log: 3.0.0
       promise-inflight: 1.0.1
       promise-retry: 2.0.1
-      semver: 7.5.4
+      semver: 7.6.3
       which: 4.0.0
     transitivePeerDependencies:
       - bluebird
@@ -5522,6 +5522,7 @@ packages:
       electron-to-chromium: 1.4.628
       node-releases: 2.0.14
       update-browserslist-db: 1.0.13(browserslist@4.22.2)
+    dev: true
 
   /browserslist@4.23.3:
     resolution: {integrity: sha512-btwCFJVjI4YWDNfau8RhZ+B1Q/VLoUITrm3RlP6y1tYGWIOa+InuYiRGXUBXo8nA1qKmHMyLB/iVQg5TT4eFoA==}
@@ -5532,7 +5533,6 @@ packages:
       electron-to-chromium: 1.5.13
       node-releases: 2.0.18
       update-browserslist-db: 1.1.0(browserslist@4.23.3)
-    dev: true
 
   /bser@2.1.1:
     resolution: {integrity: sha512-gQxTNE/GAfIIrmHLUE3oJyp5FO6HRBfhjnw4/wMmA63ZGDJnWBmgY/lyQBpnDUkGmAhbSe39tx2d/iTOAfglwQ==}
@@ -5563,7 +5563,7 @@ packages:
   /builtins@5.0.1:
     resolution: {integrity: sha512-qwVpFEHNfhYJIzNRBvd2C1kyo6jz3ZSMPyyuR47OPdiKWlbYnZNyDWuyR175qDnAJLiCo5fBBqPb3RiXgWlkOQ==}
     dependencies:
-      semver: 7.5.4
+      semver: 7.6.3
     dev: true
 
   /bundle-name@3.0.0:
@@ -5648,18 +5648,18 @@ packages:
   /caniuse-api@3.0.0:
     resolution: {integrity: sha512-bsTwuIg/BZZK/vreVTYYbSWoe2F+71P7K5QGEX+pT250DZbfU1MQ5prOKpPR+LL6uWKK3KMwMCAS74QB3Um1uw==}
     dependencies:
-      browserslist: 4.22.2
-      caniuse-lite: 1.0.30001576
+      browserslist: 4.23.3
+      caniuse-lite: 1.0.30001653
       lodash.memoize: 4.1.2
       lodash.uniq: 4.5.0
     dev: true
 
   /caniuse-lite@1.0.30001576:
     resolution: {integrity: sha512-ff5BdakGe2P3SQsMsiqmt1Lc8221NR1VzHj5jXN5vBny9A6fpze94HiVV/n7XRosOlsShJcvMv5mdnpjOGCEgg==}
+    dev: true
 
   /caniuse-lite@1.0.30001653:
     resolution: {integrity: sha512-XGWQVB8wFQ2+9NZwZ10GxTYC5hk0Fa+q8cSkr0tgvMhYhMHP/QC+WTgrePMDBWiWc/pV+1ik82Al20XOK25Gcw==}
-    dev: true
 
   /capital-case@1.0.4:
     resolution: {integrity: sha512-ds37W8CytHgwnhGGTi88pcPyR15qoNkOpYwmMMfnWqqWgESapLqvDx6huFjQ5vqWSn2Z06173XNA7LtMOeUh1A==}
@@ -6533,10 +6533,10 @@ packages:
 
   /electron-to-chromium@1.4.628:
     resolution: {integrity: sha512-2k7t5PHvLsufpP6Zwk0nof62yLOsCf032wZx7/q0mv8gwlXjhcxI3lz6f0jBr0GrnWKcm3burXzI3t5IrcdUxw==}
+    dev: true
 
   /electron-to-chromium@1.5.13:
     resolution: {integrity: sha512-lbBcvtIJ4J6sS4tb5TLp1b4LyfCdMkwStzXPyAgVgTRAsep4bvrAGaBOP7ZJtQMNJpSQ9SqG4brWOroNaQtm7Q==}
-    dev: true
 
   /emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
@@ -6751,7 +6751,6 @@ packages:
   /escalade@3.1.2:
     resolution: {integrity: sha512-ErCHMCae19vR8vQGe50xIsVomy19rg6gFu3+r3jkEO46suLMWBksvVyoGgQV+jOfl84ZSOSlmv6Gxa89PmTGmA==}
     engines: {node: '>=6'}
-    dev: true
 
   /escape-html@1.0.3:
     resolution: {integrity: sha512-NiSupZ4OeuGwr68lGIeym/ksIZMJodUGOSCZ/FSnTxcrekbvqrgdUxlJOMpijaKZVjAJrWrGs/6Jy8OMuyj9ow==}
@@ -9448,7 +9447,7 @@ packages:
       make-fetch-happen: 13.0.0
       nopt: 7.2.0
       proc-log: 3.0.0
-      semver: 7.5.4
+      semver: 7.6.3
       tar: 6.2.0
       which: 4.0.0
     transitivePeerDependencies:
@@ -9461,10 +9460,10 @@ packages:
 
   /node-releases@2.0.14:
     resolution: {integrity: sha512-y10wOWt8yZpqXmOgRo77WaHEmhYQYGNA6y421PKsKYWEK8aW+cqAphborZDhqfyKrbZEN92CN1X2KbafY2s7Yw==}
+    dev: true
 
   /node-releases@2.0.18:
     resolution: {integrity: sha512-d9VeXT4SJ7ZeOqGX6R5EM022wpL+eWPooLI+5UpWn2jCT1aosUQEhQP214x33Wkwx3JQMvIm+tIoVOdodFS40g==}
-    dev: true
 
   /nopt@5.0.0:
     resolution: {integrity: sha512-Tbj67rffqceeLpcRXrT7vKAN8CwfPeIBgM7E6iBkmKLV7bEMwpGgYLGv0jACUsECaa/vuxP0IjEont6umdMgtQ==}
@@ -9488,7 +9487,7 @@ packages:
     dependencies:
       hosted-git-info: 7.0.1
       is-core-module: 2.13.1
-      semver: 7.5.4
+      semver: 7.6.3
       validate-npm-package-license: 3.0.4
     dev: true
 
@@ -9519,7 +9518,7 @@ packages:
     resolution: {integrity: sha512-W29RiK/xtpCGqn6f3ixfRYGk+zRyr+Ew9F2E20BfXxT5/euLdA/Nm7fO7OeTGuAmTs30cpgInyJ0cYe708YTZw==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     dependencies:
-      semver: 7.5.4
+      semver: 7.6.3
     dev: true
 
   /npm-normalize-package-bin@3.0.1:
@@ -9533,7 +9532,7 @@ packages:
     dependencies:
       hosted-git-info: 7.0.1
       proc-log: 3.0.0
-      semver: 7.5.4
+      semver: 7.6.3
       validate-npm-package-name: 5.0.0
     dev: true
 
@@ -9551,7 +9550,7 @@ packages:
       npm-install-checks: 6.3.0
       npm-normalize-package-bin: 3.0.1
       npm-package-arg: 11.0.1
-      semver: 7.5.4
+      semver: 7.6.3
     dev: true
 
   /npm-registry-fetch@16.1.0:
@@ -10340,10 +10339,10 @@ packages:
 
   /picocolors@1.0.0:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
+    dev: true
 
   /picocolors@1.0.1:
     resolution: {integrity: sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==}
-    dev: true
 
   /picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
@@ -10422,7 +10421,7 @@ packages:
     peerDependencies:
       postcss: ^8.4.31
     dependencies:
-      browserslist: 4.22.2
+      browserslist: 4.23.3
       caniuse-api: 3.0.0
       colord: 2.9.3
       postcss: 8.4.33
@@ -10448,7 +10447,7 @@ packages:
     peerDependencies:
       postcss: ^8.4.31
     dependencies:
-      browserslist: 4.22.2
+      browserslist: 4.23.3
       postcss: 8.4.33
       postcss-value-parser: 4.2.0
     dev: true
@@ -10587,7 +10586,7 @@ packages:
     peerDependencies:
       postcss: ^8.4.31
     dependencies:
-      browserslist: 4.22.2
+      browserslist: 4.23.3
       caniuse-api: 3.0.0
       cssnano-utils: 4.0.1(postcss@8.4.33)
       postcss: 8.4.33
@@ -10657,7 +10656,7 @@ packages:
     peerDependencies:
       postcss: ^8.4.31
     dependencies:
-      browserslist: 4.22.2
+      browserslist: 4.23.3
       cssnano-utils: 4.0.1(postcss@8.4.33)
       postcss: 8.4.33
       postcss-value-parser: 4.2.0
@@ -10830,7 +10829,7 @@ packages:
     peerDependencies:
       postcss: ^8.4.31
     dependencies:
-      browserslist: 4.22.2
+      browserslist: 4.23.3
       postcss: 8.4.33
       postcss-value-parser: 4.2.0
     dev: true
@@ -10914,7 +10913,7 @@ packages:
     peerDependencies:
       postcss: ^8.4.31
     dependencies:
-      browserslist: 4.22.2
+      browserslist: 4.23.3
       caniuse-api: 3.0.0
       postcss: 8.4.33
     dev: true
@@ -12039,7 +12038,7 @@ packages:
     peerDependencies:
       postcss: ^8.4.31
     dependencies:
-      browserslist: 4.22.2
+      browserslist: 4.23.3
       postcss: 8.4.33
       postcss-selector-parser: 6.0.15
     dev: true
@@ -12099,7 +12098,7 @@ packages:
       css-tree: 2.3.1
       css-what: 6.1.0
       csso: 5.0.5
-      picocolors: 1.0.0
+      picocolors: 1.0.1
     dev: true
 
   /svgo@3.3.2:
@@ -12113,7 +12112,7 @@ packages:
       css-tree: 2.3.1
       css-what: 6.1.0
       csso: 5.0.5
-      picocolors: 1.0.0
+      picocolors: 1.0.1
     dev: true
 
   /swap-case@2.0.2:
@@ -12797,8 +12796,9 @@ packages:
       browserslist: '>= 4.21.0'
     dependencies:
       browserslist: 4.22.2
-      escalade: 3.1.1
-      picocolors: 1.0.0
+      escalade: 3.1.2
+      picocolors: 1.0.1
+    dev: true
 
   /update-browserslist-db@1.1.0(browserslist@4.23.3):
     resolution: {integrity: sha512-EdRAaAyk2cUE1wOf2DkEhzxqOQvFOoRJFNS6NeyJ01Gp2beMRpBAINjM2iDXE3KCuKhwnvHIQCJm6ThL2Z+HzQ==}
@@ -12809,7 +12809,6 @@ packages:
       browserslist: 4.23.3
       escalade: 3.1.2
       picocolors: 1.0.1
-    dev: true
 
   /upper-case-first@2.0.2:
     resolution: {integrity: sha512-514ppYHBaKwfJRK/pNC6c/OxfGa0obSnAl106u97Ed0I625Nin96KAjttZF6ZL3e1XLtphxnqrOi9iWgm+u+bg==}
@@ -13266,7 +13265,7 @@ packages:
     engines: {vscode: ^1.52.0}
     dependencies:
       minimatch: 3.1.2
-      semver: 7.5.4
+      semver: 7.6.3
       vscode-languageserver-protocol: 3.16.0
     dev: true
 
