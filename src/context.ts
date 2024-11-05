@@ -1,4 +1,4 @@
-import { promises as fsp } from 'fs'
+import { promises as fsp } from 'node:fs'
 import { parse } from 'graphql'
 import { upperFirst } from 'scule'
 import type { Import } from 'unimport'
@@ -17,7 +17,7 @@ export interface GqlContext {
   clientTypes?: Record<string, string[]>
 }
 
-export async function prepareContext (ctx: GqlContext, prefix: string) {
+export async function prepareContext(ctx: GqlContext, prefix: string) {
   if (ctx.clientDocs) { await prepareOperations(ctx) }
 
   if (ctx.template) { prepareTemplate(ctx) }
@@ -56,25 +56,25 @@ export async function prepareContext (ctx: GqlContext, prefix: string) {
       : ctx.clients!.map(client => `import { getSdk as ${client}GqlSdk } from '#gql/${client}'`)),
     ...Object.entries(ctx.clientTypes || {}).map(([k, v]) => genExport(`#gql/${k}`, v)),
     'declare module \'#gql\' {',
-      `  type GqlClients = '${ctx.clients?.join("' | '") || 'default'}'`,
-      `  type GqlOps = '${Object.values(ctx.clientOps!).flat().join("' | '")}'`,
-      `  const GqClientOps = ${JSON.stringify(ctx.clientOps)}`,
-      ...(!ctx.codegen
-        ? []
-        : [
-            '  const GqlSdks = {',
-            ...ctx.clients!.map(client => `    ${client}: ${client}GqlSdk,`),
-            '  }',
-            ...ctx.fns!.map(f => fnExp(f, true)),
-            `  type GqlSdkFuncs = ${ctx.clients?.map(c => `ReturnType<typeof ${c}GqlSdk>`).join(' & ') || 'any'}`
-          ]),
-      '}'
+    `  type GqlClients = '${ctx.clients?.join('\' | \'') || 'default'}'`,
+    `  type GqlOps = '${Object.values(ctx.clientOps!).flat().join('\' | \'')}'`,
+    `  const GqClientOps = ${JSON.stringify(ctx.clientOps)}`,
+    ...(!ctx.codegen
+      ? []
+      : [
+          '  const GqlSdks = {',
+          ...ctx.clients!.map(client => `    ${client}: ${client}GqlSdk,`),
+          '  }',
+          ...ctx.fns!.map(f => fnExp(f, true)),
+          `  type GqlSdkFuncs = ${ctx.clients?.map(c => `ReturnType<typeof ${c}GqlSdk>`).join(' & ') || 'any'}`
+        ]),
+    '}'
   ].join('\n')
 
   ctx.fnImports = ctx.fns.map((fn): Import => ({ from: '#gql', name: fnName(fn) }))
 }
 
-async function prepareOperations (ctx: GqlContext) {
+async function prepareOperations(ctx: GqlContext) {
   const scanDoc = async (doc: string, client: string) => {
     const { definitions } = parse(await fsp.readFile(doc, 'utf8'))
 
@@ -99,7 +99,7 @@ async function prepareOperations (ctx: GqlContext) {
   }
 }
 
-function prepareTemplate (ctx: GqlContext) {
+function prepareTemplate(ctx: GqlContext) {
   if (!ctx.codegen) { return }
 
   ctx.clientTypes ||= {}

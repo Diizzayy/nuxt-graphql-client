@@ -44,8 +44,8 @@
     "docs:dev": "nuxi dev docs",
     "docs:generate": "nuxi generate docs",
     "test": "pnpm dev:prepare && nuxi prepare examples/basic && nuxi prepare examples/multi-client && vitest run",
-    "lint": "eslint --ext .js,.ts,.vue .",
-    "lint:fix": "eslint --fix --ext .js,.ts,.vue ."
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@graphql-codegen/cli": "^5.0.3",

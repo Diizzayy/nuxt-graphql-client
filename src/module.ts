@@ -1,5 +1,5 @@
 import { relative, resolve } from 'node:path'
-import { existsSync, statSync } from 'fs'
+import { existsSync, statSync } from 'node:fs'
 import { defu } from 'defu'
 import { upperFirst } from 'scule'
 import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createResolver, defineNuxtModule } from '@nuxt/kit'
@@ -32,7 +32,7 @@ export default defineNuxtModule<GqlConfig>({
     tokenStorage: true,
     functionPrefix: 'Gql'
   },
-  async setup (opts, nuxt) {
+  async setup(opts, nuxt) {
     const resolver = createResolver(import.meta.url)
     const srcResolver = createResolver(nuxt.options.srcDir)
 
@@ -73,11 +73,11 @@ export default defineNuxtModule<GqlConfig>({
     }
 
     if (!ctx?.clients?.length) {
-      const host =
-        process.env.GQL_HOST || nuxt.options.runtimeConfig.public.GQL_HOST
+      const host
+        = process.env.GQL_HOST || nuxt.options.runtimeConfig.public.GQL_HOST
 
-      const clientHost =
-        process.env.GQL_CLIENT_HOST || nuxt.options.runtimeConfig.public.GQL_CLIENT_HOST
+      const clientHost
+        = process.env.GQL_CLIENT_HOST || nuxt.options.runtimeConfig.public.GQL_CLIENT_HOST
 
       if (!host) {
         logger.warn('No GraphQL clients configured. Skipping module setup.')
@@ -158,14 +158,15 @@ export default defineNuxtModule<GqlConfig>({
 
         if (existsSync(dir)) {
           documentPaths.push(dir)
-        } else {
+        }
+        else {
           logger.warn(`[nuxt-graphql-client] Invalid document path: ${dir}`)
         }
       }
     }
 
     const gqlMatch = '**/*.{gql,graphql}'
-    async function generateGqlTypes (hmrDoc?: string) {
+    async function generateGqlTypes(hmrDoc?: string) {
       const documents: string[] = []
       for await (const path of documentPaths) {
         const files = (await resolveFiles(path, [gqlMatch, '!**/schemas'], { followSymbolicLinks: false })).filter(allowDocument)
