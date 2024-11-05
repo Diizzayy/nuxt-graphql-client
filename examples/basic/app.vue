@@ -1,10 +1,10 @@
 <template>
   <div>
-    <NuxtExampleLayout repo="diizzayy/nuxt-graphql-client" example="basic" class="text-start">
+    <UCard>
       <div>
-        <NButton @click="refresh()">
+        <UButton @click="refresh()">
           Refresh
-        </NButton>
+        </UButton>
       </div>
 
       <p>Launch Count: {{ data?.launches.length || 0 }}</p>
@@ -38,7 +38,7 @@
           </p>
         </div>
       </div>
-    </NuxtExampleLayout>
+    </UCard>
   </div>
 </template>
 
