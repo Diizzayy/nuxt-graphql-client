@@ -102,7 +102,7 @@ export default defineNuxtPlugin(() => {
             }
 
             if (reqOpts?.token) { delete reqOpts.token }
-            return defu(req, reqOpts)
+            return defu(reqOpts, req)
           },
           ...v?.fetchOptions
         })
