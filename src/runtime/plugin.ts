@@ -102,7 +102,12 @@ export default defineNuxtPlugin(() => {
             }
 
             if (reqOpts?.token) { delete reqOpts.token }
-            return defu(reqOpts, req)
+            return defu(reqOpts, req, {
+              headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/graphql-response+json, application/json'
+              }
+            })
           },
           ...v?.fetchOptions
         })
