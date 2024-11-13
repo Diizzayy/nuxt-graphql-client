@@ -6,6 +6,7 @@ settings:
 
 overrides:
   node-fetch: npm:node-fetch-native@latest
+  nuxt-graphql-client: workspace:*
 
 importers:
 
@@ -91,8 +92,8 @@ importers:
         specifier: latest
         version: 3.14.0(@parcel/watcher@2.5.0)(@types/node@20.17.6)(eslint@9.14.0(jiti@2.4.0))(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.24.4)(terser@5.36.0)(typescript@5.6.3)(vite@5.4.10(@types/node@20.17.6)(terser@5.36.0))
       nuxt-graphql-client:
-        specifier: latest
-        version: 0.2.36(@parcel/watcher@2.5.0)(@types/node@20.17.6)(graphql-tag@2.12.6(graphql@16.9.0))(magicast@0.3.5)(rollup@4.24.4)(typescript@5.6.3)
+        specifier: workspace:*
+        version: link:../..
 
   examples/extends:
     devDependencies:
@@ -103,8 +104,8 @@ importers:
         specifier: latest
         version: 3.14.0(@parcel/watcher@2.5.0)(@types/node@20.17.6)(eslint@9.14.0(jiti@2.4.0))(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.24.4)(terser@5.36.0)(typescript@5.6.3)(vite@5.4.10(@types/node@20.17.6)(terser@5.36.0))
       nuxt-graphql-client:
-        specifier: latest
-        version: 0.2.36(@parcel/watcher@2.5.0)(@types/node@20.17.6)(graphql-tag@2.12.6(graphql@16.9.0))(magicast@0.3.5)(rollup@4.24.4)(typescript@5.6.3)
+        specifier: workspace:*
+        version: link:../..
 
   examples/multi-client:
     devDependencies:
@@ -115,8 +116,8 @@ importers:
         specifier: latest
         version: 3.14.0(@parcel/watcher@2.5.0)(@types/node@20.17.6)(eslint@9.14.0(jiti@2.4.0))(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.24.4)(terser@5.36.0)(typescript@5.6.3)(vite@5.4.10(@types/node@20.17.6)(terser@5.36.0))
       nuxt-graphql-client:
-        specifier: latest
-        version: 0.2.36(@parcel/watcher@2.5.0)(@types/node@20.17.6)(graphql-tag@2.12.6(graphql@16.9.0))(magicast@0.3.5)(rollup@4.24.4)(typescript@5.6.3)
+        specifier: workspace:*
+        version: link:../..
 
   examples/starter:
     devDependencies:
@@ -127,8 +128,8 @@ importers:
         specifier: latest
         version: 3.14.0(@parcel/watcher@2.5.0)(@types/node@20.17.6)(eslint@9.14.0(jiti@2.4.0))(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.24.4)(terser@5.36.0)(typescript@5.6.3)(vite@5.4.10(@types/node@20.17.6)(terser@5.36.0))
       nuxt-graphql-client:
-        specifier: latest
-        version: 0.2.36(@parcel/watcher@2.5.0)(@types/node@20.17.6)(graphql-tag@2.12.6(graphql@16.9.0))(magicast@0.3.5)(rollup@4.24.4)(typescript@5.6.3)
+        specifier: workspace:*
+        version: link:../..
 
   playground:
     devDependencies:
@@ -5121,9 +5122,6 @@ packages:
   nuxt-config-schema@0.4.6:
     resolution: {integrity: sha512-kHLWJFynj5QrxVZ1MjY2xmDaTSN1BCMLGExA+hMMLoCb3wn9TJlDVqnE/nSdUJPMRkNn/NQ5WP9NLA9vlAXRUw==}
 
-  nuxt-graphql-client@0.2.36:
-    resolution: {integrity: sha512-rtY05AptqJmKwTbD3PlbrdUNY4LDVfeIUBkulJLj5GVxlBRLLkcaQEZzFBp6AHow5QVNZgD5hN0R4Yjz7vjClQ==}
-
   nuxt-icon@0.3.3:
     resolution: {integrity: sha512-KdhJAigBGTP8/YIFZ3orwetk40AgLq6VQ5HRYuDLmv5hiDptor9Ro+WIdZggHw7nciRxZvDdQkEwi9B5G/jrkQ==}
 
@@ -7935,18 +7933,6 @@ snapshots:
       auto-bind: 4.0.0
       change-case-all: 1.0.15
       graphql: 16.9.0
-      tslib: 2.6.3
-    transitivePeerDependencies:
-      - supports-color
-
-  '@graphql-codegen/typescript-graphql-request@6.2.0(graphql-request@6.1.0(graphql@16.9.0))(graphql-tag@2.12.6(graphql@16.9.0))(graphql@16.9.0)':
-    dependencies:
-      '@graphql-codegen/plugin-helpers': 3.1.2(graphql@16.9.0)
-      '@graphql-codegen/visitor-plugin-common': 2.13.1(graphql@16.9.0)
-      auto-bind: 4.0.0
-      graphql: 16.9.0
-      graphql-request: 6.1.0(graphql@16.9.0)
-      graphql-tag: 2.12.6(graphql@16.9.0)
       tslib: 2.6.3
     transitivePeerDependencies:
       - supports-color
@@ -13549,33 +13535,6 @@ snapshots:
       - magicast
       - rollup
       - supports-color
-      - webpack-sources
-
-  nuxt-graphql-client@0.2.36(@parcel/watcher@2.5.0)(@types/node@20.17.6)(graphql-tag@2.12.6(graphql@16.9.0))(magicast@0.3.5)(rollup@4.24.4)(typescript@5.6.3):
-    dependencies:
-      '@graphql-codegen/cli': 5.0.3(@parcel/watcher@2.5.0)(@types/node@20.17.6)(graphql@16.9.0)(typescript@5.6.3)
-      '@graphql-codegen/typescript': 4.1.1(graphql@16.9.0)
-      '@graphql-codegen/typescript-graphql-request': 6.2.0(graphql-request@6.1.0(graphql@16.9.0))(graphql-tag@2.12.6(graphql@16.9.0))(graphql@16.9.0)
-      '@graphql-codegen/typescript-operations': 4.3.1(graphql@16.9.0)
-      '@nuxt/kit': 3.14.0(magicast@0.3.5)(rollup@4.24.4)
-      defu: 6.1.4
-      graphql: 16.9.0
-      graphql-request: 6.1.0(graphql@16.9.0)
-      knitwork: 1.1.0
-      ohash: 1.1.4
-      scule: 1.3.0
-    transitivePeerDependencies:
-      - '@parcel/watcher'
-      - '@types/node'
-      - bufferutil
-      - cosmiconfig-toml-loader
-      - enquirer
-      - graphql-tag
-      - magicast
-      - rollup
-      - supports-color
-      - typescript
-      - utf-8-validate
       - webpack-sources
 
   nuxt-icon@0.3.3(magicast@0.3.5)(rollup@4.24.4)(vue@3.5.12(typescript@5.6.3)):

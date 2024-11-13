@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-05',
 
-  modules: ['nuxt-graphql-client'],
+  modules: ['@nuxt/ui', 'nuxt-graphql-client'],
 
   runtimeConfig: {
     public: {
@@ -18,7 +18,8 @@ export default defineNuxtConfig({
           },
           rmorty: 'https://rickandmortyapi.com/graphql',
           countries: 'https://countries.trevorblades.com/graphql',
-          todos: 'https://nuxt-gql-server-2gl6xp7kua-ue.a.run.app/query'
+          todos: 'https://nuxt-gql-server-2gl6xp7kua-ue.a.run.app/query',
+          github: 'https://api.github.com/graphql'
         }
       }
     }

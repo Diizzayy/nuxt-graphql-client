@@ -77,7 +77,8 @@
   },
   "pnpm": {
     "overrides": {
-      "node-fetch": "npm:node-fetch-native@latest"
+      "node-fetch": "npm:node-fetch-native@latest",
+      "nuxt-graphql-client": "workspace:*"
     }
   },
   "packageManager": "pnpm@9.7.0"
