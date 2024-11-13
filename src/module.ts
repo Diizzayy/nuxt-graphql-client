@@ -102,11 +102,13 @@ export default defineNuxtModule<GqlConfig>({
     const defaultClient = (config?.clients?.default && 'default') || Object.keys(config.clients!)[0]
 
     for (const [k, v] of Object.entries(config.clients!)) {
+      const defaults = JSON.parse(JSON.stringify(clientDefaults))
+
       const conf = defu<GqlClient<object>, [GqlClient<object>]>(typeof v !== 'object'
         ? { host: v }
         : { ...v, token: typeof v.token === 'string' ? { value: v.token } : v.token }, {
-        ...clientDefaults,
-        ...(typeof v === 'object' && typeof v.token !== 'string' && v?.token?.type === null && { token: { ...clientDefaults.token, type: null } })
+        ...defaults,
+        ...(typeof v === 'object' && typeof v.token !== 'string' && v?.token?.type === null && { token: { ...defaults.token, type: null } })
       })
 
       const runtimeHost = k === defaultClient ? process.env.GQL_HOST : process.env?.[`GQL_${k.toUpperCase()}_HOST`]
@@ -116,7 +118,7 @@ export default defineNuxtModule<GqlConfig>({
       if (runtimeClientHost) { conf.clientHost = runtimeClientHost }
 
       if (!conf?.host) {
-        logger.warn(`GraphQL client (${k}) is missing it's host.`)
+        logger.warn(`GraphQL client (${k}) is missing its host.`)
         return
       }
 
