@@ -52,7 +52,7 @@
     "@graphql-codegen/typescript": "^4.1.1",
     "@graphql-codegen/typescript-graphql-request": "^6.2.0",
     "@graphql-codegen/typescript-operations": "^4.3.1",
-    "@nuxt/kit": "^3.14.0",
+    "@nuxt/kit": "^3.14.159",
     "defu": "^6.1.4",
     "graphql": "^16.9.0",
     "graphql-request": "^7.1.2",
@@ -64,10 +64,10 @@
     "@nuxt/eslint-config": "^0.6.1",
     "@nuxt/module-builder": "^0.8.4",
     "@nuxt/test-utils": "^3.14.0",
-    "@vitest/coverage-v8": "^2.1.4",
+    "@vitest/coverage-v8": "^2.1.5",
     "eslint": "^9.14.0",
-    "nuxt": "^3.14.0",
-    "vitest": "^2.1.4"
+    "nuxt": "^3.14.159",
+    "vitest": "^2.1.5"
   },
   "overrides": {
     "node-fetch": "npm:node-fetch-native@latest"
