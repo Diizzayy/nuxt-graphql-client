@@ -201,6 +201,12 @@ export interface GqlCodegen {
    (https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#maybevalue)
    */
   maybeValue?: string
+
+  /**
+   * Extends or overrides the built-in scalars and custom GraphQL scalars to a custom type.
+   (https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#scalars
+   */
+  scalars?: string | { [name: string]: string | { input: string, output: string } }
 }
 
 export interface GqlConfig<T = GqlClient> {
