@@ -200,6 +200,13 @@ export default defineNuxtModule<GqlConfig>({
             clientDocs,
             ...(typeof config.codegen !== 'boolean' && config.codegen)
           }).then(output => output.reduce<Record<string, string>>((acc, c) => ({ ...acc, [c.filename.split('.ts')[0]]: c.content }), {}))
+            .catch(e => {
+              if(nuxt.options.dev) { 
+                console.error(e)
+                return {}
+              }
+              throw e
+            })
           : ctx.clients!.reduce<Record<string, string>>((acc, k) => {
             if (!clientDocs?.[k]?.length) { return acc }
 
