@@ -7,7 +7,7 @@ export const mapDocsToClients = (documents: string[], clients: string[]) => {
 
   const docsWithClient = (client: string) => documents.filter(d => !mappedDocs.has(d)).filter((file: string) => {
     const clientInExt = new RegExp(`\\.${client}\\.(gql|graphql)$`)
-    const clientInPath = new RegExp(`\\/${client}\\/(?=${file.split('/').pop()?.replace(/\./g, '\\.')})`)
+    const clientInPath = new RegExp(`\\/${client}\\/(.+\\/)?(?=${file.split('/').pop()?.replace(/\./g, '\\.')})`)
 
     const clientSpecified = clientInExt.test(file) || clientInPath.test(file)
 
