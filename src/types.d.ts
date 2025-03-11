@@ -1,4 +1,4 @@
-import type { GraphQLClient } from 'graphql-request'
+import type { GraphQLClient, FetchOptions } from 'graphql-request'
 import type { GraphQLError } from 'graphql-request/dist/types'
 import type { CookieOptions } from 'nuxt/dist/app/composables'
 
@@ -7,17 +7,17 @@ type TokenOpts = {
    * The name of the Authentication token header.
    *
    * @default 'Authorization'
-   * */
-  name?: string;
+   */
+  name?: string
 
   /**
    * The HTTP Authentication scheme.
    *
    * @default "Bearer"
-   * */
-  type?: string | null;
+   */
+  type?: string | null
 
-  value?: string;
+  value?: string
 }
 
 type TokenStorageOpts = {
@@ -27,17 +27,17 @@ type TokenStorageOpts = {
    * @type {string}
    * @default "gql:<client-name>"
    */
-  name?: string;
+  name?: string
 
   /**
    * Specify if the auth token should be stored in `cookie` or `localStorage`.
    * `Cookie` storage is required for SSR.
    * @type {string}
    * @default "cookie"
-   **/
-  mode?: 'cookie' | 'localStorage';
+   */
+  mode?: 'cookie' | 'localStorage'
 
-  cookieOptions?: Omit< CookieOptions, 'encode' | 'decode' | 'expires' | 'default'>;
+  cookieOptions?: Omit< CookieOptions, 'encode' | 'decode' | 'expires' | 'default'>
 }
 
 export interface GqlClient<T = string> {
@@ -47,7 +47,7 @@ export interface GqlClient<T = string> {
    * Specify a host to be used for client side requests.
    *
    * @type string
-   * */
+   */
   clientHost?: string
 
   /**
@@ -61,14 +61,14 @@ export interface GqlClient<T = string> {
    * Specify the path to a GraphQL Schema file to be used for code generation. When omitted, the `host` will be used.
    *
    * @type string
-   * */
+   */
   schema?: string
 
   token?: T extends object ? TokenOpts : string | TokenOpts
 
   /**
    * Configuration for the token storage
-   * */
+   */
   tokenStorage?: T extends object ? TokenStorageOpts : boolean | TokenStorageOpts
 
   /**
@@ -77,7 +77,7 @@ export interface GqlClient<T = string> {
    *
    * @type boolean
    * @default false
-   * */
+   */
   retainToken?: boolean
 
   /**
@@ -85,9 +85,8 @@ export interface GqlClient<T = string> {
    *
    * @type boolean
    * @default true
-   * */
+   */
   proxyCookies?: boolean
-
 
   /**
    * Headers to be passed from the browser to the GraphQL API in SSR mode.
@@ -99,7 +98,7 @@ export interface GqlClient<T = string> {
   /**
    * Specify CORS options to be used for client-side requests.
    * @type {object}
-   * */
+   */
   corsOptions?: {
     mode?: RequestMode
     credentials?: RequestCredentials
@@ -107,11 +106,11 @@ export interface GqlClient<T = string> {
 
   /**
    * Specify additional headers to be passed to the GraphQL client.
-   * */
+   */
   headers?: Record<string, string> | {
     /**
      * Declare headers that should only be applied on server side.
-     * */
+     */
     serverOnly?: Record<string, string>
   }
 
@@ -120,13 +119,19 @@ export interface GqlClient<T = string> {
    *
    * @type boolean
    * @default false
-   * */
+   */
   preferGETQueries?: boolean
 
   /**
    * Declare headers that should only be applied to the GraphQL Code Generator.
-   * */
+   */
   codegenHeaders?: Record<string, string>
+
+  /**
+   * Additional fetch options to be passed to the GraphQL client.
+   * @see https://github.com/jasonkuhrt/graphql-request#configuration
+   */
+  fetchOptions?: FetchOptions
 }
 
 export interface GqlCodegen {
@@ -159,7 +164,7 @@ export interface GqlCodegen {
    *
    * @type boolean
    * @default true
-   * */
+   */
   useTypeImports?: boolean
 
   /**
@@ -178,7 +183,7 @@ export interface GqlCodegen {
    *
    * @type boolean
    * @default true
-   * */
+   */
   onlyOperationTypes?: boolean
 
   /**
@@ -196,6 +201,12 @@ export interface GqlCodegen {
    (https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations#maybevalue)
    */
   maybeValue?: string
+
+  /**
+   * Extends or overrides the built-in scalars and custom GraphQL scalars to a custom type.
+   (https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#scalars
+   */
+  scalars?: string | { [name: string]: string | { input: string, output: string } }
 }
 
 export interface GqlConfig<T = GqlClient> {
@@ -242,14 +253,14 @@ export interface GqlConfig<T = GqlClient> {
    *
    * @type string[]
    * @example ['../shared/queries']
-   * */
+   */
   documentPaths?: string[]
 
   /**
    * Allows generating multiple clients with different GraphQL hosts.
    *
    * @note this option overrides the `GQL_HOST` in `runtimeConfig`.
-   * */
+   */
   clients?: Record<string, T extends GqlClient ? GqlClient<T> : string | GqlClient<T>>
 
   /**
@@ -257,12 +268,12 @@ export interface GqlConfig<T = GqlClient> {
    *
    * @type boolean
    * @default false
-   * */
+   */
   preferGETQueries?: boolean
 
   /**
    * Configuration for the token storage
-   * */
+   */
   tokenStorage?: boolean | TokenStorageOpts
 }
 
@@ -276,5 +287,5 @@ export type GqlError = {
 
 export type OnGqlError = <T>(error: GqlError) => Promise<T> | any
 
-type GqlStateOpts = {instance?: GraphQLClient, options?: { token?: TokenOpts } & Pick<RequestInit, 'headers' | 'mode' | 'credentials'> }
+type GqlStateOpts = { instance?: GraphQLClient, options?: { token?: TokenOpts } & Pick<RequestInit, 'headers' | 'mode' | 'credentials'> }
 export type GqlState = Record<string, GqlStateOpts> & { onError?: OnGqlError }

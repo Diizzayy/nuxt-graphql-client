@@ -33,4 +33,13 @@ describe('test multiple clients', () => {
     expect(result).toContain('<p>First Episode: Pilot</p>')
     expect(result).toContain('<p>Name: Morty Smith</p>')
   })
+
+  it('retrieve github user details', async () => {
+    const token = process.env.GH_TOKEN
+    const result = await $fetch('/github', {
+      headers: { Cookie: token ? `gql:github=${token}` : '' }
+    })
+
+    expect(result).toContain('Logged in as github-actions[bot]')
+  })
 })
