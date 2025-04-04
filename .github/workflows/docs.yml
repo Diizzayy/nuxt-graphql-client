@@ -7,15 +7,9 @@ on:
     paths:
       - "docs/**"
       - ".github/workflows/docs.yml"
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "docs/**"
-      - ".github/workflows/docs.yml"
   workflow_dispatch:
 
-jobs:    
+jobs:
   publish-docs:
     runs-on: ${{ matrix.os }}
 
@@ -23,7 +17,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         node: [18]
-    
+
     steps:
       - uses: actions/checkout@v4
 
