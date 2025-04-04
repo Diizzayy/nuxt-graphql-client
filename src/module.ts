@@ -201,12 +201,12 @@ export default defineNuxtModule<GqlConfig>({
             ...(typeof config.codegen !== 'boolean' && config.codegen)
           }).then(output => output.reduce<Record<string, string>>((acc, c) => ({ ...acc, [c.filename.split('.ts')[0]]: c.content }), {}))
           : ctx.clients!.reduce<Record<string, string>>((acc, k) => {
-            if (!clientDocs?.[k]?.length) { return acc }
+              if (!clientDocs?.[k]?.length) { return acc }
 
-            const entries = extractGqlOperations(ctx?.clientDocs?.[k] || [])
+              const entries = extractGqlOperations(ctx?.clientDocs?.[k] || [])
 
-            return { ...acc, [k]: mockTemplate(entries) }
-          }, {})
+              return { ...acc, [k]: mockTemplate(entries) }
+            }, {})
 
         ctx.template = defu(codegenResult, ctx.template)
       }

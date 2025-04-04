@@ -37,7 +37,7 @@ type TokenStorageOpts = {
    */
   mode?: 'cookie' | 'localStorage'
 
-  cookieOptions?: Omit< CookieOptions, 'encode' | 'decode' | 'expires' | 'default'>
+  cookieOptions?: Omit<CookieOptions, 'encode' | 'decode' | 'expires' | 'default'>
 }
 
 export interface GqlClient<T = string> {
