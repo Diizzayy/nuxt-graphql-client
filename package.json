@@ -79,7 +79,12 @@
     "overrides": {
       "node-fetch": "npm:node-fetch-native@latest",
       "nuxt-graphql-client": "workspace:*"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild",
+      "vue-demi"
+    ]
   },
-  "packageManager": "pnpm@9.7.0"
+  "packageManager": "pnpm@10.7.1"
 }

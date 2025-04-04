@@ -45,7 +45,8 @@
 ## 💻 Development
 
 - Clone this repository
-- Enable [Corepack](https://github.com/nodejs/corepack) using `corepack enable`
+- Make sure you have **pnpm v10+** installed (you can check with `pnpm -v`).
+  If not, run `npm install -g pnpm` to get the latest version.
 - Install dependencies using `pnpm install`
 - Open playground with `pnpm dev`
 
