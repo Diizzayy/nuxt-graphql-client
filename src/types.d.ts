@@ -203,6 +203,12 @@ export interface GqlCodegen {
   maybeValue?: string
 
   /**
+   * Allow to override the type value of InputMaybe.
+   (https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#inputMaybeValue)
+   */
+  inputMaybeValue?: string
+
+  /**
    * Extends or overrides the built-in scalars and custom GraphQL scalars to a custom type.
    (https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#scalars
    */

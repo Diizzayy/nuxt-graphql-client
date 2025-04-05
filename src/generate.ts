@@ -51,6 +51,7 @@ function prepareConfig(options: GenerateOptions & GqlCodegen): CodegenConfig {
     },
     avoidOptionals: options?.avoidOptionals,
     maybeValue: options?.maybeValue,
+    inputMaybeValue: options?.inputMaybeValue,
     scalars: options?.scalars
   }
 

@@ -53,6 +53,7 @@ export default defineNuxtModule<GqlConfig>({
       onlyOperationTypes: true,
       avoidOptionals: false,
       maybeValue: 'T | null',
+      inputMaybeValue: 'Maybe<T>',
       scalars: {}
     }
 
