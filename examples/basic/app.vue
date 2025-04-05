@@ -38,7 +38,7 @@
             </div>
           </div>
 
-          <h2>{{ `${entry.name} (${new Date(entry.date).getFullYear()})` }}</h2>
+          <h2>{{ entry.name }}<span v-if="entry.date">({{ new Date(entry.date).getFullYear() }})</span></h2>
           <p>Launch Status: {{ entry.success ? '🚀' : '🪂' }}</p>
 
           <p v-if="entry.links?.article">
