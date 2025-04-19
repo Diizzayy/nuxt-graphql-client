@@ -207,6 +207,20 @@ export interface GqlCodegen {
    (https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#scalars
    */
   scalars?: string | { [name: string]: string | { input: string, output: string } }
+
+  /**
+   * Generates enum as TypeScript string union type instead of an enum.
+   * Useful if you wish to generate .d.ts declaration file instead of .ts, or if you want to avoid using TypeScript enums due to bundle size concerns.
+   (https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#enumsastypes
+   */
+  enumsAsTypes?: boolean
+
+  /**
+   * Generates enum as TypeScript const assertions instead of enum.
+   * This can even be used to enable enum-like patterns in plain JavaScript code if you choose not to use TypeScript’s enum construct.
+   (https://the-guild.dev/graphql/codegen/plugins/typescript/typescript#enumsasconst
+   */
+  enumsAsConst?: boolean
 }
 
 export interface GqlConfig<T = GqlClient> {

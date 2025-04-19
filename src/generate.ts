@@ -51,7 +51,9 @@ function prepareConfig(options: GenerateOptions & GqlCodegen): CodegenConfig {
     },
     avoidOptionals: options?.avoidOptionals,
     maybeValue: options?.maybeValue,
-    scalars: options?.scalars
+    scalars: options?.scalars,
+    enumsAsTypes: options?.enumsAsTypes,
+    enumsAsConst: options?.enumsAsConst
   }
 
   const generates: CodegenConfig['generates'] = Object.entries(options.clients || {}).reduce((acc, [k, v]) => {
