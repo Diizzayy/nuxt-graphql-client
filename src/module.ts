@@ -1,4 +1,4 @@
-import { relative, resolve } from 'node:path'
+import { relative, resolve, normalize } from 'node:path'
 import { existsSync, statSync } from 'node:fs'
 import { defu } from 'defu'
 import { upperFirst } from 'scule'
@@ -174,7 +174,9 @@ export default defineNuxtModule<GqlConfig>({
     async function generateGqlTypes(hmrDoc?: string) {
       const documents: string[] = []
       for await (const path of documentPaths) {
-        const files = (await resolveFiles(path, [gqlMatch, '!**/schemas'], { followSymbolicLinks: false })).filter(allowDocument)
+        const files = (await resolveFiles(path, [gqlMatch, '!**/schemas'], { followSymbolicLinks: false }))
+          .filter(allowDocument)
+          .map(file => normalize(file))
 
         documents.push(...files)
       }
