@@ -17,7 +17,6 @@ const { data, error, pending, refresh } = await useAsyncGql({
 })
 
 if (error.value) {
-  // eslint-disable-next-line no-console
   console.error(error.value)
 }
 </script>

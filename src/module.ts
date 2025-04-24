@@ -1,18 +1,19 @@
 import { relative, resolve, normalize } from 'node:path'
-import { existsSync, statSync } from 'fs'
+import { existsSync, statSync } from 'node:fs'
 import { defu } from 'defu'
 import { upperFirst } from 'scule'
 import { useLogger, addPlugin, addImportsDir, addTemplate, resolveFiles, createResolver, defineNuxtModule } from '@nuxt/kit'
 import { name, version } from '../package.json'
 import generate from './generate'
 import { mapDocsToClients, extractGqlOperations } from './utils'
-import type { GqlConfig, GqlClient, GqlCodegen, TokenStorageOpts } from './types'
+import type { GqlConfig, GqlClient, GqlCodegen, TokenStorageOpts, GqlError } from './types'
 import { prepareContext, mockTemplate } from './context'
 import type { GqlContext } from './context'
 
 const logger = useLogger('nuxt-graphql-client')
 
 export type ModuleOptions = Partial<GqlConfig>
+export type { GqlError }
 
 export default defineNuxtModule<GqlConfig>({
   meta: {
@@ -20,7 +21,7 @@ export default defineNuxtModule<GqlConfig>({
     version,
     configKey: 'graphql-client',
     compatibility: {
-      nuxt: '^3.7.0'
+      nuxt: '>=3.7.0'
     }
   },
   defaults: {
@@ -31,7 +32,7 @@ export default defineNuxtModule<GqlConfig>({
     tokenStorage: true,
     functionPrefix: 'Gql'
   },
-  async setup (opts, nuxt) {
+  async setup(opts, nuxt) {
     const resolver = createResolver(import.meta.url)
     const srcResolver = createResolver(nuxt.options.srcDir)
 
@@ -51,7 +52,10 @@ export default defineNuxtModule<GqlConfig>({
       disableOnBuild: false,
       onlyOperationTypes: true,
       avoidOptionals: false,
-      maybeValue: 'T | null'
+      maybeValue: 'T | null',
+      scalars: {},
+      enumsAsTypes: false,
+      enumsAsConst: false
     }
 
     config.codegen = !!config.codegen && defu<GqlCodegen, [GqlCodegen]>(config.codegen, codegenDefaults)
@@ -72,11 +76,11 @@ export default defineNuxtModule<GqlConfig>({
     }
 
     if (!ctx?.clients?.length) {
-      const host =
-        process.env.GQL_HOST || nuxt.options.runtimeConfig.public.GQL_HOST
+      const host
+        = process.env.GQL_HOST || nuxt.options.runtimeConfig.public.GQL_HOST
 
-      const clientHost =
-        process.env.GQL_CLIENT_HOST || nuxt.options.runtimeConfig.public.GQL_CLIENT_HOST
+      const clientHost
+        = process.env.GQL_CLIENT_HOST || nuxt.options.runtimeConfig.public.GQL_CLIENT_HOST
 
       if (!host) {
         logger.warn('No GraphQL clients configured. Skipping module setup.')
@@ -101,11 +105,13 @@ export default defineNuxtModule<GqlConfig>({
     const defaultClient = (config?.clients?.default && 'default') || Object.keys(config.clients!)[0]
 
     for (const [k, v] of Object.entries(config.clients!)) {
+      const defaults = JSON.parse(JSON.stringify(clientDefaults))
+
       const conf = defu<GqlClient<object>, [GqlClient<object>]>(typeof v !== 'object'
         ? { host: v }
         : { ...v, token: typeof v.token === 'string' ? { value: v.token } : v.token }, {
-        ...clientDefaults,
-        ...(typeof v === 'object' && typeof v.token !== 'string' && v?.token?.type === null && { token: { ...clientDefaults.token, type: null } })
+        ...defaults,
+        ...(typeof v === 'object' && typeof v.token !== 'string' && v?.token?.type === null && { token: { ...defaults.token, type: null } })
       })
 
       const runtimeHost = k === defaultClient ? process.env.GQL_HOST : process.env?.[`GQL_${k.toUpperCase()}_HOST`]
@@ -115,7 +121,7 @@ export default defineNuxtModule<GqlConfig>({
       if (runtimeClientHost) { conf.clientHost = runtimeClientHost }
 
       if (!conf?.host) {
-        logger.warn(`GraphQL client (${k}) is missing it's host.`)
+        logger.warn(`GraphQL client (${k}) is missing its host.`)
         return
       }
 
@@ -157,14 +163,15 @@ export default defineNuxtModule<GqlConfig>({
 
         if (existsSync(dir)) {
           documentPaths.push(dir)
-        } else {
+        }
+        else {
           logger.warn(`[nuxt-graphql-client] Invalid document path: ${dir}`)
         }
       }
     }
 
     const gqlMatch = '**/*.{gql,graphql}'
-    async function generateGqlTypes (hmrDoc?: string) {
+    async function generateGqlTypes(hmrDoc?: string) {
       const documents: string[] = []
       for await (const path of documentPaths) {
         const files = (await resolveFiles(path, [gqlMatch, '!**/schemas'], { followSymbolicLinks: false }))
@@ -198,12 +205,12 @@ export default defineNuxtModule<GqlConfig>({
             ...(typeof config.codegen !== 'boolean' && config.codegen)
           }).then(output => output.reduce<Record<string, string>>((acc, c) => ({ ...acc, [c.filename.split('.ts')[0]]: c.content }), {}))
           : ctx.clients!.reduce<Record<string, string>>((acc, k) => {
-            if (!clientDocs?.[k]?.length) { return acc }
+              if (!clientDocs?.[k]?.length) { return acc }
 
-            const entries = extractGqlOperations(ctx?.clientDocs?.[k] || [])
+              const entries = extractGqlOperations(ctx?.clientDocs?.[k] || [])
 
-            return { ...acc, [k]: mockTemplate(entries) }
-          }, {})
+              return { ...acc, [k]: mockTemplate(entries) }
+            }, {})
 
         ctx.template = defu(codegenResult, ctx.template)
       }
@@ -305,7 +312,7 @@ export default defineNuxtModule<GqlConfig>({
     await generateGqlTypes()
 
     nuxt.hook('vite:extendConfig', (config, { isServer }) => {
-      config.optimizeDeps?.include?.push('graphql-request')
+      config.optimizeDeps?.include?.push('nuxt-graphql-client > graphql-request')
 
       if (isServer && config.define?.['typeof document']) {
         delete config.define['typeof document']

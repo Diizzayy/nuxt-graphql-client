@@ -15,7 +15,7 @@ interface GenerateOptions {
   clientDocs?: Record<string, string[]>
 }
 
-function prepareConfig (options: GenerateOptions & GqlCodegen): CodegenConfig {
+function prepareConfig(options: GenerateOptions & GqlCodegen): CodegenConfig {
   const prepareSchema = (v: GqlClient<object>) => {
     if (v.schema) {
       v.schema = options.resolver?.resolve(v.schema)
@@ -50,7 +50,10 @@ function prepareConfig (options: GenerateOptions & GqlCodegen): CodegenConfig {
       enumValues: 'change-case-all#upperCaseFirst'
     },
     avoidOptionals: options?.avoidOptionals,
-    maybeValue: options?.maybeValue
+    maybeValue: options?.maybeValue,
+    scalars: options?.scalars,
+    enumsAsTypes: options?.enumsAsTypes,
+    enumsAsConst: options?.enumsAsConst
   }
 
   const generates: CodegenConfig['generates'] = Object.entries(options.clients || {}).reduce((acc, [k, v]) => {

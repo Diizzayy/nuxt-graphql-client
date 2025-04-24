@@ -7,6 +7,8 @@ await setup({
   rootDir: fileURLToPath(new URL('../examples/multi-client', import.meta.url))
 })
 
+const token = process.env.GH_TOKEN
+
 describe('test multiple clients', () => {
   it('renders ten (10) launches with the spacex client', async () => {
     const result = await $fetch('/spacex')
@@ -33,4 +35,14 @@ describe('test multiple clients', () => {
     expect(result).toContain('<p>First Episode: Pilot</p>')
     expect(result).toContain('<p>Name: Morty Smith</p>')
   })
+
+  if (token) {
+    it('retrieve github user details', async () => {
+      const result = await $fetch('/github', {
+        headers: { Cookie: token ? `gql:github=${token}` : '' }
+      })
+
+      expect(result).toContain('Logged in as github-actions[bot]')
+    })
+  }
 })

@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - main
+      - dev
     paths-ignore:
       - 'docs/**'
       - '.github/workflows/docs.yml'
   pull_request:
     branches:
       - main
+      - dev
     paths-ignore:
       - 'docs/**'
       - '.github/workflows/docs.yml'
@@ -21,20 +23,27 @@ jobs:
 
     strategy:
       matrix:
-        node: [18]
+        node: [20]
         os: [ubuntu-latest]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - run: corepack enable
+      - uses: pnpm/action-setup@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           cache: 'pnpm'
           node-version: ${{ matrix.node }}
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-
 
       - name: Install dependencies
         run: pnpm install
@@ -47,25 +56,38 @@ jobs:
       - name: Build Playground
         run: pnpm dev:build
 
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: ./dist
+
   lint:
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        node: [18]
+        node: [20]
         os: [ubuntu-latest]
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - run: corepack enable
+      - uses: pnpm/action-setup@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           cache: 'pnpm'
           node-version: ${{ matrix.node }}
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-
 
       - name: Install dependencies
         run: pnpm install
@@ -74,13 +96,13 @@ jobs:
 
       - name: Lint
         run: pnpm lint
-  
+
   test:
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        node: [18]
+        node: [20]
         os: [ubuntu-latest]
       fail-fast: true
 
@@ -88,15 +110,22 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - run: corepack enable
+      - uses: pnpm/action-setup@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           cache: 'pnpm'
           node-version: ${{ matrix.node }}
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-
 
       - name: Install dependencies
         run: pnpm install
@@ -105,12 +134,15 @@ jobs:
 
       - name: Run Tests
         run: pnpm test -- --coverage
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: codecov/codecov-action@v3
-  
+      - uses: codecov/codecov-action@v5
+
   release-build:
     if: |
       github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
       !contains(github.event.head_commit.message, 'chore') &&
       !contains(github.event.head_commit.message, 'docs')
 
@@ -124,15 +156,59 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node: [18]
+        node: [20]
 
     permissions:
       contents: write
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
 
       - run: yes | npx bumpp package.json
+
+  pre-release:
+    name: Pre-Release
+    if: (github.ref == 'refs/heads/dev' || github.event.pull_request.base.ref == 'dev')
+
+    needs:
+      - lint
+      - test
+      - build
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [20]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          cache: 'pnpm'
+          node-version: ${{ matrix.node }}
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - run: pnpm dev:prepare
+
+      - name: Annotate
+        run: echo "::notice ::Pre-release build from commit $GITHUB_SHA"
+
+      - name: Publish with pkg.pr.new (pre-release)
+        run: pnpx pkg-pr-new publish --comment=update

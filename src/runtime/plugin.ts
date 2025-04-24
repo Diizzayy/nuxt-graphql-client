@@ -5,15 +5,17 @@ import type { GqlState, GqlConfig } from '../types'
 import { ref, useCookie, useNuxtApp, defineNuxtPlugin, useRuntimeConfig, useRequestHeaders } from '#imports'
 import type { GqlClients } from '#gql'
 
-export default defineNuxtPlugin((nuxtApp) => {
-  // const nuxtApp = useNuxtApp() as Partial<{ _gqlState: Ref<GqlState> }> & ReturnType<typeof useNuxtApp>
+export default defineNuxtPlugin(() => {
+  const nuxtApp = useNuxtApp()
 
   if (!nuxtApp?._gqlState) {
     nuxtApp._gqlState = ref({})
 
     const config = useRuntimeConfig()
 
-    const { clients }: GqlConfig = defu(config?.['graphql-client'], config?.public?.['graphql-client'])
+    const { clients }: GqlConfig = import.meta.server
+      ? defu(config?.['graphql-client'], config?.public?.['graphql-client'])
+      : config?.public?.['graphql-client'] as GqlConfig
 
     const proxyHeaders = Object.values(clients || {}).flatMap(v => v?.proxyHeaders).filter((v, i, a) => Boolean(v) && a.indexOf(v) === i) as string[]
     if (!proxyHeaders.includes('cookie')) { proxyHeaders.push('cookie') }
@@ -45,7 +47,8 @@ export default defineNuxtPlugin((nuxtApp) => {
           ...serverHeaders,
           ...(proxyCookie && { cookie: requestHeaders?.cookie })
         },
-        ...v?.corsOptions
+        ...v?.corsOptions,
+        ...v?.fetchOptions
       }
 
       nuxtApp._gqlState.value[name] = {
@@ -66,12 +69,14 @@ export default defineNuxtPlugin((nuxtApp) => {
             if (token.value === undefined && typeof v.tokenStorage === 'object') {
               if (v.tokenStorage?.mode === 'cookie') {
                 if (import.meta.client) {
-                  token.value = useCookie(v.tokenStorage.name!).value
-                } else if (requestHeaders?.cookie) {
+                  token.value = useCookie(v.tokenStorage.name!).value || undefined
+                }
+                else if (requestHeaders?.cookie) {
                   const cookieName = `${v.tokenStorage.name}=`
                   token.value = requestHeaders?.cookie.split(';').find(c => c.trim().startsWith(cookieName))?.split('=')?.[1]
                 }
-              } else if (import.meta.client && v.tokenStorage?.mode === 'localStorage') {
+              }
+              else if (import.meta.client && v.tokenStorage?.mode === 'localStorage') {
                 const storedToken = localStorage.getItem(v.tokenStorage.name!)
 
                 if (storedToken) { token.value = storedToken }
@@ -83,21 +88,28 @@ export default defineNuxtPlugin((nuxtApp) => {
             if (token.value) {
               token.value = token.value.trim()
 
-              const tokenName = token.value === reqOpts?.token?.value ? reqOpts?.token?.name || v?.token?.name : v?.token?.name
+              const tokenName = (token.value === reqOpts?.token?.value ? reqOpts?.token?.name || v?.token?.name : v?.token?.name) as string
               const tokenType = token.value === reqOpts?.token?.value ? reqOpts?.token?.type === null ? null : reqOpts?.token?.type || v?.token?.type : v?.token?.type
 
-              const authScheme = !!token.value?.match(/^[a-zA-Z]+\s/)?.[0]
+              const authScheme = !!token.value?.match(/^[a-z]+\s/i)?.[0]
 
               if (authScheme) {
-                reqOpts.headers[tokenName] = token.value
-              } else {
-                reqOpts.headers[tokenName] = !tokenType ? token.value : `${tokenType} ${token.value}`
+                (reqOpts.headers as Record<string, string>)[tokenName] = token.value
+              }
+              else {
+                (reqOpts.headers as Record<string, string>)[tokenName] = !tokenType ? token.value : `${tokenType} ${token.value}`
               }
             }
 
             if (reqOpts?.token) { delete reqOpts.token }
-            return defu(req, reqOpts)
-          }
+            return defu(reqOpts, req, {
+              headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/graphql-response+json, application/json'
+              }
+            })
+          },
+          ...v?.fetchOptions
         })
       }
     }
@@ -105,6 +117,10 @@ export default defineNuxtPlugin((nuxtApp) => {
 })
 
 declare module '#app' {
+  interface NuxtApp {
+    _gqlState: Ref<GqlState>
+  }
+
   interface RuntimeNuxtHooks {
     /**
      * `gql:auth:init` hook specifies how the authentication token is retrieved.

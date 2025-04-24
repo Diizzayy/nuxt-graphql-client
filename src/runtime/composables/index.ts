@@ -3,7 +3,6 @@ import { hash } from 'ohash'
 import { unref, isRef, reactive } from 'vue'
 import type { Ref } from 'vue'
 import type { AsyncData, AsyncDataOptions } from 'nuxt/app'
-import type { ClientError } from 'graphql-request'
 import type { GqlState, GqlConfig, GqlError, TokenOpts, OnGqlError, GqlStateOpts } from '../../types'
 // @ts-ignore
 import { GqlSdks, GqClientOps } from '#gql'
@@ -27,10 +26,12 @@ const useGqlState = (): Ref<GqlState> => {
 /**
  *
  * @param {object} options Changes to be made to gqlState
+ * @param {GqlClients} options.client The name of your GraphQL client.
+ * @param {object} options.patch Changes to be made to the client's state.
  *
- * */
+ */
 // The decision was made to avert using `GraphQLClient's` `setHeader(s)` helper in favor of reactivity and more granular control.
-const setGqlState = ({ client, patch }: {client?: GqlClients, patch: GqlStateOpts['options']}) => {
+const setGqlState = ({ client, patch }: { client?: GqlClients, patch: GqlStateOpts['options'] }) => {
   const state = useGqlState()
 
   client = getGqlClient(client, state)
@@ -66,10 +67,10 @@ const setGqlState = ({ client, patch }: {client?: GqlClients, patch: GqlStateOpt
  * ```ts
  * useGqlHeaders(null, 'my-client')
  * ```
- * */
-export function useGqlHeaders (headers: Record<string, string>, client?: GqlClients): void
-export function useGqlHeaders (opts :{headers: Record<string, string>, client?: GqlClients, respectDefaults?: boolean}): void
-export function useGqlHeaders (...args: any[]) {
+ */
+export function useGqlHeaders(headers: Record<string, string>, client?: GqlClients): void
+export function useGqlHeaders(opts: { headers: Record<string, string>, client?: GqlClients, respectDefaults?: boolean }): void
+export function useGqlHeaders(...args: any[]) {
   const client = args[1] || args?.[0]?.client
   let headers = (args[0] && typeof args[0] !== 'undefined' && 'headers' in args[0]) ? args[0].headers : args[0]
   const respectDefaults = args?.[0]?.respectDefaults
@@ -98,19 +99,19 @@ type GqlTokenOptions = {
    * `{ type: 'Bearer', name: 'Authorization' }`
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization
-   * */
+   */
   config?: Omit<TokenOpts, 'value'>
 
   /**
    * The name of your GraphQL clients.
    * @note defined in `nuxt.config`
-   * */
+   */
   client?: GqlClients
 
   /**
    * Refresh Gql Data on token change.
    * @default true
-   * */
+   */
   refreshData?: boolean
 }
 
@@ -121,15 +122,15 @@ type GqlToken = string | null
  *
  * @param {GqlToken} token The token to be used for authentication
  * @param {object} opts Options for the auth token
- * */
-export function useGqlToken (token: GqlToken, opts?: GqlTokenOptions): void
+ */
+export function useGqlToken(token: GqlToken, opts?: GqlTokenOptions): void
 /**
  * `useGqlToken` adds an Authorization header to every request.
  *
  * @param {object} opts Options for the auth token
- * */
-export function useGqlToken (opts: GqlTokenOptions & {token: GqlToken}): void
-export function useGqlToken (...args: any[]) {
+ */
+export function useGqlToken(opts: GqlTokenOptions & { token: GqlToken }): void
+export function useGqlToken(...args: any[]) {
   args = args || []
 
   const config: TokenOpts = args[0]?.config || args?.[1]?.config
@@ -153,7 +154,8 @@ export function useGqlToken (...args: any[]) {
     if (import.meta.client && tokenStorage.mode === 'localStorage') {
       if (token !== null) {
         localStorage.setItem(tokenStorage.name!, token)
-      } else {
+      }
+      else {
         localStorage.removeItem(tokenStorage.name!)
       }
     }
@@ -175,7 +177,7 @@ interface GqlCors {
   /**
    * The name of your GraphQL client.
    * @note defined in `nuxt.config`
-   * */
+   */
   client?: GqlClients
 }
 
@@ -183,7 +185,7 @@ interface GqlCors {
  * `useGqlCors` adds CORS headers to every request.
  *
  * @param {object} opts Options for the CORS headers
- * */
+ */
 export const useGqlCors = (opts: GqlCors) => {
   const { mode, credentials, client } = opts || {}
 
@@ -212,30 +214,35 @@ export const useGqlHost = (host: string, client?: GqlClients) => {
   state.value?.[client].instance!.setEndpoint(host)
 }
 
-export function useGql (): <
-T extends GqlOps,
-R extends ReturnType<GqlSdkFuncs[T]>,
-P extends Parameters<GqlSdkFuncs[T]>['0'],
+export function useGql(): <
+  T extends GqlOps,
+  R extends ReturnType<GqlSdkFuncs[T]>,
+  P extends Parameters<GqlSdkFuncs[T]>['0']
 > (...args: [T, P] | [{ operation: T, variables?: P }]) => R
 
-export function useGql () {
+export function useGql() {
   const state = useGqlState()
   const errState = useGqlErrorState()
 
   return (...args: any[]) => {
-    const operation = (typeof args?.[0] !== 'string' && 'operation' in args?.[0] ? args[0].operation : args[0]) ?? undefined
-    const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? args[0].variables : args[1]) ?? undefined
+    const arg0 = args?.[0]
+    const operation = (typeof arg0 === 'object' && 'operation' in arg0) ? arg0.operation : args?.[0] ?? undefined
+    const variables = (typeof arg0 === 'object' && 'variables' in arg0) ? arg0.variables : args?.[1] ?? undefined
 
     const client = Object.keys(GqClientOps).find(k => GqClientOps[k as keyof typeof GqClientOps].includes(operation)) ?? 'default'
 
-    const { instance } = state!.value?.[client]
+    const clientState = state?.value?.[client]
+    if (!clientState || !clientState.instance) {
+      throw new Error('Invalid GraphQL Operation')
+    }
 
-    if (!instance) { throw new Error('Invalid GraphQL Operation') }
+    const { instance } = clientState
 
     return GqlSdks[client as keyof typeof GqlSdks]!(instance, async (action, operationName, operationType): Promise<any> => {
       try {
         return await action()
-      } catch (err: ClientError | any) {
+      }
+      catch (err: any) {
         errState.value = {
           client,
           operationType,
@@ -265,7 +272,7 @@ export function useGql () {
  *    console.error(err)
  * })
  * ```
- * */
+ */
 export const useGqlError = (onError: OnGqlError) => {
   // proactive measure to prevent context reliant calls
   useGqlState().value.onError = import.meta.client
@@ -281,16 +288,16 @@ export const useGqlError = (onError: OnGqlError) => {
 
 const useGqlErrorState = () => useState<GqlError | null>('_gqlErrors', () => null)
 
-type PickFrom<T, K extends Array<string>> = T extends Array<any> ? T : T extends Record<string, any> ? keyof T extends K[number] ? T : K[number] extends never ? T : Pick<T, K[number]> : T;
-type KeysOf<T> = Array<T extends T ? keyof T extends string ? keyof T : never : never>;
+type PickFrom<T, K extends Array<string>> = T extends Array<any> ? T : T extends Record<string, any> ? keyof T extends K[number] ? T : K[number] extends never ? T : Pick<T, K[number]> : T
+type KeysOf<T> = Array<T extends T ? keyof T extends string ? keyof T : never : never>
 
 /**
  * Asynchronously query data that is required to load a page or component.
  *
- * @param {Object} options
+ * @param {object} options
  * @param {string} options.operation Name of the query to be executed.
  * @param {string} options.variables Variables to be passed to the query.
- * @param {Object} options.options AsyncData options.
+ * @param {object} options.options AsyncData options.
  */
 export function useAsyncGql<
   T extends GqlOps,
@@ -299,11 +306,11 @@ export function useAsyncGql<
   d extends Awaited<ReturnType<GqlSdkFuncs[T]>>,
   D = d,
   E = GqlError,
-  PK extends KeysOf<D> = KeysOf<D>,
+  PK extends KeysOf<D> = KeysOf<D>
 >(
   options: {
-    operation: T,
-    variables?: P,
+    operation: T
+    variables?: P
     options?: AsyncDataOptions<d, D, PK>
   }
 ): AsyncData<PickFrom<D, PK>, E | null>
@@ -313,7 +320,7 @@ export function useAsyncGql<
  *
  * @param {string} operation Name of the query to be executed.
  * @param {string} variables Variables to be passed to the query.
- * @param {Object} options AsyncData options.
+ * @param {object} options AsyncData options.
  */
 export function useAsyncGql<
   T extends GqlOps,
@@ -322,18 +329,19 @@ export function useAsyncGql<
   d extends Awaited<ReturnType<GqlSdkFuncs[T]>>,
   D = d,
   E = GqlError,
-  PK extends KeysOf<D> = KeysOf<D>,
+  PK extends KeysOf<D> = KeysOf<D>
 >(
   operation: T,
   variables?: P,
   options?: AsyncDataOptions<d, D, PK>
 ): AsyncData<PickFrom<D, PK>, E | null>
 
-export function useAsyncGql (...args: any[]) {
+export function useAsyncGql(...args: any[]) {
   const toReactive = (v: any) => v && isRef(v) ? v : reactive(v)
-  const options = (typeof args?.[0] !== 'string' && 'options' in args?.[0] ? args[0].options : args[2]) ?? {}
-  const operation = (typeof args?.[0] !== 'string' && 'operation' in args?.[0] ? args[0].operation : args[0]) ?? undefined
-  const variables = (typeof args?.[0] !== 'string' && 'variables' in args?.[0] ? toReactive(args[0].variables) : args[1] && toReactive(args[1])) ?? undefined
+  const arg0 = args?.[0]
+  const options = (typeof arg0 === 'object' && 'options' in arg0 ? args[0].options : args[2]) ?? {}
+  const operation = (typeof arg0 === 'object' && 'operation' in arg0 ? args[0].operation : args[0]) ?? undefined
+  const variables = (typeof arg0 === 'object' && 'variables' in arg0 ? toReactive(args[0].variables) : args[1] && toReactive(args[1])) ?? undefined
   if (variables) {
     options.watch = options.watch || []
     options.watch.push(variables)

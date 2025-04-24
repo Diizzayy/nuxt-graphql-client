@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs'
+import { readFileSync } from 'node:fs'
 import { parse } from 'graphql'
 import type { DefinitionNode, NameNode } from 'graphql'
 
@@ -7,7 +7,7 @@ export const mapDocsToClients = (documents: string[], clients: string[]) => {
 
   const docsWithClient = (client: string) => documents.filter(d => !mappedDocs.has(d)).filter((file: string) => {
     const clientInExt = new RegExp(`\\.${client}\\.(gql|graphql)$`)
-    const clientInPath = new RegExp(`\\/${client}\\/(?=${file.split('/').pop()?.replace(/\./g, '\\.')})`)
+    const clientInPath = new RegExp(`\\/${client}\\/(.+\\/)?(?=${file.split('/').pop()?.replace(/\./g, '\\.')})`)
 
     const clientSpecified = clientInExt.test(file) || clientInPath.test(file)
 
@@ -17,7 +17,7 @@ export const mapDocsToClients = (documents: string[], clients: string[]) => {
   })
 
   const docsWithoutClient = documents.filter(d => !mappedDocs.has(d)).filter((file: string) => {
-    const clientInExt = /\.\w+\.(gql|graphql)$/.test(file)
+    const clientInExt = new RegExp(`\\.(${clients.join('|')})\\.(gql|graphql)$`).test(file)
     const clientInPath = new RegExp(`\\/(${clients.join('|')})\\/(?=${file.split('/').pop()?.replace(/\./g, '\\.')})`).test(file)
 
     return !clientInExt && !clientInPath
