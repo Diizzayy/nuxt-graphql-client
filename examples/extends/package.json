@@ -8,7 +8,7 @@
     "generate": "nuxt generate"
   },
   "devDependencies": {
-    "@nuxt/ui": "^3.0.2",
+    "@nuxt/ui": "^3.3.3",
     "nuxt": "latest",
     "nuxt-graphql-client": "latest"
   }
