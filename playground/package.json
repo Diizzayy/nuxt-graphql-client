@@ -1,8 +1,9 @@
 {
-    "private": true,
-    "version": "0.0.0",
-    "name": "playground",
-    "devDependencies": {
-      "nuxt-graphql-client": "workspace:*"
-    }
+  "private": true,
+  "version": "0.0.0",
+  "name": "playground",
+  "devDependencies": {
+    "nuxt-graphql-client": "workspace:*"
+  },
+  "packageManager": "pnpm@10.17.1"
 }
