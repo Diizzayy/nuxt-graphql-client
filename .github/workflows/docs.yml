@@ -28,9 +28,6 @@ jobs:
           cache: 'pnpm'
           node-version: ${{ matrix.node }}
 
-      - name: Install dependencies 👨🏻‍💻
-        run: pnpm install
-
       - name: Deploy To Firebase
         run: ./scripts/deploy-docs.sh
         shell: bash
