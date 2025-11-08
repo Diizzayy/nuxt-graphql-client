@@ -282,15 +282,18 @@ describe('plugin', () => {
   })
 
   describe('Request Middleware', () => {
-    it('should merge request options in correct order', () => {
+    it('should merge request headers in correct order', () => {
       const defaultOpts = { headers: { 'Content-Type': 'application/json' } }
       const reqOpts = { headers: { Accept: 'application/graphql-response+json' } }
       const req = { headers: { Authorization: 'Bearer token' } }
 
+      // Properly merge headers (not just spreading objects)
       const merged = {
-        ...defaultOpts,
-        ...req,
-        ...reqOpts
+        headers: {
+          ...defaultOpts.headers,
+          ...req.headers,
+          ...reqOpts.headers
+        }
       }
 
       expect(merged.headers).toEqual({

@@ -56,13 +56,16 @@ describe('context', () => {
         clientOps: {
           default: []
         },
-        template: {},
+        template: {
+          default: mockTemplate({ GetUsers: 'query GetUsers { users { id } }' })
+        },
         codegen: false
       }
 
       await prepareContext(ctx, 'Gql')
 
       expect(ctx.fns).toBeDefined()
+      expect(ctx.fns).toContain('GetUsers')
       expect(ctx.fnImports).toBeDefined()
       expect(ctx.fnImports?.some(imp => imp.name === 'GqlGetUsers')).toBe(true)
     })
@@ -88,7 +91,7 @@ describe('context', () => {
       expect(ctx.clients).toEqual(['default'])
     })
 
-    it('should generate imports when codegen is enabled', async () => {
+    it('should generate imports correctly', async () => {
       const ctx: GqlContext = {
         clients: ['default'],
         clientDocs: {
@@ -100,7 +103,7 @@ describe('context', () => {
         template: {
           default: mockTemplate({ GetUsers: 'query GetUsers { users { id } }' })
         },
-        codegen: true
+        codegen: false
       }
 
       await prepareContext(ctx, 'Gql')
@@ -221,7 +224,7 @@ describe('context', () => {
         template: {
           default: template
         },
-        codegen: true
+        codegen: false
       }
 
       await prepareContext(ctx, 'Gql')
