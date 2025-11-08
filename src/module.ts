@@ -276,6 +276,49 @@ export default defineNuxtModule<GqlConfig>({
         'export default { clients, config }'
       ].join('\n')
 
+      // Add type declarations for the #gql-nitro virtual module
+      addTemplate({
+        filename: 'types/gql-nitro.d.ts',
+        getContents: () => {
+          if (!ctx.codegen || !ctx.fns || !ctx.clients) {
+            // Fallback for non-codegen mode
+            const fnTypes = ctx.fns?.map(fn => `  export const ${config.functionPrefix + upperFirst(fn)}: (...params: any[]) => Promise<any>`).join('\n') || ''
+            return [
+              'declare module \'#gql-nitro\' {',
+              fnTypes,
+              '  const _default: { clients: Record<string, any>, config: any }',
+              '  export default _default',
+              '}'
+            ].join('\n')
+          }
+
+          // Use import type syntax that works in .d.ts files
+          const typeImports = ctx.clients.map(client => `import type * as ${client}Types from '../gql/${client}'`).join('\n')
+
+          const fnTypes = ctx.fns.map((fn) => {
+            const fnName = config.functionPrefix + upperFirst(fn)
+            const sdkUnion = ctx.clients!.map(c => `ReturnType<typeof ${c}Types.getSdk>`).join(' & ')
+            return `  export const ${fnName}: (...params: Parameters<(${sdkUnion})['${fn}']>) => ReturnType<(${sdkUnion})['${fn}']>`
+          }).join('\n')
+
+          return [
+            typeImports,
+            'declare module \'#gql-nitro\' {',
+            fnTypes,
+            '  const _default: { clients: Record<string, any>, config: any }',
+            '  export default _default',
+            '}'
+          ].join('\n')
+        }
+      })
+
+      // Configure TypeScript to resolve #gql-nitro virtual module types
+      nitro.typescript = nitro.typescript || {}
+      nitro.typescript.tsConfig = nitro.typescript.tsConfig || {}
+      nitro.typescript.tsConfig.compilerOptions = nitro.typescript.tsConfig.compilerOptions || {}
+      nitro.typescript.tsConfig.compilerOptions.paths = nitro.typescript.tsConfig.compilerOptions.paths || {}
+      nitro.typescript.tsConfig.compilerOptions.paths['#gql-nitro'] = ['./types/gql-nitro']
+
       nitro.imports = defu(nitro.imports, {
         presets: [{
           from: '#gql-nitro',
@@ -285,6 +328,13 @@ export default defineNuxtModule<GqlConfig>({
 
       nitro.plugins = nitro.plugins || []
       nitro.plugins.push(resolver.resolve('runtime/nitro'))
+    })
+
+    // Add TypeScript path mapping for #gql-nitro virtual module
+    nuxt.hook('prepare:types', ({ tsConfig }) => {
+      tsConfig.compilerOptions = tsConfig.compilerOptions || {}
+      tsConfig.compilerOptions.paths = tsConfig.compilerOptions.paths || {}
+      tsConfig.compilerOptions.paths['#gql-nitro'] = ['./.nuxt/types/gql-nitro']
     })
 
     const allowDocument = (f: string) => {
