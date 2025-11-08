@@ -16,7 +16,7 @@ export default {
         'docs/**'
       ]
     },
-    include: ['test/unit/**/*.test.ts'],
+    include: ['test/unit/**/*.test.ts', 'test/unit/**/*.integration.test.ts'],
     exclude: ['test/basic.test.ts', 'test/multi-client.test.ts']
   },
   esbuild: {
