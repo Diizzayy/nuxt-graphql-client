@@ -43,7 +43,9 @@
     "dev:prepare": "nuxt-module-build build --stub && nuxi prepare playground",
     "docs:dev": "nuxi dev docs",
     "docs:generate": "nuxi generate docs",
-    "test": "pnpm dev:prepare && nuxi prepare examples/basic && nuxi prepare examples/multi-client && vitest run",
+    "test": "pnpm dev:prepare && nuxi prepare examples/basic && nuxi prepare examples/multi-client && INTEGRATION_TESTS=1 vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

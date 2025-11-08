@@ -27,7 +27,10 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    include: ['test/utils.test.ts', 'test/context.test.ts', 'test/generate.test.ts', 'test/module-config.test.ts'],
+    // By default, run unit tests only. Integration tests are run via `pnpm test`
+    include: process.env.INTEGRATION_TESTS
+      ? ['test/**/*.test.ts']
+      : ['test/utils.test.ts', 'test/context.test.ts', 'test/generate.test.ts', 'test/module-config.test.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
