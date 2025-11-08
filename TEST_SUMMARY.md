@@ -12,12 +12,13 @@ Comprehensive unit test suite added to nuxt-graphql-client, significantly improv
 - **Test Code**: 63 lines
 
 ### After
-- **Test Files**: 8 (2 E2E + 6 unit test suites)
-- **Test Cases**: 217 tests (217 passing, 0 failing)
+- **Test Files**: 10 (2 E2E + 6 unit + 2 integration suites)
+- **Test Cases**: 235 tests (235 passing, 0 failing)
 - **Pass Rate**: 100% ✅
-- **Test Code**: 2,500 lines
+- **Test Code**: 2,890 lines
 - **Source Code**: 1,425 lines
-- **Test-to-Code Ratio**: 1.75:1
+- **Test-to-Code Ratio**: 2.03:1
+- **Code Coverage**: 38.66% (composables 72.46%, plugin 44.44%)
 
 ## Test Coverage Breakdown
 
@@ -146,16 +147,25 @@ Comprehensive unit test suite added to nuxt-graphql-client, significantly improv
 ### Test Organization
 ```
 test/
-├── basic.test.ts              # E2E: Single client
-├── multi-client.test.ts       # E2E: Multiple clients
-├── fixtures/                  # Test fixtures
-│   ├── gql/                   # GraphQL test documents
-│   └── context/               # Context test files
-└── unit/                      # Unit tests
+├── basic.test.ts                       # E2E: Single client
+├── multi-client.test.ts                # E2E: Multiple clients
+├── fixtures/                           # Test fixtures
+│   ├── gql/                            # GraphQL test documents
+│   ├── context/                        # Context test files
+│   └── nuxt-app/                       # Test Nuxt app for integration tests
+│       ├── graphql/test.gql
+│       ├── schema.graphql
+│       ├── app.vue
+│       └── nuxt.config.ts
+├── integration/                        # Integration tests with @nuxt/test-utils
+│   └── composables.nuxt.test.ts
+└── unit/                               # Unit tests
     ├── utils.test.ts
     ├── context.test.ts
-    ├── composables.test.ts
-    ├── plugin.test.ts
+    ├── composables.test.ts             # Logic-based unit tests
+    ├── composables.integration.test.ts # Actual source imports (15 tests)
+    ├── plugin.test.ts                  # Logic-based unit tests
+    ├── plugin.integration.test.ts      # Actual source imports (3 tests)
     ├── module.test.ts
     └── error-handling.test.ts
 ```
