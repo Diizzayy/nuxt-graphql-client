@@ -38,7 +38,7 @@ jobs:
           cache: 'pnpm'
           node-version: ${{ matrix.node }}
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ~/.pnpm-store
           key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
@@ -82,7 +82,7 @@ jobs:
           cache: 'pnpm'
           node-version: ${{ matrix.node }}
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ~/.pnpm-store
           key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
@@ -120,7 +120,7 @@ jobs:
           cache: 'pnpm'
           node-version: ${{ matrix.node }}
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ~/.pnpm-store
           key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
@@ -195,7 +195,7 @@ jobs:
           cache: 'pnpm'
           node-version: ${{ matrix.node }}
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ~/.pnpm-store
           key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
